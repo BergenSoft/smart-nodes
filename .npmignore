@@ -1,0 +1,5 @@
+.vscode
+.npmignore
+smart-nodes.code-workspace
+temp
+*.tgz

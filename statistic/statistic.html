@@ -1,0 +1,107 @@
+<script type="text/javascript">
+    RED.nodes.registerType("smart_statistic", {
+        category: "Smart Nodes",
+        paletteLabel: "Statistic",
+        color: "#E2D96E",
+        defaults: {
+            name: { value: "" },
+            operation: { value: "MIN" }, // MIN, MAX, SUM, DIFF, ABS, ABS_DIFF, AVG, MOV_AVG
+            count: { value: 10 },
+            save_state: { value: true },
+            resend_on_start: { value: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "function.svg",
+        label: function ()
+        {
+            return this.name || this.operation || "Statistic";
+        },
+        oneditprepare: function ()
+        {
+            $("#node-input-operation")
+                .typedInput({
+                    types: [
+                        {
+                            default: "MIN",
+                            options: [
+                                { value: "MIN", label: "Minimum" },
+                                { value: "MAX", label: "Maximum" },
+                                { value: "SUM", label: "Summe" },
+                                { value: "DIFF", label: "Differenz" },
+                                { value: "ABS", label: "Absoluter Wert" },
+                                { value: "ABS_DIFF", label: "Absolute Differenz" },
+                                { value: "AVG", label: "Durchschnitt" },
+                                { value: "MOV_AVG", label: "Gleitender Mittelwert" }
+                            ],
+                        },
+                    ],
+                });
+
+            $("#node-input-count").css("max-width", "4rem").spinner({
+                min: 2,
+                change: function (event, ui)
+                {
+                    var value = parseInt(this.value);
+                    value = isNaN(value) ? 0 : value;
+                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                    if (value !== this.value) $(this).spinner("value", value);
+                },
+            });
+
+            $("#node-input-operation").on("change", function (event, type, value)
+            {
+                if (value === "MOV_AVG")
+                    $(".statistic-moving-average-row").show();
+                else
+                    $(".statistic-moving-average-row").hide();
+            });
+
+            $("#node-input-save_state").on("change", ev =>
+            {
+                if (ev.target.checked)
+                    $("#resend_on_start_row").show();
+                else
+                    $("#resend_on_start_row").hide();
+            });
+            $("#node-input-save_state").trigger("change");
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="smart_statistic">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-operation"><i class="fa fa-sort"></i> Operation</label>
+        <input id="node-input-operation" />
+    </div>
+    <div class="form-row statistic-moving-average-row" style="display: none;">
+        <label for="node-input-count"><i class="fa fa-hashtag"></i> Anzahl</label>
+        <input id="node-input-count" />
+    </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
+        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+    </div>
+    <div class="form-row" id="resend_on_start_row">
+        <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="smart_statistic">
+    <p>Dieser Knoten berechnet das Minimum, Maximum, die Summe, die Differenz, den absoluten Wert, die absolute Differenz, den Durchschnitt sowie den gleitenden Mittelwert verschiedener Werte.</p>
+    <p>Jeder Wert muss mit einem eigenen Topic gesendet werden. Kommt ein zweiter Wert mit dem gleichen Topic, wird der entsprechende Wert überschrieben.</p>
+    <p>Im Falle von MIN, MAX und ABS wird das entsprechende Topic, welches mit den Werten kam, mit ausgegeben. Bei SUM, DIFF, AVG und MOV_AVG handelt es sich um kombinierte Ergebnisse, weshalb Topic hier immer nicht gesetzt ist.</p>
+    <p>Für den absoluten Wert sowie den gleitenden Mittelwert spielt das Topic keine Rolle, jeder Wert der empfangen wird, wird für die Berechnung verwendet.</p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>nummer</code>. <code>name</code> und <code>#</code> sind dabei optional.
+    </p>
+</script>

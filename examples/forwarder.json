@@ -1,0 +1,152 @@
+[
+    {
+        "id": "3f7674b42690cbf6",
+        "type": "tab",
+        "label": "Forwarder",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b66a09e81ad59e7f",
+        "type": "inject",
+        "z": "3f7674b42690cbf6",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "enable",
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "96f4341ffed2d829"
+            ]
+        ]
+    },
+    {
+        "id": "7626979605acc1fd",
+        "type": "debug",
+        "z": "3f7674b42690cbf6",
+        "name": "debug 28",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "96f4341ffed2d829",
+        "type": "smart_forwarder",
+        "z": "3f7674b42690cbf6",
+        "name": "",
+        "enabled": true,
+        "always_forward_true": false,
+        "always_forward_false": false,
+        "forward_last_on_enable": true,
+        "save_state": true,
+        "resend_on_start": true,
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "7626979605acc1fd"
+            ]
+        ]
+    },
+    {
+        "id": "77cb71c53af51072",
+        "type": "inject",
+        "z": "3f7674b42690cbf6",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "disable",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "96f4341ffed2d829"
+            ]
+        ]
+    },
+    {
+        "id": "ede57c90bfaaa971",
+        "type": "inject",
+        "z": "3f7674b42690cbf6",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "example",
+        "payload": "42",
+        "payloadType": "num",
+        "x": 110,
+        "y": 160,
+        "wires": [
+            [
+                "96f4341ffed2d829"
+            ]
+        ]
+    },
+    {
+        "id": "be2437f2d4445321",
+        "type": "inject",
+        "z": "3f7674b42690cbf6",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "example",
+        "payload": "777",
+        "payloadType": "num",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "96f4341ffed2d829"
+            ]
+        ]
+    }
+]

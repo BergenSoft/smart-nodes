@@ -1,0 +1,135 @@
+<script type="text/javascript">
+    RED.nodes.registerType("smart_multi-press-control", {
+        category: "Smart Nodes",
+        paletteLabel: "Multi press control",
+        color: "#FF8080",
+        defaults: {
+            name: { value: "" },
+            press_delay_ms: { value: 200 },
+            outputs: { value: 2 },
+            out1: { value: '{"topic": ""}' },
+            out2: { value: '{"topic": ""}' },
+            out3: { value: '{"topic": ""}' },
+            out4: { value: '{"topic": ""}' },
+        },
+        inputs: 1,
+        outputs: 1,
+        outputLabels: function (index)
+        {
+            return "Pressed " + (index + 1) + " time" + (index == 0 ? "" : "s");
+        },
+        icon: "font-awesome/fa-bullseye",
+        label: function ()
+        {
+            return this.name || "Multi press control";
+        },
+        oneditprepare: function ()
+        {
+            $("#node-input-outputs").spinner({
+                min: 2,
+                max: 4,
+                change: function (event, ui)
+                {
+                    var value = parseInt(this.value, 10);
+                    value = isNaN(value) ? 2 : value;
+                    value = Math.max(value, parseInt($(this).attr("aria-valuemin"), 10));
+                    value = Math.min(value, parseInt($(this).attr("aria-valuemax"), 10));
+                    if (value !== this.value)
+                        $(this).spinner("value", value);
+
+                    showNeededMessages(value);
+                }
+            });
+            $("#node-input-outputs").trigger("change");
+
+            $("#node-input-press_delay_ms").spinner({
+                min: 1,
+                change: function (event, ui)
+                {
+                    var value = parseInt(this.value, 10);
+                    value = isNaN(value) ? 0 : value;
+                    value = Math.max(value, parseInt($(this).attr("aria-valuemin"), 10));
+                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                    if (value !== this.value)
+                        $(this).spinner("value", value);
+                }
+            });
+
+            $("#node-input-out1").typedInput({
+                type: "json",
+                types: ["json"]
+            });
+
+            $("#node-input-out2").typedInput({
+                type: "json",
+                types: ["json"]
+            });
+
+            $("#node-input-out3").typedInput({
+                type: "json",
+                types: ["json"]
+            });
+
+            $("#node-input-out4").typedInput({
+                type: "json",
+                types: ["json"]
+            });
+
+            showNeededMessages(this.outputs);
+        }
+    });
+
+    let showNeededMessages = value =>
+    {
+        // Hide not used rows
+        if (value < 3)
+            $("#form-row-three-click").hide();
+        else
+            $("#form-row-three-click").show();
+
+        if (value < 4)
+            $("#form-row-four-click").hide();
+        else
+            $("#form-row-four-click").show();
+    }
+</script>
+
+<script type="text/html" data-template-name="smart_multi-press-control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputs" style="vertical-align: middle"><i class="fa fa-hand-o-up"></i> Anzahl Tastendrücke</label>
+        <input id="node-input-outputs" placeholder="Max Anzahl an Tastendrücke" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-press_delay_ms"><i class="fa fa-clock-o"></i> Zeitabstand</label>
+        <input id="node-input-press_delay_ms" placeholder="Max Zeit in ms zwischen Tastendruck" />
+        <span> ms</span>
+   </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;">Ausgangsnachrichten</h4>
+    <div class="form-row">
+        <label for="node-input-out1"><i class="fa fa-hand-o-up"></i> 1x</label>
+        <input type="text" id="node-input-out1" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-out2"><i class="fa fa-hand-o-up"></i> 2x</label>
+        <input type="text" id="node-input-out2" />
+    </div>
+    <div class="form-row" id="form-row-three-click">
+        <label for="node-input-out3"><i class="fa fa-hand-o-up"></i> 3x</label>
+        <input type="text" id="node-input-out3" />
+    </div>
+    <div class="form-row" id="form-row-four-click">
+        <label for="node-input-out4"><i class="fa fa-hand-o-up"></i> 4x</label>
+        <input type="text" id="node-input-out4" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="smart_multi-press-control">
+    <p>Diese Node zählt mit, wie oft eine bestimmte Taste gedrückt wurde. Ein weiterer Tastendruck muss innerhalb der eingestellten Zeit erfolgen.</p>
+    <p>Wenn nach der eingestellten Zeit kein weiterer Tastendruck vorgenommen wird, so wird eine Nachricht mit dem eingestellen Inhalt an den entsprechenden Ausgang geschickt.</p>
+    <p>Ist die maximale Anzahl an Tastendrücken erreicht, wird sofort eine Nachricht rausgeschickt. Weitere Tastendrücke werden wieder von vorne gezählt und ausgewertet.</p>
+</script>

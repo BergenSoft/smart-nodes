@@ -1,0 +1,575 @@
+<script type="text/javascript">
+    (function ()
+    {
+        let treeList;
+        let candidateNodesCount = 0;
+        let flows = [];
+        let flowMap = {};
+
+        function onEditPrepare(node, targetTypes)
+        {
+            if (!node.links)
+                node.links = [];
+
+            const activeSubflow = RED.nodes.subflow(node.z);
+
+            treeList = $("<div>")
+                .css({ width: "100%", height: "100%" })
+                .appendTo(".node-input-link-row")
+                .treeList({ autoSelect: false })
+                .on("treelistitemmouseover", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = true;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                })
+                .on("treelistitemmouseout", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = false;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                });
+
+            flows = [];
+            flowMap = {};
+
+            if (activeSubflow)
+            {
+                flowMap[activeSubflow.id] = {
+                    id: activeSubflow.id,
+                    class: "red-ui-palette-header",
+                    label: "Subflow : " + (activeSubflow.name || activeSubflow.id),
+                    expanded: true,
+                    children: []
+                };
+                flows.push(flowMap[activeSubflow.id]);
+            }
+            else
+            {
+                RED.nodes.eachWorkspace(function (ws)
+                {
+                    if (!ws.disabled)
+                    {
+                        flowMap[ws.id] = {
+                            id: ws.id,
+                            class: "red-ui-palette-header",
+                            label: (ws.label || ws.id) + (node.z === ws.id ? " *" : ""),
+                            expanded: true,
+                            children: []
+                        };
+                        flows.push(flowMap[ws.id]);
+                    }
+                });
+            }
+
+            setTimeout(function ()
+            {
+                treeList.treeList("show", node.z);
+            }, 100);
+        }
+
+        function initTreeList(node, targetTypes)
+        {
+            candidateNodesCount = 0;
+            for (const key in flowMap)
+            {
+                flowMap[key].children = [];
+            }
+
+            let candidateNodes = [];
+
+            targetTypes.forEach(function (targetType)
+            {
+                candidateNodes = candidateNodes.concat(RED.nodes.filterNodes({ type: targetType }));
+            });
+
+            candidateNodes.forEach(function (n)
+            {
+                if (flowMap[n.z])
+                {
+                    const isChecked = (node.links.indexOf(n.id) !== -1) || (n.links || []).indexOf(node.id) !== -1;
+                    if (isChecked)
+                    {
+                        flowMap[n.z].children.push({
+                            id: n.id,
+                            node: n,
+                            label: n.name || n.id,
+                            selected: false,
+                            checkbox: false,
+                            radio: false
+                        });
+                        candidateNodesCount++;
+                    }
+                }
+            });
+
+            for (const key in flowMap)
+            {
+                flowMap[key].children.sort((a, b) => a.label.localeCompare(b.label));
+            }
+
+            const flowsFiltered = flows.filter(function (f) { return f.children.length > 0 });
+            treeList.treeList("empty");
+            treeList.treeList("data", flowsFiltered);
+        }
+
+        function resizeDialog(size)
+        {
+            size = size || { height: $(".red-ui-tray-content form").height() }
+            var rowsScenes = $("#dialog-form > div:not(.node-input-property-scenes-row):visible");
+            var rowsOutputs = $("#dialog-form > div:not(.node-input-property-outputs-row):visible");
+            var rows = Math.max(rowsScenes, rowsOutputs);
+            var height = size.height;
+            for (var i = 0; i < rows.length; i++)
+            {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            let sceneHeight = height;
+            let outputHeight = height;
+
+            var editorRow = $("#dialog-form > div.node-input-property-scenes-row");
+            sceneHeight -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            sceneHeight += 16;
+            $("#node-input-property-scenes").editableList("height", sceneHeight);
+
+            var editorRow = $("#dialog-form > div.node-input-property-outputs-row");
+            outputHeight -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            outputHeight += 16;
+            $("#node-input-property-outputs").editableList("height", outputHeight);
+
+            // links tree list
+            var rows = $("#dialog-form>div:not(#light-control-scenes)");
+            var height = $("#dialog-form").height();
+            for (var i = 0; i < rows.length; i++)
+            {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var tabRow = $("#dialog-form div.scene-tabs-row");
+            height -= (parseInt(tabRow.css("marginTop")) + parseInt(tabRow.css("marginBottom"))) + tabRow.outerHeight(true);
+            var editorRow = $("#dialog-form div.node-input-link-row");
+            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            $(".node-input-link-row").css("height", height + "px");
+        }
+
+        function getScenes(el)
+        {
+            var result = {
+                scenes: []
+            }
+            el.each(function (i)
+            {
+                var prop = $(this);
+                result.scenes.push({
+                    name: prop.find(".node-input-prop-name").val(),
+                    outputs: prop.find(".node-input-prop-outputs").typedInput("value")
+                });
+            });
+            return result;
+        }
+
+        function getOutputs(el)
+        {
+            var result = {
+                output_items: []
+            }
+            el.each(function (i)
+            {
+                var prop = $(this);
+                result.output_items.push({
+                    name: prop.find(".node-input-prop-name").val(),
+                });
+            });
+            return result;
+        }
+
+        function initScenesOutputs()
+        {
+            let outputs = getOutputs($("#node-input-property-outputs").editableList("items"));
+
+            let options = [];
+            for (let i = 0; i < outputs.output_items.length; i++)
+            {
+                const item = outputs.output_items[i];
+                options.push({ value: "" + (i + 1), label: item.name });
+            }
+
+            let inputs = $(".node-input-prop-outputs");
+            for (let i = 0; i < inputs.length; i++)
+            {
+                let value = $(inputs[i]).typedInput("value");
+                $(inputs[i]).typedInput("types", [{
+                    multiple: "true",
+                    options: options
+                }]);
+                $(inputs[i]).typedInput("value", value);
+            }
+        }
+
+        RED.nodes.registerType("smart_scene-control", {
+            category: "Smart Nodes",
+            paletteLabel: "Scene control",
+            color: "#C882FF",
+            defaults: {
+                name: { value: "" },
+                max_time_on: { value: "0" },
+                max_time_on_unit: { value: "s" },
+                outputs: { value: 1 },
+                output_items: { value: [{ name: "" }] },
+                scenes: {
+                    value: [{ name: "", outputs: "" }],
+                },
+                links: { value: [], type: "smart_central-control[]" }
+            },
+            inputs: 1,
+            outputs: 1,
+            outputLabels: function (index)
+            {
+                return this.output_items[index].name;
+            },
+
+            icon: "font-awesome/fa-lightbulb-o",
+            label: function ()
+            {
+                return this.name || "Scene control";
+            },
+            oneditprepare: function ()
+            {
+                let node = this;
+                onEditPrepare(this, ["smart_central-control"]);
+                initTreeList(node, ["smart_central-control"]);
+
+                // Output list
+                var outputList = $("#node-input-property-outputs").css("min-height", "120px").css("min-width", "445px");
+
+                outputList.editableList({
+                    addItem: function (container, i, opt)
+                    {
+                        var prop = opt;
+                        if (!prop.hasOwnProperty("name"))
+                        {
+                            prop = { name: "" };
+                        }
+                        container.css({
+                            overflow: "hidden",
+                            whiteSpace: "nowrap"
+                        });
+                        var row = $("<div/>").appendTo(container);
+
+                        // Output number
+                        $("<div/>", { style: "display:inline-block; padding:0px 6px;" })
+                            .text((i + 1) + ":")
+                            .appendTo(row);
+
+                        // Output name
+                        var outputName = $("<input/>", { class: "node-input-prop-name", placeholder: "Name", type: "text" })
+                            .css("width", "80%")
+                            .appendTo(row);
+
+                        outputName.val(prop.name);
+                    },
+                    removable: true,
+                });
+
+                // Default outputs
+                if (!this.output_items)
+                    this.output_items = [{ name: "" }];
+
+                // Add existing outputs to list
+                for (var i = 0; i < this.output_items.length; i++)
+                {
+                    var item = this.output_items[i];
+                    var newItem = { name: item.name };
+                    outputList.editableList("addItem", newItem);
+                }
+
+                // Scene list
+                var sceneList = $("#node-input-property-scenes").css("min-height", "120px").css("min-width", "445px");
+
+                sceneList.editableList({
+                    addItem: function (container, i, opt)
+                    {
+                        var prop = opt;
+                        if (!prop.hasOwnProperty("name"))
+                        {
+                            prop = { name: "", outputs: "" };
+                        }
+                        container.css({
+                            overflow: "hidden",
+                            whiteSpace: "nowrap"
+                        });
+                        var row = $("<div/>").appendTo(container);
+
+                        // Scene number
+                        $("<div/>", { style: "display:inline-block; padding:0px 6px;" })
+                            .text((i + 1) + ":")
+                            .appendTo(row);
+
+                        // Scene name
+                        var sceneName = $("<input/>", { class: "node-input-prop-name", placeholder: "Name", type: "text" })
+                            .css("width", "30%")
+                            .appendTo(row);
+
+                        // Arrow
+                        $("<div/>", { style: "display:inline-block; padding:0px 6px;" })
+                            .text("=>")
+                            .appendTo(row);
+
+                        // Output select
+                        var outputs = $("<input/>", { class: "node-input-prop-outputs", type: "text" })
+                            .css("width", "calc(70% - 55px)")
+                            .appendTo(row)
+                            .typedInput({
+                                types: [{
+                                    multiple: "true",
+                                    options: [
+                                    ]
+                                }]
+                            });
+
+                        // Fill values
+                        sceneName.val(prop.name);
+                        outputs.typedInput("value", prop.outputs);
+
+                        initScenesOutputs();
+                    },
+                    removable: true,
+                });
+
+                // Default scenes
+                if (!this.scenes)
+                    this.scenes = [{ name: "", outputs: "" }];
+
+                // Add existing scenes to list
+                for (var i = 0; i < this.scenes.length; i++)
+                {
+                    var scene = this.scenes[i];
+                    var newScene = { name: scene.name, outputs: scene.outputs };
+                    sceneList.editableList("addItem", newScene);
+                }
+
+                // Init tabs
+                var tabs = RED.tabs.create({
+                    id: "scene-tabs",
+                    onchange: function (tab)
+                    {
+                        if (tab.id == "scene-tab-scenes")
+                            initScenesOutputs();
+
+                        $("#scene-tabs-content").children().hide();
+                        $("#" + tab.id).show();
+                        resizeDialog();
+                    }
+                });
+                tabs.addTab({
+                    id: "scene-tab-outputs",
+                    iconClass: "fa fa-lightbulb-o",
+                    label: "Ausgänge"
+                });
+
+                tabs.addTab({
+                    id: "scene-tab-scenes",
+                    iconClass: "fa fa-list-ul",
+                    label: "Szenen"
+                });
+
+                tabs.addTab({
+                    id: "scene-tab-links",
+                    iconClass: "fa fa-links",
+                    label: "Links"
+                });
+
+
+                $("#scene-tabs").trigger("change");
+
+                $("#node-input-max_time_on").spinner({
+                    min: 0,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value)
+                            $(this).spinner("value", value);
+                    }
+                });
+
+                $("#node-input-max_time_on_unit")
+                    .css("max-width", "10rem")
+                    .typedInput({
+                        types: [
+                            {
+                                default: "s",
+                                options: [
+                                    { value: "ms", label: "Millisekunden" },
+                                    { value: "s", label: "Sekunden" },
+                                    { value: "min", label: "Minuten" },
+                                    { value: "h", label: "Stunden" },
+                                ],
+                            },
+                        ],
+                    });
+            },
+            oneditsave: function ()
+            {
+                // Set scenes
+                var items = $("#node-input-property-scenes").editableList("items");
+                var result = getScenes(items);
+                this.scenes = result.scenes;
+
+                // Set outputs
+                var items = $("#node-input-property-outputs").editableList("items");
+                var result = getOutputs(items);
+                this.output_items = result.output_items;
+                this.outputs = this.output_items.length;
+            },
+            onadd: function ()
+            {
+                this.links = [];
+            },
+            oneditresize: resizeDialog
+        });
+    })();
+</script>
+
+<script type="text/html" data-template-name="smart_scene-control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> Zeit Ein</label>
+        <input id="node-input-max_time_on" value="0" />
+        <input id="node-input-max_time_on_unit" />
+    </div>
+
+    <div id="light-control-scenes">
+        <div class="form-row scene-tabs-row">
+            <ul style="min-width: 600px; margin-bottom: 20px;" id="scene-tabs"></ul>
+        </div>
+        <div id="scene-tabs-content">
+            <div id="scene-tab-outputs" style="display: none;">
+                <ol id="node-input-property-outputs"></ol>
+            </div>
+            <div id="scene-tab-scenes" style="display: none;">
+                <ol id="node-input-property-scenes"></ol>
+            </div>
+            <div id="scene-tab-links" style="display: none;">
+                <span><i class="fa fa-link"></i> Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:</span>
+                <div class="form-row node-input-link-row node-input-link-rows"></div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="smart_scene-control">
+    <p>
+        Diese Node steuert mehrere Ausgänge die anhand einer definierten Szene ein- bzw. ausgeschaltet werden.
+        An jeden Ausgang wird immer <code>msg.payload = true</code> oder <code>msg.payload = false</code> gesendet um ihn ein-, bzw. auszuschalten.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet sowohl den Teil <code>name</code> als auch <code>nummer</code>. Je nach Nachricht müssen evtl. beide Werte gesetzt sein.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>status#2</code></td>
+                    <td>
+                        Gibt über <code>msg.payload = true</code> oder <code>msg.payload = false</code> den aktuellen Status des Ausgangs <code>2</code> an.<br/>
+                        Bei einem Wechsel eines Ausgangs wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>on</code></td>
+                    <td>Schaltet alle Ausgänge ein und startet die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.</td>
+                </tr>
+                <tr>
+                    <td><code>off</code></td>
+                    <td>Schaltet alle Ausgänge aus.</td>
+                </tr>
+                <tr>
+                    <td><code>set</code></td>
+                    <td>
+                        Schaltet alle Ausgänge bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus.<br/>
+                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>set_permanent</code></td>
+                    <td>
+                        Schaltet alle Ausgänge bei <code>msg.payload = true</code>dauerhaft ein und bei <code>msg.payload = false</code> aus.<br/>
+                        Es wird dabei keine Zeitmessung gestartet.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>scene_x,y,z</code></td>
+                    <td>
+                        Schaltet die Ausgänge entsprechend der mitgegebenen Szenennummern (x, y und z) an, bzw. aus.<br/>
+                        Beim Eintreffen der Nachricht wird geschaut welche Szene aktuell aktiv ist. Taucht die Nummer in der Liste auf, wird die nächste angegebene Szene aktiviert.<br/>
+                        Taucht die Szene nicht in der Liste auf, wird die erste aufgelistete Szene aktiviert.<br/>
+                        Wenn nur eine Szene angegeben ist, wechselt der Baustein zwischen der angegebenen Szene und aus.<br/>
+                        Sollte mindestens ein Ausgang eingeschaltet sein, startet die Zeitmessung erneut.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>
+                        Schaltet alle Ausgänge aus, falls mindestens einer bereits eingeschaltet wahr.<br/>
+                        Sollten bereits alle Ausgänge ausgeschaltet sein, werden alle eingeschalten.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Diese Node hat eine einstellbare Maximallaufzeit, bevor alle Ausgänge automatisch wieder ausgeschalten werden.
+        Diese Zeitmessung wird wie in der Tabelle oben verwendet.
+        Die eingestellte Zeit kann gezielt überschrieben werden.
+        Beispiel: <code>msg = { "topic": "on", "time_on": 5000 }</code> oder <code>msg = { "topic": "on", "time_on": "5s" }</code><br/>
+        Diese Nachricht schaltet das Licht für 5000 Millisekunden / 5 Sekunden an und anschließend wieder aus.
+        Die nächste Nachricht ohne <code>time_on</code> Angabe verwendet wieder die voreingestellte Zeit.
+        Ist die Zeit auf 0 eingestellt, wird das Licht <b>nicht</b> automatisch ausgeschalten.<br/>
+        Als Einheit für die Zeit können folgende Werte verwendet werden:
+        <table>
+            <thead>
+                <tr>
+                    <th>Einheit</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Millisekunden</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> oder <code>sec</code></td>
+                    <td>Sekunden</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> oder <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Stunden</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

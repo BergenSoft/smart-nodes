@@ -1,0 +1,358 @@
+<script type="text/javascript">
+    (function ()
+    {
+        let treeList;
+        let candidateNodesCount = 0;
+        let flows = [];
+        let flowMap = {};
+
+        function onEditPrepare(node, targetTypes)
+        {
+            if (!node.links)
+                node.links = [];
+
+            const activeSubflow = RED.nodes.subflow(node.z);
+
+            treeList = $("<div>")
+                .css({ width: "100%", height: "100%" })
+                .appendTo(".node-input-link-row")
+                .treeList({ autoSelect: false })
+                .on("treelistitemmouseover", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = true;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                })
+                .on("treelistitemmouseout", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = false;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                });
+
+            flows = [];
+            flowMap = {};
+
+            if (activeSubflow)
+            {
+                flowMap[activeSubflow.id] = {
+                    id: activeSubflow.id,
+                    class: "red-ui-palette-header",
+                    label: "Subflow : " + (activeSubflow.name || activeSubflow.id),
+                    expanded: true,
+                    children: []
+                };
+                flows.push(flowMap[activeSubflow.id]);
+            }
+            else
+            {
+                RED.nodes.eachWorkspace(function (ws)
+                {
+                    if (!ws.disabled)
+                    {
+                        flowMap[ws.id] = {
+                            id: ws.id,
+                            class: "red-ui-palette-header",
+                            label: (ws.label || ws.id) + (node.z === ws.id ? " *" : ""),
+                            expanded: true,
+                            children: []
+                        };
+                        flows.push(flowMap[ws.id]);
+                    }
+                });
+            }
+
+            setTimeout(function ()
+            {
+                treeList.treeList("show", node.z);
+            }, 100);
+        }
+
+        function initTreeList(node, targetTypes)
+        {
+            candidateNodesCount = 0;
+            for (const key in flowMap)
+            {
+                flowMap[key].children = [];
+            }
+
+            let candidateNodes = [];
+
+            targetTypes.forEach(function (targetType)
+            {
+                candidateNodes = candidateNodes.concat(RED.nodes.filterNodes({ type: targetType }));
+            });
+
+            candidateNodes.forEach(function (n)
+            {
+                if (flowMap[n.z])
+                {
+                    const isChecked = (node.links.indexOf(n.id) !== -1) || (n.links || []).indexOf(node.id) !== -1;
+                    if (isChecked)
+                    {
+                        flowMap[n.z].children.push({
+                            id: n.id,
+                            node: n,
+                            label: n.name || n.id,
+                            selected: false,
+                            checkbox: false,
+                            radio: false
+                        });
+                        candidateNodesCount++;
+                    }
+                }
+            });
+
+            for (const key in flowMap)
+            {
+                flowMap[key].children.sort((a, b) => a.label.localeCompare(b.label));
+            }
+
+            const flowsFiltered = flows.filter(function (f) { return f.children.length > 0 });
+            treeList.treeList("empty");
+            treeList.treeList("data", flowsFiltered);
+        }
+
+        function resizeNodeList()
+        {
+            var rows = $("#dialog-form>div:not(.node-input-link-row)");
+            var height = $("#dialog-form").height();
+            for (var i = 0; i < rows.length; i++)
+            {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var editorRow = $("#dialog-form>div.node-input-link-row");
+            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            $(".node-input-link-row").css("height", height + "px");
+        }
+
+        RED.nodes.registerType("smart_light-control", {
+            category: "Smart Nodes",
+            paletteLabel: "Light control",
+            color: "#C882FF",
+            defaults: {
+                name: { value: "" },
+                icon: { value: "light" }, // light | outlet
+                max_time_on: { value: "0" },
+                max_time_on_unit: { value: "s" },
+                alarm_action: { value: 'NOTHING' }, // NOTHING | ON | OFF
+                links: { value: [], type: "smart_central-control[]" }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: function ()
+            {
+                if (this.icon == "outlet")
+                    return "font-awesome/fa-plug";
+                return "font-awesome/fa-lightbulb-o";
+            },
+            label: function ()
+            {
+                return this.name || (this.icon == "outlet" ? "Outlet control" : "Light control");
+            },
+            oneditprepare: function ()
+            {
+                let node = this;
+                onEditPrepare(this, ["smart_central-control"]);
+                initTreeList(node, ["smart_central-control"]);
+
+                $("#node-input-icon")
+                    .css("max-width", "10rem")
+                    .typedInput({
+                        types: [
+                            {
+                                default: "light",
+                                options: [
+                                    { value: "light", label: "Licht" },
+                                    { value: "outlet", label: "Steckdose" }
+                                ],
+                            },
+                        ],
+                    });
+
+                $("#node-input-max_time_on")
+                    .spinner({
+                        min: 0,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    }).css("max-width", "4rem");
+
+                $("#node-input-max_time_on_unit")
+                    .css("max-width", "10rem")
+                    .typedInput({
+                        types: [
+                            {
+                                default: "s",
+                                options: [
+                                    { value: "ms", label: "Millisekunden" },
+                                    { value: "s", label: "Sekunden" },
+                                    { value: "min", label: "Minuten" },
+                                    { value: "h", label: "Stunden" },
+                                ],
+                            },
+                        ],
+                    });
+
+                $("#node-input-alarm_action").typedInput({
+                    types: [
+                        {
+                            default: "NOTHING",
+                            options: [
+                                { value: "NOTHING", label: "Keine Aktion" },
+                                { value: "ON", label: "Einschalten" },
+                                { value: "OFF", label: "Ausschalten" }
+                            ],
+                        },
+                    ],
+                });
+            },
+            onadd: function ()
+            {
+                this.links = [];
+            },
+            oneditresize: resizeNodeList
+        });
+    })();
+</script>
+
+<script type="text/html" data-template-name="smart_light-control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-icon"><i class="fa fa-picture-o"></i> Icon</label>
+        <input id="node-input-icon" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> Zeit Ein</label>
+        <input id="node-input-max_time_on" value="0" />
+        <input id="node-input-max_time_on_unit" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-alarm_action"><i class="fa fa-exclamation-triangle"></i> Alarm Aktion</label>
+        <input id="node-input-alarm_action"/>
+    </div>
+    <span><i class="fa fa-link"></i> Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:</span>
+    <div class="form-row node-input-link-row node-input-link-rows"></div>
+</script>
+
+<script type="text/html" data-help-name="smart_light-control">
+    <p>
+        Diese Node steuert einen Ausgang. Dies kann ein Licht, eine Steckdose oder ähnliches sein.
+        Als Ausgang wird immer <code>msg.payload = true</code> oder <code>msg.payload = false</code> gesendet um den Ausgang ein-, bzw. auszuschalten.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>status</code></td>
+                    <td>
+                        Gibt über <code>msg.payload = true</code> oder <code>msg.payload = false</code> den aktuellen Status des Ausgangs an.<br/>
+                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>on</code></td>
+                    <td>Schaltet den Ausgang ein und startet die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.</td>
+                </tr>
+                <tr>
+                    <td><code>off</code></td>
+                    <td>Schaltet den Ausgang aus.</td>
+                </tr>
+                <tr>
+                    <td><code>set</code></td>
+                    <td>
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus.<br/>
+                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>set_permanent</code></td>
+                    <td>
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> dauerhaft ein und bei <code>msg.payload = false</code> aus.<br/>
+                        Es wird dabei keine Zeitmessung gestartet.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>motion</code></td>
+                    <td>
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein ohne eine Zeitmessung.<br/>
+                        Bei <code>msg.payload = false</code> wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.<br/>
+                        Ist keine Zeit angegeben oder hinterlegt, schaltet sich der Ausgang sofort aus.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>alarm</code></td>
+                    <td>Setzt den aktuellen Alarmzustand auf den Wert von <code>msg.payload</code> und löst die entsprechende Aktion aus.</td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>
+                        Schaltet den Ausgang abwechselnd ein und aus.<br/>
+                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Diese Node hat eine einstellbare Maximallaufzeit, bevor der Ausgang automatisch wieder ausgeschalten wird.
+        Diese Zeitmessung wird wie in der Tabelle oben verwendet.
+        Die eingestellte Zeit kann gezielt überschrieben werden.
+        Beispiel: <code>msg = { "topic": "on", "time_on": 5000 }</code> oder <code>msg = { "topic": "on", "time_on": "5s" }</code><br/>
+        Diese Nachricht schaltet das Licht für 5000 Millisekunden / 5 Sekunden an und anschließend wieder aus.
+        Die nächste Nachricht ohne <code>time_on</code> Angabe verwendet wieder die voreingestellte Zeit.
+        Ist die Zeit auf 0 eingestellt, wird das Licht <b>nicht</b> automatisch ausgeschalten.<br/>
+        Als Einheit für die Zeit können folgende Werte verwendet werden:
+        <table>
+            <thead>
+                <tr>
+                    <th>Einheit</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Millisekunden</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> oder <code>sec</code></td>
+                    <td>Sekunden</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> oder <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Stunden</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

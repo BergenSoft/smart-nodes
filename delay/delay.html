@@ -1,0 +1,192 @@
+<script type="text/javascript">
+    RED.nodes.registerType("smart_delay", {
+        category: "Smart Nodes",
+        paletteLabel: "delay",
+        color: "#6EE2D9",
+        defaults: {
+            name: { value: "" },
+            on_delay: { value: 10 },
+            on_delay_unit: { value: "s" },
+            off_delay: { value: 10 },
+            off_delay_unit: { value: "s" },
+            delay_only_on_change: { value: true },
+            save_state: { value: true },
+            resend_on_start: { value: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "timer.png",
+        label: function ()
+        {
+            return this.name || "Delay";
+        },
+        oneditprepare: function ()
+        {
+            $("#node-input-on_delay").spinner({
+                min: 0,
+                change: function (event, ui)
+                {
+                    var value = parseInt(this.value);
+                    value = isNaN(value) ? 0 : value;
+                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                    if (value !== this.value)
+                        $(this).spinner("value", value);
+                }
+            });
+
+            $("#node-input-on_delay_unit").css("max-width", "10rem").typedInput({
+                types: [
+                    {
+                        default: "s",
+                        options: [
+                            { value: "ms", label: "Millisekunden" },
+                            { value: "s", label: "Sekunden" },
+                            { value: "min", label: "Minuten" },
+                            { value: "h", label: "Stunden" },
+                        ]
+                    }
+                ]
+            });
+
+            $("#node-input-off_delay").spinner({
+                min: 0,
+                change: function (event, ui)
+                {
+                    var value = parseInt(this.value);
+                    value = isNaN(value) ? 0 : value;
+                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                    if (value !== this.value)
+                        $(this).spinner("value", value);
+                }
+            });
+
+            $("#node-input-off_delay_unit").css("max-width", "10rem").typedInput({
+                types: [
+                    {
+                        default: "s",
+                        options: [
+                            { value: "ms", label: "Millisekunden" },
+                            { value: "s", label: "Sekunden" },
+                            { value: "min", label: "Minuten" },
+                            { value: "h", label: "Stunden" },
+                        ]
+                    }
+                ]
+            });
+
+            $("#node-input-save_state").on("change", ev =>
+            {
+                if (ev.target.checked)
+                    $("#resend_on_start_row").show();
+                else
+                    $("#resend_on_start_row").hide();
+            });
+            $("#node-input-save_state").trigger("change");
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="smart_delay">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-on_delay"><i class="fa fa-clock-o"></i> Einschalt- verzögerung</label>
+        <input id="node-input-on_delay" value="0" />
+        <input id="node-input-on_delay_unit" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-off_delay"><i class="fa fa-clock-o"></i> Ausschalt- verzögerung</label>
+        <input id="node-input-off_delay" value="0" />
+        <input id="node-input-off_delay_unit" />
+    </div>
+    <div class="form-row">
+        <input id="node-input-delay_only_on_change" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
+        <span>Nur verzögern, wenn sich <code>msg.payload</code> verändert hat.</span>
+    </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
+        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+    </div>
+    <div class="form-row" id="resend_on_start_row">
+        <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="smart_delay">
+    <p>Diese Node kann dazu verwendet werden ein Ein- oder Ausschaltsignal zu verzögern.</p>
+    <p>Die Zeit 0 bedeutet keine Verögerung.</p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>set_delay_on</code></td>
+                    <td>Setzt die Einschaltverzögerung auf die in <code>msg.payload</code> angegebene Zeit.</td>
+                </tr>
+                <tr>
+                    <td><code>set_delay_off</code></td>
+                    <td>Setzt die Ausschaltverzögerung auf die in <code>msg.payload</code> angegebene Zeit.</td>
+                </tr>
+                <tr>
+                    <td><code>set_delays</code></td>
+                    <td>Setzt die Ein- und Ausschaltverzögerung auf die in <code>msg.payload</code> angegebene Zeit.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Beispiel: <code>msg = { "topic": "set_delay_on", "payload": 5000 }</code> oder <code>msg = { "topic": "set_delay_on", "payload": "5s" }</code><br/>
+        Diese Nachricht setzt die Einschaltverzögerung auf 5000 Millisekunden / 5 Sekunden.
+        Ist die Zeit auf 0 eingestellt, wird die Nachricht sofort weitergeleitet.<br/>
+        Als Einheit für die Zeit können folgende Werte verwendet werden:
+        <table>
+            <thead>
+                <tr>
+                    <th>Einheit</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Millisekunden</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> oder <code>sec</code></td>
+                    <td>Sekunden</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> oder <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Stunden</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Wenn die Checkbox <b>Nur verzögern, wenn sich <code>msg.payload</code> verändert hat.</b> aktiviert ist
+        und während dem Warten um ein Einschaltsignal weiterzuleiten ein Ausschaltsignal empfangen wird,
+        so wird das Senden des Einschaltsignals abgebrochen. Dies gilt auch für den umgekehrten Fall.<br/>
+        Ist die Checkbox nicht aktiviert, wird jede Nachricht verzögert, sofern nicht bereits eine Verzögerung für den gleichen <code>payload</code> aktiv ist.
+    </p>
+</script>

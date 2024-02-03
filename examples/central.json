@@ -1,0 +1,804 @@
+[
+    {
+        "id": "dfdc3b0c1fa91566",
+        "type": "tab",
+        "label": "Central",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "dfa01b87bc3d1f9d",
+        "type": "smart_central-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "Central light",
+        "mode": "light",
+        "links": [
+            "8bd18af1e0c2cd28",
+            "ee9af56699440e8c"
+        ],
+        "x": 350,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "ee9af56699440e8c",
+        "type": "smart_light-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "Light 1 (10s)",
+        "icon": "light",
+        "max_time_on": "10",
+        "max_time_on_unit": "s",
+        "alarm_action": "NOTHING",
+        "links": [
+            "dfa01b87bc3d1f9d"
+        ],
+        "x": 810,
+        "y": 80,
+        "wires": [
+            [
+                "374256bac730a8d1"
+            ]
+        ]
+    },
+    {
+        "id": "95acb8bb0ca1705d",
+        "type": "smart_scene-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "scene 1 (10s)",
+        "max_time_on": "10",
+        "max_time_on_unit": "s",
+        "outputs": 1,
+        "output_items": [
+            {
+                "name": "Light 1"
+            }
+        ],
+        "scenes": [
+            {
+                "name": "All",
+                "outputs": "1"
+            }
+        ],
+        "links": [
+            "5b054c2eed0ef912"
+        ],
+        "x": 820,
+        "y": 300,
+        "wires": [
+            [
+                "1dea9a7ab923705c"
+            ]
+        ]
+    },
+    {
+        "id": "5b054c2eed0ef912",
+        "type": "smart_central-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "Central scene",
+        "mode": "light",
+        "links": [
+            "1503ad6337802626",
+            "95acb8bb0ca1705d"
+        ],
+        "x": 360,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "aa64be428fe27822",
+        "type": "smart_central-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "Central shutter",
+        "mode": "shutter",
+        "links": [
+            "2cee4db9018ea507",
+            "96682737b021e4e6"
+        ],
+        "x": 360,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "96682737b021e4e6",
+        "type": "smart_shutter-complex-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "shutter 1 (10s)",
+        "max_time": "10",
+        "revert_time_ms": 100,
+        "alarm_action": "NOTHING",
+        "links": [
+            "aa64be428fe27822"
+        ],
+        "x": 820,
+        "y": 500,
+        "wires": [
+            [
+                "e927a90c97a4c2b9"
+            ],
+            [
+                "b5f92434f6cb62d9"
+            ],
+            [
+                "44b2a5b605c94c6e"
+            ]
+        ]
+    },
+    {
+        "id": "374256bac730a8d1",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 39",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "1dea9a7ab923705c",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 40",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "e927a90c97a4c2b9",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 41",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "b5f92434f6cb62d9",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 42",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "44b2a5b605c94c6e",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 43",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "51353097b85f000e",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "on",
+        "x": 150,
+        "y": 60,
+        "wires": [
+            [
+                "dfa01b87bc3d1f9d"
+            ]
+        ]
+    },
+    {
+        "id": "17e76f246765af84",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "off",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "dfa01b87bc3d1f9d"
+            ]
+        ]
+    },
+    {
+        "id": "c549df4bbe9a35e9",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "on",
+        "x": 150,
+        "y": 280,
+        "wires": [
+            [
+                "5b054c2eed0ef912"
+            ]
+        ]
+    },
+    {
+        "id": "1494f5e857762a78",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "off",
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "5b054c2eed0ef912"
+            ]
+        ]
+    },
+    {
+        "id": "01928a0d6a44f3b9",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "up",
+        "x": 150,
+        "y": 500,
+        "wires": [
+            [
+                "aa64be428fe27822"
+            ]
+        ]
+    },
+    {
+        "id": "de20729577436ab1",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "stop",
+        "x": 150,
+        "y": 580,
+        "wires": [
+            [
+                "aa64be428fe27822"
+            ]
+        ]
+    },
+    {
+        "id": "089b4655dbbd32e4",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "down",
+        "x": 150,
+        "y": 620,
+        "wires": [
+            [
+                "aa64be428fe27822"
+            ]
+        ]
+    },
+    {
+        "id": "8bd18af1e0c2cd28",
+        "type": "smart_light-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "Light 2",
+        "icon": "light",
+        "max_time_on": "0",
+        "max_time_on_unit": "s",
+        "alarm_action": "NOTHING",
+        "links": [
+            "dfa01b87bc3d1f9d"
+        ],
+        "x": 790,
+        "y": 140,
+        "wires": [
+            [
+                "9712e428f6a48294"
+            ]
+        ]
+    },
+    {
+        "id": "9712e428f6a48294",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 44",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "4b7196a2c4bdbc95",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "on",
+        "x": 630,
+        "y": 60,
+        "wires": [
+            [
+                "ee9af56699440e8c"
+            ]
+        ]
+    },
+    {
+        "id": "244339f94691c106",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "off",
+        "x": 630,
+        "y": 100,
+        "wires": [
+            [
+                "ee9af56699440e8c"
+            ]
+        ]
+    },
+    {
+        "id": "3aaf9f433139c570",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 45",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "d5047c286b084633",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "on",
+        "x": 630,
+        "y": 280,
+        "wires": [
+            [
+                "95acb8bb0ca1705d"
+            ]
+        ]
+    },
+    {
+        "id": "4deef6f286f0bd99",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "off",
+        "x": 630,
+        "y": 320,
+        "wires": [
+            [
+                "95acb8bb0ca1705d"
+            ]
+        ]
+    },
+    {
+        "id": "22747676fe42b518",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "up",
+        "x": 630,
+        "y": 460,
+        "wires": [
+            [
+                "96682737b021e4e6"
+            ]
+        ]
+    },
+    {
+        "id": "392778d2c206fa6c",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "down",
+        "x": 630,
+        "y": 540,
+        "wires": [
+            [
+                "96682737b021e4e6"
+            ]
+        ]
+    },
+    {
+        "id": "2cee4db9018ea507",
+        "type": "smart_shutter-complex-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "shutter 2",
+        "max_time": 60,
+        "revert_time_ms": 100,
+        "alarm_action": "NOTHING",
+        "links": [
+            "aa64be428fe27822"
+        ],
+        "x": 800,
+        "y": 640,
+        "wires": [
+            [
+                "8d23df31edb5111a"
+            ],
+            [
+                "1dd79b67c40e147a"
+            ],
+            [
+                "c5e577277de90ac4"
+            ]
+        ]
+    },
+    {
+        "id": "8d23df31edb5111a",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 46",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "1dd79b67c40e147a",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 47",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "c5e577277de90ac4",
+        "type": "debug",
+        "z": "dfdc3b0c1fa91566",
+        "name": "debug 48",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "b3ab13035b9bc68b",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "toggle",
+        "x": 150,
+        "y": 140,
+        "wires": [
+            [
+                "dfa01b87bc3d1f9d"
+            ]
+        ]
+    },
+    {
+        "id": "956eb2be0aa966c3",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "toggle",
+        "x": 150,
+        "y": 360,
+        "wires": [
+            [
+                "5b054c2eed0ef912"
+            ]
+        ]
+    },
+    {
+        "id": "1503ad6337802626",
+        "type": "smart_scene-control",
+        "z": "dfdc3b0c1fa91566",
+        "name": "scene 2",
+        "max_time_on": "0",
+        "max_time_on_unit": "s",
+        "outputs": 1,
+        "output_items": [
+            {
+                "name": "Light 1"
+            }
+        ],
+        "scenes": [
+            {
+                "name": "All",
+                "outputs": "1"
+            }
+        ],
+        "links": [
+            "5b054c2eed0ef912"
+        ],
+        "x": 800,
+        "y": 360,
+        "wires": [
+            [
+                "3aaf9f433139c570"
+            ]
+        ]
+    },
+    {
+        "id": "ca4567679badaae5",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "up_stop",
+        "x": 140,
+        "y": 540,
+        "wires": [
+            [
+                "aa64be428fe27822"
+            ]
+        ]
+    },
+    {
+        "id": "b5fe1d0342e20275",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "down_stop",
+        "x": 130,
+        "y": 660,
+        "wires": [
+            [
+                "aa64be428fe27822"
+            ]
+        ]
+    },
+    {
+        "id": "60fc3412cd541835",
+        "type": "inject",
+        "z": "dfdc3b0c1fa91566",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "stop",
+        "x": 630,
+        "y": 500,
+        "wires": [
+            [
+                "96682737b021e4e6"
+            ]
+        ]
+    }
+]

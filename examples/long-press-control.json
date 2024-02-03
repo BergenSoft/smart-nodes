@@ -1,0 +1,113 @@
+[
+    {
+        "id": "b80f634da5eb6a57",
+        "type": "tab",
+        "label": "Long press",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "188e6bc063e55fe1",
+        "type": "debug",
+        "z": "b80f634da5eb6a57",
+        "name": "debug 19",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "8405fcb432a84c2f",
+        "type": "inject",
+        "z": "b80f634da5eb6a57",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 230,
+        "y": 140,
+        "wires": [
+            [
+                "f82e00455a239343"
+            ]
+        ]
+    },
+    {
+        "id": "f82e00455a239343",
+        "type": "smart_long-press-control",
+        "z": "b80f634da5eb6a57",
+        "name": "",
+        "long_press_ms": "2000",
+        "short": "{\"payload\": \"short\"}",
+        "long": "{\"payload\": \"long\"}",
+        "x": 470,
+        "y": 160,
+        "wires": [
+            [
+                "188e6bc063e55fe1"
+            ],
+            [
+                "ca7b66f07b084862"
+            ]
+        ]
+    },
+    {
+        "id": "5918b210888d529e",
+        "type": "inject",
+        "z": "b80f634da5eb6a57",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 230,
+        "y": 180,
+        "wires": [
+            [
+                "f82e00455a239343"
+            ]
+        ]
+    },
+    {
+        "id": "ca7b66f07b084862",
+        "type": "debug",
+        "z": "b80f634da5eb6a57",
+        "name": "debug 20",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 180,
+        "wires": []
+    }
+]

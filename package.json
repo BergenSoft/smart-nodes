@@ -1,0 +1,59 @@
+{
+    "name": "smart-nodes",
+    "version": "0.1.0",
+    "description": "Smart Nodes",
+    "keywords": [
+        "node-red",
+        "smart nodes",
+        "light control",
+        "shutter control",
+        "long press",
+        "multi press",
+        "scene",
+        "scenes",
+        "delay",
+        "forwarder",
+        "logic",
+        "hysteresis",
+        "compare",
+        "comparator",
+        "statistic",
+        "scheduler",
+        "central"
+    ],
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Samuel Bergen",
+    "license": "MIT",
+    "node-red": {
+        "version": ">=1.0.0",
+        "nodes": {
+            "light-control": "light-control/light-control.js",
+            "scene-control": "scene-control/scene-control.js",
+            "shutter-control": "shutter-control/shutter-control.js",
+            "shutter-complex-control": "shutter-complex-control/shutter-complex-control.js",
+            "long-press-control": "long-press-control/long-press-control.js",
+            "multi-press-control": "multi-press-control/multi-press-control.js",
+            "logic": "logic/logic.js",
+            "forwarder": "forwarder/forwarder.js",
+            "compare": "compare/compare.js",
+            "hysteresis": "hysteresis/hysteresis.js",
+            "statistic": "statistic/statistic.js",
+            "scheduler": "scheduler/scheduler.js",
+            "delay": "delay/delay.js",
+            "central": "central/central.js"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/TODO"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "font-awesome": "^4.7.0"
+    },
+    "engines": {
+        "node": ">=10"
+    }
+}

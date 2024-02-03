@@ -1,0 +1,338 @@
+<script type="text/html" data-template-name="smart_scheduler">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-enabled"></label>
+        <input type="checkbox" id="node-input-enabled" style="width: 20px;" />
+        <label for="node-input-enabled" style="width: 200px;">Scheduler aktiviert</label>
+    </div>
+    <div class="form-row" style="margin-bottom: 2px;">
+        <p class="text-center"><i class="fa fa-list"></i>&nbsp;<strong>Schedules</strong></p>
+    </div>
+    <div class="form-row node-scheduler-schedules-row">
+        <ol id="node-scheduler-schedules"></ol>
+    </div>
+</script>
+
+<script type="text/html" data-template-scheduler-row="">
+    <div>
+        <div style="display: inline-block; width: 30px; margin-left: 10px;">
+            <i class="fa fa-calendar"></i>
+        </div>
+        <input class="days"/>
+    </div>
+    <div style="margin-top: 8px;">
+        <div style="display: inline-block; width: 30px; margin-left: 10px;">
+            <i class="fa fa-clock-o"></i>
+        </div>
+        <select class="node-input-scheduler-select-hours hour fill24" style="display: inline-block; width: 75px;">
+            <option value="-1">hour</option>
+        </select>
+        :
+        <select class="node-input-scheduler-select-minutes minute fill60" style="display: inline-block; width: 75px;">
+            <option value="-1">min</option>
+        </select>
+        :
+        <select class="node-input-scheduler-select-seconds second fill60" style="display: inline-block; width: 75px;">
+            <option value="-1">sec</option>
+        </select>
+    </div>
+    <div style="margin-top: 8px;">
+        <div style="display: inline-block; width: 30px; margin-left: 10px;">
+            <i class="fa fa-envelope"></i>
+        </div>
+        <input type="text" class="message"/>
+    </div>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType("smart_scheduler", {
+        category: "Smart Nodes",
+        paletteLabel: "Scheduler",
+        color: "#6EE2D9",
+        defaults: {
+            name: { value: "" },
+            enabled: { value: false },
+            schedules: {
+                value: [],
+                validate: function (v)
+                {
+                    let schedules = [];
+
+                    if (v.length < 1)
+                    {
+                        return true;
+                    }
+
+                    /** make a first pass and create extra schedules if off is before on
+                     * this so we can calculate overlaps later on */
+                    for (let i = 0; i < v.length; i++)
+                    {
+                        v[i].valid = true;
+
+                        days = v[i].days;
+                        hour = parseInt(v[i].hour, 10);
+                        minute = parseInt(v[i].minute, 10);
+                        second = parseInt(v[i].second, 10);
+                        message = v[i].message;
+
+                        schedules.push({
+                            days: v[i].days,
+                            hour: hour,
+                            minute: minute,
+                            second: second,
+                            message: message,
+                            n: i,
+                            valid: true,
+                        });
+                    }
+
+                    /** validate schedules */
+                    for (let i = 0; i < schedules.length; i++)
+                    {
+                        let s = schedules[i];
+
+                        /** hours should be 0..23 */
+                        if (s.hour < 0 || s.hour > 23)
+                        {
+                            v[s.n].valid = false;
+                        }
+
+                        /** minutes and seconds should be 0..59 */
+                        if (s.minute < 0 || s.second < 0 || s.minute > 59 || s.second > 59)
+                        {
+                            v[s.n].valid = false;
+                        }
+                    }
+
+                    /** if any are not valid return false */
+                    for (i = 0; i < v.length; i++)
+                    {
+                        if (v[i].valid === false)
+                            return false;
+                    }
+
+                    return true;
+                },
+            },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-clock-o",
+        label: function ()
+        {
+            return this.name || "Scheduler";
+        },
+        oneditprepare: function ()
+        {
+            let node = this;
+
+            /**
+             * prepare schedule
+             */
+            let scheduleList = $("#node-scheduler-schedules");
+
+            scheduleList
+                .css("min-height", "147px")
+                .css("min-width", "350px")
+                .editableList({
+                    sortable: true,
+                    removable: true,
+                    addItem: function (row, index, data)
+                    {
+                        schedule = data.schedule || false;
+
+                        let template = $("script[data-template-scheduler-row]").html() || "";
+                        $(row).append(template);
+
+                        fillOptions(row, schedule);
+                        scheduleResize();
+                    },
+                    removeItem: function (data)
+                    {
+                        scheduleResize();
+                    },
+                });
+
+            /**
+             * pass all existing schedules to editableList or pass an empty one
+             */
+            if (node.schedules.length == 0)
+            {
+                scheduleList.editableList("addItem");
+            }
+            else
+            {
+                for (let i = 0; i < node.schedules.length; i++)
+                {
+                    let schedule = node.schedules[i];
+                    scheduleList.editableList("addItem", { schedule: schedule, i: i });
+                }
+            }
+
+            /**
+             * resize the editableList
+             */
+            function scheduleResize()
+            {
+                height = 40 + scheduleList.editableList("length") * 135;
+                scheduleList.editableList("height", height);
+            }
+
+            /**
+             * fill the controls with days/hours/minutes/seconds/message
+             * @param row
+             */
+            function fillOptions(row, schedule)
+            {
+                schedule = schedule ? schedule : {
+                    days: "",
+                    hour: -1,
+                    minute: -1,
+                    second: -1,
+                    message: '{"topic": ""}'
+                };
+
+                // Fill days list
+                row.find(".days")
+                    .typedInput({
+                        types: [
+                            {
+                                default: "",
+                                multiple: true,
+                                options: [
+                                    { value: "1", label: "Montag" },
+                                    { value: "2", label: "Dienstag" },
+                                    { value: "3", label: "Mittwoch" },
+                                    { value: "4", label: "Donnerstag" },
+                                    { value: "5", label: "Freitag" },
+                                    { value: "6", label: "Samstag" },
+                                    { value: "0", label: "Sonntag" }
+                                ],
+                            },
+                        ],
+                    });
+
+                // Fill hours
+                let hours = row.find(".fill24");
+                for (let i = 0; i < 24; i++)
+                {
+                    i = pad(i);
+                    hours.append($("<option></option>").val(i).text(i));
+                }
+
+                // Fill minutes and seconds
+                let minsec = row.find(".fill60");
+                for (let i = 0; i < 60; i++)
+                {
+                    i = pad(i);
+                    minsec.append($("<option></option>").val(i).text(i));
+                }
+
+                row.find(".message").typedInput({
+                    type: "json",
+                    types: ["json"]
+                });
+
+                /**
+                 * set the value of the select boxes
+                 */
+                row.find(".days").typedInput("value", schedule.days);
+                row.find(".hour").val(schedule.hour);
+                row.find(".minute").val(schedule.minute);
+                row.find(".second").val(schedule.second);
+                row.find(".message").typedInput("value", schedule.message);
+
+                /** set error on the li */
+                if (schedule.valid === false)
+                {
+                    row.closest("li").css("background-color", "#f9b1bf");
+                }
+
+                /** modify some css */
+                row.parent().find(".red-ui-editableList-item-handle").css("color", "black").css("left", "10px");
+                row.parent().find(".red-ui-editableList-item-remove").css("right", "10px");
+            }
+
+            /**
+             * prepend string with 0
+             * @param s
+             * @returns {string|*}
+             */
+            function pad(s)
+            {
+                s = s.toString();
+                if (s.length < 2)
+                {
+                    s = "0".concat(s);
+                }
+                return s;
+            }
+        },
+
+        oneditsave: function ()
+        {
+            let node = this;
+            node.schedules = [];
+
+            let scheduleList = $("#node-scheduler-schedules");
+            let schedules = scheduleList.editableList("items");
+
+            schedules.each(function (i)
+            {
+                let days = this.find(".days").val();
+                let hour = this.find(".hour").val();
+                let minute = this.find(".minute").val();
+                let second = this.find(".second").val();
+                let message = this.find(".message").val();
+
+                let schedule = {
+                    days: days,
+                    hour: hour,
+                    minute: minute,
+                    second: second,
+                    message: message,
+                };
+
+                /** if any of the inputs was modified, save it */
+                if (days.length > 0 || hour != -1 || minute != -1 || second != -1 || message != "{}")
+                {
+                    node.schedules.push(schedule);
+                }
+            });
+        },
+    });
+</script>
+
+<script type="text/html" data-help-name="smart_scheduler">
+    <p>
+        Diese Node sendet zu den angegebenen Zeitpunkten die entsprechenden Nachrichten an den Ausgang.
+        <p>
+            Folgende topics werden akzeptiert:
+            <table>
+                <thead>
+                    <tr>
+                        <th>Topic</th>
+                        <th>Beschreibung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>enable</code></td>
+                        <td>Aktiviert den Scheduler.</td>
+                    </tr>
+                    <tr>
+                        <td><code>disable</code></td>
+                        <td>Deaktiviert den Scheduler.</td>
+                    </tr>
+                    <tr>
+                        <td><code>set_state</code></td>
+                        <td>Aktiviert den Scheduler, wenn <code>msg.payload = true</code> oder deaktiviert den Scheduler, wenn <code>msg.payload = false</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </p>
+        </p>
+</script>
