@@ -1,5 +1,3 @@
-This package contains 5 different node red nodes.
-
 # General information
 
 The smart nodes was created to control smart home devices like lights, power outlets shutter and some more.
