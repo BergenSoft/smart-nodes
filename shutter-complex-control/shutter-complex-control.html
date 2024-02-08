@@ -253,40 +253,54 @@
                 <tr>
                     <th>Topic</th>
                     <th>Beschreibung</th>
+                    <th>msg.payload == false wird ignoriert</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><code>up_stop</code></td>
                     <td>Sendet abwechselnd einen Stop- und einen Hochfahrbefehl.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
-                    <td><code>down</code></td>
-                    <td>Sendet einen Runterfahrbefehl, falls der Rollladen nicht bereits nach unten fährt. Ggf. wird vorher noch ein Stop-Befehl gesendet und die eingestellte Zeit gewartet.</td>
+                    <td><code>up</code></td>
+                    <td>Sendet einen Hochfahrbefehl, falls der Rollladen nicht bereits nach oben fährt. Ggf. wird vorher noch ein Stop-Befehl gesendet und die eingestellte Zeit gewartet.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>down_stop</code></td>
                     <td>Sendet abwechselnd einen Stop- und einen Runterfahrbefehl.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>down</code></td>
+                    <td>Sendet einen Runterfahrbefehl, falls der Rollladen nicht bereits nach unten fährt. Ggf. wird vorher noch ein Stop-Befehl gesendet und die eingestellte Zeit gewartet.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>up_down</code></td>
                     <td>Nimmt einen Befehl von Home Assistant entgegen und leitet die entsprechende Aktion ein.</td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>stop</code></td>
                     <td>Sendet einen Stopbefehl.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>position</code></td>
                     <td>Sendet einen Positionsbefehl. <code>msg.payload</code> sollte ein Wert zwischen 0 (offen) und 100 (geschlossen) haben.</td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>alarm</code></td>
                     <td>Setzt den aktuellen Alarmzustand.</td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>toggle</code> (default)</td>
                     <td>Schaltet den Rollladen abwechselnd auf hoch, stop, runter, stop.</td>
+                    <td>Ja</td>
                 </tr>
             </tbody>
         </table>

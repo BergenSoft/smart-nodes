@@ -3,6 +3,10 @@
 The smart nodes was created to control smart home devices like lights, power outlets shutter and some more.
 This controls are designed to work with the [node-red-contrib-knx-ultimate](https://github.com/Supergiovane/node-red-contrib-knx-ultimate) but it could also work with other smart technologies.
 
+The knx binary input and output/switching modules should be configured very stupid. Closing a binary input should output 1 and releasing 0.
+Same for the output/switching modules, 1 should turn on and 0 turn out. That makes it easy to count the presses or check for short and long presses.
+Some node has to filter out the binary inputs if they goes to 0 or in other words, if `msg.payload == false`. Please see the internal node documentation then this signals are ignored. As an example sending a toggle topic for closing an input and also for releasing would toggle a light twice.
+
 Sometimes one source node should be connected to multiple smart nodes which requires different topics.
 To avoid requiring many change nodes, the smart node are using a special `msg.topic` notation. You can always send topics in the format `name#number`, e.g. `toggle#1`.
 Smart nodes that requires a name are using only the name part. the # and the number are optional. Smart nodes that requries a number will only use the number, the name and # is also optional.
@@ -122,6 +126,3 @@ This control can send a defined message on defined times.
 * The scheduler can be activated or deactivated in runtime.
 * The state can be saved between NodeRed restarts.
 * The last message can automatically be sent 10 seconds after a deployment.
-
-# Create node package
-run `node pack` to create a new *.tgz node module.

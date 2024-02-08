@@ -62,10 +62,18 @@ module.exports = function (RED)
                     break;
 
                 case "off":
+                    // If button is released, don't handle this message
+                    if (msg.payload === false)
+                        return;
+
                     nodeSettings.last_value = false;
                     break;
 
                 case "on":
+                    // If button is released, don't handle this message
+                    if (msg.payload === false)
+                        return;
+
                     nodeSettings.last_value = true;
                     break;
 

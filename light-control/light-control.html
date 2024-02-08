@@ -265,6 +265,7 @@
                 <tr>
                     <th>Topic</th>
                     <th>Beschreibung</th>
+                    <th>msg.payload == false wird ignoriert</th>
                 </tr>
             </thead>
             <tbody>
@@ -274,14 +275,17 @@
                         Gibt über <code>msg.payload = true</code> oder <code>msg.payload = false</code> den aktuellen Status des Ausgangs an.<br/>
                         Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
                     </td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>on</code></td>
                     <td>Schaltet den Ausgang ein und startet die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>off</code></td>
                     <td>Schaltet den Ausgang aus.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>set</code></td>
@@ -289,6 +293,7 @@
                         Schaltet den Ausgang bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus.<br/>
                         Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
                     </td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>set_permanent</code></td>
@@ -296,6 +301,7 @@
                         Schaltet den Ausgang bei <code>msg.payload = true</code> dauerhaft ein und bei <code>msg.payload = false</code> aus.<br/>
                         Es wird dabei keine Zeitmessung gestartet.
                     </td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>motion</code></td>
@@ -304,10 +310,12 @@
                         Bei <code>msg.payload = false</code> wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.<br/>
                         Ist keine Zeit angegeben oder hinterlegt, schaltet sich der Ausgang sofort aus.
                     </td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>alarm</code></td>
                     <td>Setzt den aktuellen Alarmzustand auf den Wert von <code>msg.payload</code> und löst die entsprechende Aktion aus.</td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>toggle</code> (default)</td>
@@ -315,6 +323,7 @@
                         Schaltet den Ausgang abwechselnd ein und aus.<br/>
                         Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
                     </td>
+                    <td>Ja</td>
                 </tr>
             </tbody>
         </table>

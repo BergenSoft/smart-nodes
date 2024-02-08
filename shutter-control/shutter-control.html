@@ -194,6 +194,7 @@
                 <tr>
                     <th>Topic</th>
                     <th>Beschreibung</th>
+                    <th>msg.payload == false wird ignoriert</th>
                 </tr>
             </thead>
             <tbody>
@@ -211,34 +212,42 @@
                         Nimmt einen Befehl von Home Assistant entgegen um informiert zu werden ob der Rollladen läuft und in welche Richtung.<br/>
                         <strong>Wichtig:</strong> Dieses Topic startet den Rollladen <u>nicht</u>, da die Gruppenadresse direkt mit dem Jalousiemodul verbunden sein muss.
                     </td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>up</code></td>
                     <td>Sendet einen Hochfahrbefehl, falls der Rollladen nicht bereits nach oben fährt. Ggf. wird vorher noch ein Stop-Befehl gesendet.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>up_stop</code></td>
                     <td>Sendet abwechselnd einen Stop- und einen Hochfahrbefehl.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>down</code></td>
                     <td>Sendet einen Runterfahrbefehl, falls der Rollladen nicht bereits nach unten fährt. Ggf. wird vorher noch ein Stop-Befehl gesendet.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>down_stop</code></td>
                     <td>Sendet abwechselnd einen Stop- und einen Runterfahrbefehl.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>stop</code></td>
                     <td>Sendet einen Stopbefehl.</td>
+                    <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>position</code></td>
                     <td>Sendet einen Positionsbefehl. <code>msg.payload</code> sollte ein Wert zwischen 0 (offen) und 100 (geschlossen) haben.</td>
+                    <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>toggle</code> (default)</td>
                     <td>Schaltet den Rollladen abwechselnd auf hoch, stop, runter, stop.</td>
+                    <td>Ja</td>
                 </tr>
             </tbody>
         </table>
