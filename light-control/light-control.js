@@ -8,6 +8,9 @@ module.exports = function (RED)
         const smartContext = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
+        // used from text-exec node
+        node.exec_text_names = config.exec_text_names;
+
         // persistent values
         var nodeSettings = Object.assign({}, {
             last_value: false,

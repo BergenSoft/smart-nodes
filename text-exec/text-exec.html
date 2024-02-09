@@ -100,10 +100,7 @@
             {
                 treeList.treeList("show", node.z);
             }, 100);
-        }
 
-        function initTreeList(node, targetTypes)
-        {
             candidateNodesCount = 0;
             for (const key in flowMap)
             {
@@ -128,7 +125,7 @@
                     flowMap[n.z].children.push({
                         id: n.id,
                         node: n,
-                        label: n.name || n.id,
+                        label: n.type.replace("smart_", "").replace("-control", "").replace("-complex", "") + ": " + (n.name || n.id),
                         selected: isChecked,
                         checkbox: true,
                         radio: false,
@@ -250,45 +247,28 @@
             }
         }
 
-        RED.nodes.registerType("smart_central-control", {
+        RED.nodes.registerType("smart_text-exec", {
             category: "Smart Nodes",
-            paletteLabel: "Central control",
-            color: "#6EE2D9",
+            paletteLabel: "Text exec control",
+            color: "#E9967A",
             defaults: {
                 name: { value: "" },
-                mode: { value: "shutter" }, // shutter | light
                 links: { value: [], type: "smart_shutter-complex-control[]" },
             },
             inputs: 1,
             outputs: 0,
             icon: function ()
             {
-                if (this.mode === "shutter")
-                    return "font-awesome/fa-align-justify";
-
-                return "font-awesome/fa-lightbulb-o";
+                return "font-awesome/fa-cog";
             },
             label: function ()
             {
-                return this.name || "Central control";
+                return this.name || "Text exec control";
             },
             oneditprepare: function ()
             {
-                let node = this;
-
-                onEditPrepare(this, ["smart_shutter-complex-control", "smart_shutter-control"]);
-                $("#node-input-mode").on("change", function ()
-                {
-                    if (this.value == "shutter")
-                        initTreeList(node, ["smart_shutter-complex-control", "smart_shutter-control"]);
-                    else
-                        initTreeList(node, ["smart_light-control", "smart_scene-control"]);
-                });
-
-                if (!this.mode)
-                {
-                    $("#node-input-mode").val("shutter").trigger("change");
-                }
+                console.log("Here");
+                onEditPrepare(this, ["smart_light-control", "smart_scene-control", "smart_shutter-complex-control", "smart_shutter-control"]);
             },
             oneditsave: function ()
             {
@@ -300,17 +280,10 @@
     })();
 </script>
 
-<script type="text/html" data-template-name="smart_central-control">
+<script type="text/html" data-template-name="smart_text-exec">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" />
-    </div>
-    <div class="form-row">
-        <label for="node-input-mode">Typ</label>
-        <select id="node-input-mode" style="width: 70%">
-            <option value="shutter" selected>Rollladen</option>
-            <option value="light">Licht/Steckdose</option>
-        </select>
     </div>
     <div class="node-input-link-rows" style="position:relative; height: 30px; text-align: right;"
         ><div style="display:inline-block"><input type="text" id="node-input-link-target-filter" /></div
@@ -318,13 +291,21 @@
     <div class="form-row node-input-link-row node-input-link-rows"></div>
 </script>
 
-<script type="text/html" data-help-name="smart_central-control">
+<script type="text/html" data-help-name="smart_text-exec">
     <p>
-        Der Zentralbaustein leitet einkommende Nachrichten an alle verlinkten Unterbausteine weiter.
-        Dabei beachtet der Baustein, die Funktion der Unterbausteine synchron zu halten.
+        Diese Node nimmt einen Text entgegen, zerlegt ihn und führt die Kommandos auf den ausgewählten und passenden Nodes aus.
     </p>
     <p>
-        D.h. Wird ein <code>toggle</code> an mehrere Lichtbausteine geschickt, so werden diese zuerst ausgeschaltet, falls mindestens eines eingeschaltet war.<br />
-        Rollladen werden ebenfalls erst gestoppt, falls einer gerade aktiv ist. Ein <code>toggle</code> an mehrere Rollladen wird derzeit nicht unterstützt.
+        <strong>Beispiele:</strong><br/><br/>
+        <strong>Schalte das Licht im Wohnzimmer ein.</strong><br/>
+        Alle Light-controls und Scene-controls die das Wort <strong>Wohnzimmer</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code>.<br/><br/>
+        
+        <strong>Schalte das Büro ein und die Küche aus.</strong><br/>
+        Alle Light-controls und Scene-controls die das Wort <strong>Büro</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code> und
+        alle Light-controls und Scene-controls die das Wort <strong>Küche</strong> enthalten bekommen eine Nachricht mit dem topic <code>off</code>.<br/><br/>
+        
+        <strong>Schließe die Rollladen im Wohnzimmer und schalte das Licht in der Küche an.</strong><br/>
+        Alle Schutter-controls und Shutter-complex-controls die das Wort <strong>Wohnzimmer</strong> enthalten bekommen eine Nachricht mit dem topic <code>down</code> und
+        alle Light-controls und Scene-controls die das Wort <strong>Küche</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code>.<br/><br/>
     </p>
 </script>

@@ -126,3 +126,14 @@ This control can send a defined message on defined times.
 * The scheduler can be activated or deactivated in runtime.
 * The state can be saved between NodeRed restarts.
 * The last message can automatically be sent 10 seconds after a deployment.
+
+## 14. Text execution
+This control parses a text and performs actions to the selected and matching smart nodes
+
+### **Features:**
+* Control light and scenes in german and english
+* Control shutter in german and english
+
+### Examples
+* Turn on kitchen and cupboard off
+* Open shutter in kitchen and turn light off

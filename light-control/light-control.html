@@ -138,7 +138,7 @@
             color: "#C882FF",
             defaults: {
                 name: { value: "" },
-                icon: { value: "light" }, // light | outlet
+                exec_text_names: { value: "" },
                 max_time_on: { value: "0" },
                 max_time_on_unit: { value: "s" },
                 alarm_action: { value: 'NOTHING' }, // NOTHING | ON | OFF
@@ -148,13 +148,11 @@
             outputs: 1,
             icon: function ()
             {
-                if (this.icon == "outlet")
-                    return "font-awesome/fa-plug";
                 return "font-awesome/fa-lightbulb-o";
             },
             label: function ()
             {
-                return this.name || (this.icon == "outlet" ? "Outlet control" : "Light control");
+                return this.name || "Light control";
             },
             oneditprepare: function ()
             {
@@ -233,8 +231,9 @@
         <input type="text" id="node-input-name" placeholder="Name" />
     </div>
     <div class="form-row">
-        <label for="node-input-icon"><i class="fa fa-picture-o"></i> Icon</label>
-        <input id="node-input-icon" />
+        <label for="node-input-exec_text_names"><i class="fa fa-comments-o"></i> Text</label>
+        <input id="node-input-exec_text_names" type="text" />
+        <div style="max-width: 450px;">Diese Node kann über die eingegebenen Wörter gesteuert werden. Mehrere Wörter werden durch ein Komma getrennt.</div>
     </div>
     <div class="form-row">
         <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> Zeit Ein</label>

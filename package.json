@@ -1,6 +1,6 @@
 {
     "name": "smart-nodes",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Smart Nodes",
     "keywords": [
         "node-red",
@@ -19,7 +19,8 @@
         "comparator",
         "statistic",
         "scheduler",
-        "central"
+        "central",
+        "text execution"
     ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -42,7 +43,8 @@
             "statistic": "statistic/statistic.js",
             "scheduler": "scheduler/scheduler.js",
             "delay": "delay/delay.js",
-            "central": "central/central.js"
+            "central": "central/central.js",
+            "text-exec": "text-exec/text-exec.js"
         }
     },
     "repository": {

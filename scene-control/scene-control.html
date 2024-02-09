@@ -217,6 +217,7 @@
             color: "#C882FF",
             defaults: {
                 name: { value: "" },
+                exec_text_names: { value: "" },
                 max_time_on: { value: "0" },
                 max_time_on_unit: { value: "s" },
                 outputs: { value: 1 },
@@ -442,6 +443,11 @@
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-exec_text_names"><i class="fa fa-comments-o"></i> Text</label>
+        <input id="node-input-exec_text_names" type="text" />
+        <div style="max-width: 450px;">Diese Node kann über die eingegebenen Wörter gesteuert werden. Mehrere Wörter werden durch ein Komma getrennt.</div>
     </div>
     <div class="form-row">
         <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> Zeit Ein</label>

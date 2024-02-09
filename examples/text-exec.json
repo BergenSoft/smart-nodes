@@ -1,0 +1,147 @@
+[
+    {
+        "id": "90448dd828d24ddd",
+        "type": "tab",
+        "label": "Text Exec",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2e14a6369ac138a3",
+        "type": "smart_text-exec",
+        "z": "90448dd828d24ddd",
+        "name": "",
+        "links": [
+            "767db1c6ace634a9",
+            "9907df9b18c77b8f"
+        ],
+        "x": 470,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "485438cec89d4bea",
+        "type": "inject",
+        "z": "90448dd828d24ddd",
+        "name": "Essen an, Sofa aus",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Schalte Essen an und das Sofa aus",
+        "payloadType": "str",
+        "x": 190,
+        "y": 120,
+        "wires": [
+            [
+                "2e14a6369ac138a3"
+            ]
+        ]
+    },
+    {
+        "id": "9907df9b18c77b8f",
+        "type": "smart_light-control",
+        "z": "90448dd828d24ddd",
+        "name": "Essen",
+        "exec_text_names": "Essen, Wohnzimmer",
+        "max_time_on": "0",
+        "max_time_on_unit": "s",
+        "alarm_action": "NOTHING",
+        "links": [
+            "2e14a6369ac138a3"
+        ],
+        "x": 230,
+        "y": 260,
+        "wires": [
+            [
+                "a11ef18f66c62bb4"
+            ]
+        ]
+    },
+    {
+        "id": "a11ef18f66c62bb4",
+        "type": "debug",
+        "z": "90448dd828d24ddd",
+        "name": "debug 55",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "767db1c6ace634a9",
+        "type": "smart_light-control",
+        "z": "90448dd828d24ddd",
+        "name": "Sofa",
+        "exec_text_names": "Sofa, Wohnzimmer",
+        "max_time_on": "0",
+        "max_time_on_unit": "s",
+        "alarm_action": "NOTHING",
+        "links": [
+            "2e14a6369ac138a3"
+        ],
+        "x": 230,
+        "y": 320,
+        "wires": [
+            [
+                "2f496ef68d26b28b"
+            ]
+        ]
+    },
+    {
+        "id": "2f496ef68d26b28b",
+        "type": "debug",
+        "z": "90448dd828d24ddd",
+        "name": "debug 56",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "8a2c0707390be2e9",
+        "type": "inject",
+        "z": "90448dd828d24ddd",
+        "name": "Wohnzimmer an",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Schalte das Wohnzimmer ein",
+        "payloadType": "str",
+        "x": 200,
+        "y": 160,
+        "wires": [
+            [
+                "2e14a6369ac138a3"
+            ]
+        ]
+    }
+]
