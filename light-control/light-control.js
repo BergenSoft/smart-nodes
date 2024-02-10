@@ -9,7 +9,10 @@ module.exports = function (RED)
         const helper = require("../smart_helper.js");
 
         // used from text-exec node
-        node.exec_text_names = config.exec_text_names;
+        if (typeof config.exec_text_names == "string")
+            node.exec_text_names = config.exec_text_names.split(",").map(n => n.trim().toLowerCase());
+        else
+            node.exec_text_names = [];
 
         // persistent values
         var nodeSettings = Object.assign({}, {

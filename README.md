@@ -131,9 +131,10 @@ This control can send a defined message on defined times.
 This control parses a text and performs actions to the selected and matching smart nodes
 
 ### **Features:**
-* Control light and scenes in german and english
+* Control light and scenes (only on or off) in german and english
 * Control shutter in german and english
 
 ### Examples
 * Turn on kitchen and cupboard off
 * Open shutter in kitchen and turn light off
+* Send debug message to output.
