@@ -8,6 +8,12 @@ module.exports = function (RED)
         const smartContext = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
+        // used from text-exec node
+        if (typeof config.exec_text_names == "string")
+            node.exec_text_names = config.exec_text_names.split(",").map(n => n.trim().toLowerCase());
+        else
+            node.exec_text_names = [];
+
         // persistent values
         var nodeSettings = Object.assign({}, {
             last_values: [], // light is on or off for a scene

@@ -19,6 +19,8 @@ module.exports = function (RED)
         {
             let mode = "light"; // light || shutter
             let action = null; // on || off || up || stop || down
+            let number = null;
+
             let message = null;
 
             if (typeof msg.payload == "string")
@@ -78,6 +80,7 @@ module.exports = function (RED)
                     case "ein":
                     case "einschalten":
                         // node.log("Set action to on");
+                        mode = "light";
                         action = "on";
                         break;
 
@@ -85,6 +88,7 @@ module.exports = function (RED)
                     case "off":
                     case "ausschalten":
                         // node.log("Set action to off");
+                        mode = "light";
                         action = "off";
                         break;
 
@@ -94,6 +98,7 @@ module.exports = function (RED)
                     case "öffne":
                     case "open":
                         // node.log("Set action to up");
+                        mode = "shutter";
                         action = "up";
                         break;
 
@@ -103,12 +108,23 @@ module.exports = function (RED)
                     case "schließe":
                     case "close":
                         // node.log("Set action to down");
+                        mode = "shutter";
                         action = "down";
+                        break;
+
+                    case "prozent":
+                    case "percent":
+                    case "percentage":
+                        // node.log("Set action to position");
+                        mode = "shutter";
+                        action = "position";
                         break;
 
                     case "stoppe":
                     case "stop":
+                    case "anhalten":
                         // node.log("Set action to stop");
+                        mode = "shutter";
                         action = "stop";
                         break;
 
@@ -118,6 +134,7 @@ module.exports = function (RED)
                         {
                             action = null;
                             affectedNodes = [];
+                            number = null;
                         }
                         break;
 
@@ -129,11 +146,18 @@ module.exports = function (RED)
                             let room = rooms[parseInt(word.substring(1), 10)];
                             // node.log("Found room " + room);
 
-                            for (const node of lookup[mode][room])
+                            if (lookup[mode] && lookup[mode][room] && Array.isArray(lookup[mode][room]))
                             {
-                                if (!affectedNodes.includes(node))
-                                    affectedNodes.push(node);
+                                for (const node of lookup[mode][room])
+                                {
+                                    if (!affectedNodes.includes(node))
+                                        affectedNodes.push(node);
+                                }
                             }
+                        }
+                        else if (Number.isInteger(word))
+                        {
+                            number = parseInt(word, 10);
                         }
                         else
                         {
@@ -167,7 +191,7 @@ module.exports = function (RED)
 
                 for (const name of linkedNode.exec_text_names)
                 {
-                    // node.log("Check name = " + name + " from node = " + linkedNode.id);
+                    // console.log(linkedNode);
                     switch (linkedNode.type)
                     {
                         case "smart_light-control":

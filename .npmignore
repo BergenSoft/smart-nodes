@@ -1,5 +1,6 @@
 .vscode
 .npmignore
+examples
 smart-nodes.code-workspace
 temp
 *.tgz
