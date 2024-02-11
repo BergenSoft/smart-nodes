@@ -10,10 +10,7 @@ module.exports = function (RED)
         let log = [];
         let rooms = [];
 
-        let lookup = {
-            light: [],
-            shutter: []
-        };
+        let lookup = [];
 
         node.on("input", function (msg)
         {
@@ -131,7 +128,7 @@ module.exports = function (RED)
 
                     case "und":
                     case "and":
-                        if (performAction(mode, action, affectedNodes))
+                        if (performAction(mode, action, number, affectedNodes))
                         {
                             action = null;
                             affectedNodes = [];
@@ -147,24 +144,26 @@ module.exports = function (RED)
                             let room = rooms[parseInt(word.substring(1), 10)];
                             // node.log("Found room " + room);
 
-                            if (lookup[mode] && lookup[mode][room] && Array.isArray(lookup[mode][room]))
+                            if (lookup[room] && Array.isArray(lookup[room]))
                             {
-                                for (const node of lookup[mode][room])
+                                for (const node of lookup[room])
                                 {
                                     if (!affectedNodes.includes(node))
                                         affectedNodes.push(node);
                                 }
                             }
                         }
-                        else if (Number.isInteger(word))
+                        else if (isFinite(word))
                         {
                             number = parseInt(word, 10);
+                            // node.log("Found number " + number);
                         }
-                        else if (word[word.length - 1] == "%" && Number.isInteger(word.substr(0, word.length - 1)))
+                        else if (word[word.length - 1] == "%" && isFinite(word.substr(0, word.length - 1)))
                         {
                             number = parseInt(word.substr(0, word.length - 1), 10);
                             mode = "shutter";
                             action = "position";
+                            // node.log("Found number " + number + " with %");
                         }
                         else
                         {
@@ -174,7 +173,7 @@ module.exports = function (RED)
                 }
             }
 
-            performAction(mode, action, affectedNodes);
+            performAction(mode, action, number, affectedNodes);
 
             // node.log("Finished");
             // node.log(log);
@@ -203,22 +202,14 @@ module.exports = function (RED)
                     {
                         case "smart_light-control":
                         case "smart_scene-control":
-                            // node.log("Add room " + name);
-                            if (!lookup.light[name])
-                                lookup.light[name] = [];
-
-                            if (!lookup.light[name].includes(linkedNode))
-                                lookup.light[name].push(linkedNode);
-                            break;
-
                         case "smart_shutter-control":
                         case "smart_shutter-complex-control":
                             // node.log("Add room " + name);
-                            if (!lookup.shutter[name])
-                                lookup.shutter[name] = [];
+                            if (!lookup[name])
+                                lookup[name] = [];
 
-                            if (!lookup.shutter[name].includes(linkedNode))
-                                lookup.shutter[name].push(linkedNode);
+                            if (!lookup[name].includes(linkedNode))
+                                lookup[name].push(linkedNode);
                             break;
 
                         default:
@@ -261,14 +252,23 @@ module.exports = function (RED)
             return message;
         }
 
-        let performAction = (mode, action, affectedNodes) =>
+        let performAction = (mode, action, number, affectedNodes) =>
         {
             if (action != null && affectedNodes.length > 0)
             {
                 for (const node of affectedNodes)
                 {
                     // node.log("Notify node " + node.id);
-                    RED.events.emit("node:" + node.id, { "topic": action });
+                    if (action == "position")
+                    {
+                        // console.log({ "topic": action, "payload": number });
+                        if (number != null)
+                            RED.events.emit("node:" + node.id, { "topic": action, "payload": number });
+                    }
+                    else
+                    {
+                        RED.events.emit("node:" + node.id, { "topic": action });
+                    }
                 }
 
                 log.actions.push({ mode, action, nodes: affectedNodes.map(n => n.name || n.id) });
