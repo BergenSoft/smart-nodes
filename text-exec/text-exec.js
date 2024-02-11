@@ -113,6 +113,7 @@ module.exports = function (RED)
                         break;
 
                     case "prozent":
+                    case "%":
                     case "percent":
                     case "percentage":
                         // node.log("Set action to position");
@@ -158,6 +159,12 @@ module.exports = function (RED)
                         else if (Number.isInteger(word))
                         {
                             number = parseInt(word, 10);
+                        }
+                        else if (word[word.length - 1] == "%" && Number.isInteger(word.substr(0, word.length - 1)))
+                        {
+                            number = parseInt(word.substr(0, word.length - 1), 10);
+                            mode = "shutter";
+                            action = "position";
                         }
                         else
                         {
