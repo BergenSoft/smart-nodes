@@ -79,6 +79,12 @@ module.exports = function (RED)
                         // node.log("Set action to on");
                         mode = "light";
                         action = "on";
+                        if (performAction(mode, action, number, affectedNodes))
+                        {
+                            action = null;
+                            affectedNodes = [];
+                            number = null;
+                        }
                         break;
 
                     case "aus":
@@ -87,6 +93,12 @@ module.exports = function (RED)
                         // node.log("Set action to off");
                         mode = "light";
                         action = "off";
+                        if (performAction(mode, action, number, affectedNodes))
+                        {
+                            action = null;
+                            affectedNodes = [];
+                            number = null;
+                        }
                         break;
 
                     case "hoch":
@@ -258,6 +270,12 @@ module.exports = function (RED)
             {
                 for (const node of affectedNodes)
                 {
+                    if (mode == "light" && !["smart_light-control", "smart_scene-control"].includes(node.type))
+                        continue;
+
+                    if (mode == "shutter" && !["smart_shutter-control", "smart_shutter-complex-control"].includes(node.type))
+                        continue;
+
                     // node.log("Notify node " + node.id);
                     if (action == "position")
                     {
