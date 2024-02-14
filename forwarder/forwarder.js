@@ -83,9 +83,9 @@ module.exports = function (RED)
         let setStatus = () =>
         {
             if (nodeSettings.enabled)
-                node.status({ fill: "green", shape: "dot", text: "Forwarding enabled" });
+                node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Forwarding enabled" });
             else
-                node.status({ fill: "red", shape: "dot", text: "Forwarding disabled" });
+                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Forwarding disabled" });
         }
 
         setStatus();

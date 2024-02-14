@@ -17,124 +17,159 @@ This file only describes the general function of the node. See the documentation
 As I'm german, the internal documentation is only available in german. If you need another language, feel free to add localizations and adding more languages via a pull request.
 
 # Nodes
-## 1. Light control  
+
+## 1. Light control
+
 This node is able to control a light or a power outlet.
 
 ### **Features:**
-* Auto turn off the light after a fixed time.
-* Auto turn off the light with a custom time which is part of the message object.
-* Toggle light between on and off.
-* Can be triggered by motion sensors.
-* Has an alarm function to go to a specific state (on or off) when the alarm is activated.
+
+-   Auto turn off the light after a fixed time.
+-   Auto turn off the light with a custom time which is part of the message object.
+-   Toggle light between on and off.
+-   Can be triggered by motion sensors.
+-   Has an alarm function to go to a specific state (on or off) when the alarm is activated.
 
 ## 2. Shutter control
+
 This node is able to control a shutter.
 There is no support for slats and it is also not planned as I don't need them, but feel free to send a pull request.
 
 ### **Features:**
-* One button control which switch between `up`, `stop`, `down`, `stop`.
-* One button control for each direction `up and stop` or `down and stop`.
-* Send direct position the shutter should be.
-* Stop shutter immediately.
-* Has an alarm function to go to a specific state (Open or close) when the alarm is activated.
+
+-   One button control which switch between `up`, `stop`, `down`, `stop`.
+-   One button control for each direction `up and stop` or `down and stop`.
+-   Send direct position the shutter should be.
+-   Stop shutter immediately.
+-   Has an alarm function to go to a specific state (Open or close) when the alarm is activated.
 
 ## 3. Scene control
+
 This node is tracking the state of multiple outputs and controls them by switching to multiple defined scenes.
 
 ### **Features:**
-* An input message could name multiple scenes that should be iterated one by one by receiving the same message multiple times
+
+-   An input message could name multiple scenes that should be iterated one by one by receiving the same message multiple times
 
 ## 4. Central control
+
 This node can control multiple light/scene controls or shutter controls at the same time
 
 ### **Features:**
-* Take care that multiple light/scene controls are turned of if any of them is one before executing a toggle command. This is helpful to avoid turning one light on and the other off.
-* The same is used for shutters with the up_stop or down_stop commands. A toggle is not supported, it will only be forwarded.
+
+-   Take care that multiple light/scene controls are turned of if any of them is one before executing a toggle command. This is helpful to avoid turning one light on and the other off.
+-   The same is used for shutters with the up_stop or down_stop commands. A toggle is not supported, it will only be forwarded.
 
 ## 5. Long press control
+
 This control is used to detect a short or a long press.
 The time can be configured in this control.
 
 ### **Features:**
-* Imediately send a message to the long press output when the time is reached. It is not waiting until the button is released.
+
+-   Imediately send a message to the long press output when the time is reached. It is not waiting until the button is released.
 
 ## 6. Multi press control
+
 This control is used to detect multiple presses on a button.
 The max wait time between presses can be configured in this control.
 You can also choose 2-4 press detection.
 
 ### **Features:**
-* Imediately send a message to the last output when the max presses are reached. It is not waiting until the button is released.
+
+-   Imediately send a message to the last output when the max presses are reached. It is not waiting until the button is released.
 
 ## 7. Hysteresis
+
 This control is checking if the input value reachs a defined value until the upper message is send. When the lower level is reached, the lower masssage will be send
 
 ### **Features:**
-* The state can be saved between NodeRed restarts.
-* The last message can automatically be sent 10 seconds after a deployment.
+
+-   The state can be saved between NodeRed restarts.
+-   The last message can automatically be sent 10 seconds after a deployment.
 
 ## 8. Logic
+
 This control can be used for AND, OR and XOR logics.
 
 ### **Features:**
-* All input values could be individual converted as well as the output messsage.
-* A NOT logic is possible when selecting 1 input and convert the output.
-* The setpoint and hysteresis value can be changed in runtime.
-* The state can be saved between NodeRed restarts.
-* The last message can automatically be sent 10 seconds after a deployment.
+
+-   All input values could be individual converted as well as the output messsage.
+-   A NOT logic is possible when selecting 1 input and convert the output.
+-   The setpoint and hysteresis value can be changed in runtime.
+-   The state can be saved between NodeRed restarts.
+-   The last message can automatically be sent 10 seconds after a deployment.
 
 ## 9. Statistic
+
 This control can be used for getting the following types of values: Minimum, Maximum, Sum, Difference, Absolute Value, Absolute Difference, Average and Running average.
 
 ### **Features:**
-* All input values could be individual converted as well as the output messsage.
-* A NOT logic is possible when selecting 1 input and convert the output.
-* The state can be saved between NodeRed restarts.
-* The last message can automatically be sent 10 seconds after a deployment.
+
+-   All input values could be individual converted as well as the output messsage.
+-   A NOT logic is possible when selecting 1 input and convert the output.
+-   The state can be saved between NodeRed restarts.
+-   The last message can automatically be sent 10 seconds after a deployment.
 
 ## 10. Compare
+
 This control can compare 2 values with the following operators: < <= == >= > !=
 
 ### **Features:**
-* Can compare also texts like js would do.
-* The state can be saved between NodeRed restarts.
-* The last message can automatically be sent 10 seconds after a deployment.
+
+-   Can compare also texts like js would do.
+-   The state can be saved between NodeRed restarts.
+-   The last message can automatically be sent 10 seconds after a deployment.
 
 ## 11. Delay
+
 This control can delay incomming messages.
 
 ### **Features:**
-* Different times for `msg.payload = true` and `msg.payload = false`.
-* Delays can be changed in runtime.
-* The state can be saved between NodeRed restarts.
-* The last message can automatically be sent 10 seconds after a deployment.
+
+-   Different times for `msg.payload = true` and `msg.payload = false`.
+-   Delays can be changed in runtime.
+-   The state can be saved between NodeRed restarts.
+-   The last message can automatically be sent 10 seconds after a deployment.
 
 ## 12. Forwarder
+
 This control can control if an incomming message should be forwarded or not.
 
 ### **Features:**
-* The forwarding can be enabled or disabled in runtime.
-* The state can be saved between NodeRed restarts.
-* The last message can automatically be sent 10 seconds after a deployment.
+
+-   The forwarding can be enabled or disabled in runtime.
+-   The state can be saved between NodeRed restarts.
+-   The last message can automatically be sent 10 seconds after a deployment.
 
 ## 13. Scheduler
+
 This control can send a defined message on defined times.
 
 ### **Features:**
-* The weekdays and the time can be selected as a trigger.
-* Multiple trigger and messages can be defined in one node.
-* The scheduler can be activated or deactivated in runtime.
-* The state can be saved between NodeRed restarts.
-* The last message can automatically be sent 10 seconds after a deployment.
+
+-   The weekdays and the time can be selected as a trigger.
+-   Multiple trigger and messages can be defined in one node.
+-   The scheduler can be activated or deactivated in runtime.
+-   The state can be saved between NodeRed restarts.
+-   The last message can automatically be sent 10 seconds after a deployment.
 
 ## 14. Text execution
+
 This control parses a text and performs actions to the selected and matching smart nodes
 
 ### **Features:**
-* Control light and scenes (only on or off) in german and english
-* Control shutter in german and english
+
+-   Control light and scenes (only on or off) in german and english
+-   Control shutter in german and english
 
 ### Examples
-* Turn on kitchen and cupboard off
-* Open shutter in kitchen and turn light off
-* Send debug message to output.
+
+[ text ] is optional
+
+-   Turn on [the light in] the living room and int the kitchen off
+-   Open [the shutter in] the kitchen and turn studio off
+-   Close [the shutter in the] sleeping room
+-   Living room to 10 %
+-   Turn on living room except the couch light
+-   Sends debug message to output

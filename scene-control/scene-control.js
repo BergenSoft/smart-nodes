@@ -244,13 +244,13 @@ module.exports = function (RED)
             if (scene != 0)
             {
                 if (isPermanent || current_timeout_ms <= 0)
-                    node.status({ fill: "green", shape: "dot", text: "Scene " + scene + " active" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Scene " + scene + " active" });
                 else if (max_time_on_timeout)
-                    node.status({ fill: "yellow", shape: "ring", text: "Scene " + scene + " active, wait " + helper.formatMsToStatus(current_timeout_ms, "until") + " for auto off" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Scene " + scene + " active, wait " + helper.formatMsToStatus(current_timeout_ms, "until") + " for auto off" });
             }
             else
             {
-                node.status({ fill: "red", shape: "dot", text: "Off" });
+                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Off" });
             }
         }
 

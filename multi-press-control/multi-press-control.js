@@ -55,7 +55,7 @@ module.exports = function (RED)
 
         let sendResult = () =>
         {
-            node.status({ fill: "green", shape: "dot", text: "Last was press " + count + " time" + (count == 1 ? "" : "s") });
+            node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Last was press " + count + " time" + (count == 1 ? "" : "s") });
             let data = Array.from({ length: config.outputs }).fill(null);
             data[count - 1] = outs[count - 1];
             node.send(data);

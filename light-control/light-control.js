@@ -212,18 +212,18 @@ module.exports = function (RED)
         {
             if (alarm_active)
             {
-                node.status({ fill: "red", shape: "dot", text: "ALARM is active" });
+                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": ALARM is active" });
             }
             else if (nodeSettings.last_value)
             {
                 if (isPermanent || isMotion || current_timeout_ms <= 0)
-                    node.status({ fill: "green", shape: "dot", text: "On" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": On" });
                 else if (max_time_on_timeout)
-                    node.status({ fill: "yellow", shape: "ring", text: "Wait " + helper.formatMsToStatus(current_timeout_ms, "until") + " for auto off" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Wait " + helper.formatMsToStatus(current_timeout_ms, "until") + " for auto off" });
             }
             else
             {
-                node.status({ fill: "red", shape: "dot", text: "Off" });
+                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Off" });
             }
         }
 

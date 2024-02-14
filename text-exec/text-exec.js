@@ -17,6 +17,7 @@ module.exports = function (RED)
             let mode = "light"; // light || shutter
             let action = null; // on || off || up || stop || down
             let number = null;
+            let without = false;
 
             let message = null;
 
@@ -36,8 +37,9 @@ module.exports = function (RED)
                 return;
             }
 
-            node.status({ fill: "green", shape: "dot", text: message });
+            node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": " + message });
             log = {
+                lookup: lookup,
                 actions: []
             };
 
@@ -84,6 +86,7 @@ module.exports = function (RED)
                             action = null;
                             affectedNodes = [];
                             number = null;
+                            without = false;
                         }
                         break;
 
@@ -98,10 +101,12 @@ module.exports = function (RED)
                             action = null;
                             affectedNodes = [];
                             number = null;
+                            without = false;
                         }
                         break;
 
                     case "hoch":
+                    case "oben":
                     case "up":
                     case "auf":
                     case "öffne":
@@ -112,6 +117,7 @@ module.exports = function (RED)
                         break;
 
                     case "runter":
+                    case "unten":
                     case "down":
                     case "ab":
                     case "schließe":
@@ -131,11 +137,20 @@ module.exports = function (RED)
                         break;
 
                     case "stoppe":
+                    case "stopp":
                     case "stop":
                     case "anhalten":
                         // node.log("Set action to stop");
                         mode = "shutter";
                         action = "stop";
+                        break;
+
+                    case "außer":
+                    case "ohne":
+                    case "without":
+                    case "but":
+                    case "except":
+                        without = true;
                         break;
 
                     case "und":
@@ -145,6 +160,7 @@ module.exports = function (RED)
                             action = null;
                             affectedNodes = [];
                             number = null;
+                            without = false;
                         }
                         break;
 
@@ -160,7 +176,9 @@ module.exports = function (RED)
                             {
                                 for (const node of lookup[room])
                                 {
-                                    if (!affectedNodes.includes(node))
+                                    if (without && affectedNodes.includes(node))
+                                        affectedNodes.splice(affectedNodes.indexOf(node), 1);
+                                    else if (!without && !affectedNodes.includes(node))
                                         affectedNodes.push(node);
                                 }
                             }
@@ -258,7 +276,7 @@ module.exports = function (RED)
             for (let index = 0; index < rooms.length; index++)
             {
                 const room = rooms[index];
-                message = message.replace(room, "$" + index);
+                message = message.replaceAll(room, "$" + index);
             }
 
             return message;

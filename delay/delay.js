@@ -22,15 +22,15 @@ module.exports = function (RED)
             switch (nodeSettings.lastMessage?.payload)
             {
                 case true:
-                    node.status({ fill: "yellow", shape: "ring", text: "Load last state: On" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Load last state: On" });
                     break;
 
                 case false:
-                    node.status({ fill: "yellow", shape: "ring", text: "Load last state: Off" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Load last state: Off" });
                     break;
 
                 default:
-                    node.status({ fill: "yellow", shape: "ring", text: "No last state available" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "No last state available" });
                     break;
             }
         }
@@ -54,7 +54,7 @@ module.exports = function (RED)
             {
                 case "set_delay_on":
                     nodeSettings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
-                    node.status({ fill: "yellow", shape: "ring", text: "New on delay: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "New on delay: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
 
                     if (config.save_state)
                         smartContext.set(node.id, nodeSettings);
@@ -62,7 +62,7 @@ module.exports = function (RED)
 
                 case "set_delay_off":
                     nodeSettings.off_delay_ms = helper.getTimeInMsFromString(msg.payload);
-                    node.status({ fill: "yellow", shape: "ring", text: "New off delay: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "New off delay: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
 
                     if (config.save_state)
                         smartContext.set(node.id, nodeSettings);
@@ -71,7 +71,7 @@ module.exports = function (RED)
                 case "set_delays":
                     nodeSettings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
                     nodeSettings.off_delay_ms = nodeSettings.on_delay_ms;
-                    node.status({ fill: "yellow", shape: "ring", text: "New delays: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "New delays: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
 
                     if (config.save_state)
                         smartContext.set(node.id, nodeSettings);
@@ -112,7 +112,7 @@ module.exports = function (RED)
                     // payload changed back to last value => stop current delay
                     if (nodeSettings.lastMessage?.payload == msg.payload)
                     {
-                        node.status({});
+                        node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Stopped delayed message" });
                         clearTimeout(timeout);
                         timeout = null;
 
@@ -137,7 +137,7 @@ module.exports = function (RED)
             // No delay if 0 or smaller
             if (delayMs <= 0)
             {
-                node.status({});
+                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") });
                 nodeSettings.lastMessage = msg
 
                 if (config.save_state)
@@ -148,10 +148,10 @@ module.exports = function (RED)
             }
 
             // start new timeout
-            node.status({ fill: "yellow", shape: "ring", text: "Forward msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") + "' in " + helper.formatMsToStatus(delayMs, "at") });
+            node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Forward msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") + "' in " + helper.formatMsToStatus(delayMs, "at") });
             timeout = setTimeout(() =>
             {
-                node.status({});
+                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") });
                 nodeSettings.lastMessage = msg
 
                 if (config.save_state)
@@ -165,7 +165,7 @@ module.exports = function (RED)
         {
             setTimeout(() =>
             {
-                node.status({});
+                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + (nodeSettings.lastMessage.topic ?? "null") + "' msg.payload = '" + (nodeSettings.lastMessage.payload ?? "null") });
                 node.send(nodeSettings.lastMessage);
             }, 10000);
         }

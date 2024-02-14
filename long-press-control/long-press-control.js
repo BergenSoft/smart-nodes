@@ -22,7 +22,7 @@ module.exports = function (RED)
         {
             if (msg.payload)
             {
-                node.status({ fill: "yellow", shape: "ring", text: "Wait for button release..." });
+                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Wait for button release..." });
                 on_time = Date.now();
                 startAutoLongPress();
             }
@@ -36,13 +36,13 @@ module.exports = function (RED)
 
                 if (pressTime < long_press_ms)
                 {
-                    node.status({ fill: "green", shape: "dot", text: "Last was short" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Last was short" });
                     if (short)
                         node.send([short, null]);
                 }
                 else
                 {
-                    node.status({ fill: "green", shape: "dot", text: "Last was long" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Last was long" });
                     if (long)
                         node.send([null, long]);
                 }
@@ -55,7 +55,7 @@ module.exports = function (RED)
             max_time_on_timeout = setTimeout(() =>
             {
                 on_time = null;
-                node.status({ fill: "green", shape: "dot", text: "Last was long" });
+                node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Last was long" });
                 node.send([null, long]);
             }, long_press_ms);
         };
@@ -64,7 +64,6 @@ module.exports = function (RED)
         {
             if (max_time_on_timeout != null)
             {
-                node.status({});
                 clearTimeout(max_time_on_timeout);
                 max_time_on_timeout = null;
             }

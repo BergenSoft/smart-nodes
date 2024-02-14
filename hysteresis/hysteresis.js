@@ -22,15 +22,15 @@ module.exports = function (RED)
             switch (nodeSettings.active)
             {
                 case true:
-                    node.status({ fill: "yellow", shape: "ring", text: "Load last state: Higher" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Load last state: Higher" });
                     break;
 
                 case false:
-                    node.status({ fill: "yellow", shape: "ring", text: "Load last state: Lower" });
+                    node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Load last state: Lower" });
                     break;
 
                 default:
-                    node.status({ fill: "yellow", shape: "ring", text: "No last state available" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": No last state available" });
                     break;
             }
         }
@@ -64,7 +64,7 @@ module.exports = function (RED)
             {
                 case "setpoint":
                     setpoint = value;
-                    node.status({ fill: "yellow", shape: "ring", text: "New setpoint: " + value });
+                    node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": New setpoint: " + value + "" });
 
                     if (config.save_state)
                         smartContext.set(node.id, nodeSettings);
@@ -72,7 +72,7 @@ module.exports = function (RED)
 
                 case "hysteresis":
                     hysteresis = value;
-                    node.status({ fill: "yellow", shape: "ring", text: "New hysteresis: " + value });
+                    node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": New hysteresis: " + value + "" });
 
                     if (config.save_state)
                         smartContext.set(node.id, nodeSettings);
@@ -81,24 +81,24 @@ module.exports = function (RED)
                 case "resend":
                     if (nodeSettings.active === true && nodeSettings.lastMessage != null)
                     {
-                        node.status({ fill: "green", shape: "dot", text: "Resend higher value " });
+                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Resend higher value" });
                         node.send([nodeSettings.lastMessage, null]);
                     }
                     else if (nodeSettings.active === false && nodeSettings.lastMessage != null)
                     {
-                        node.status({ fill: "green", shape: "dot", text: "Resend lower value " });
+                        node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Resend lower value" });
                         node.send([null, nodeSettings.lastMessage]);
                     }
                     else
                     {
-                        node.status({ fill: "green", shape: "dot", text: "No resend, state is unknown" });
+                        node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": No resend, state is unknown" });
                     }
                     break;
 
                 default:
                     if (value >= setpoint + hysteresis && nodeSettings.active !== true)
                     {
-                        node.status({ fill: "green", shape: "dot", text: "Turned higher by value " + value });
+                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Turned higher by value " + value + "" });
                         nodeSettings.active = true;
                         nodeSettings.lastMessage = out_higher ?? msg;
 
@@ -109,7 +109,7 @@ module.exports = function (RED)
                     }
                     else if (value <= setpoint - hysteresis && nodeSettings.active !== false)
                     {
-                        node.status({ fill: "green", shape: "dot", text: "Turned lower by value " + value });
+                        node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Turned lower by value " + value + "" });
                         nodeSettings.active = false;
                         nodeSettings.lastMessage = out_lower ?? msg;
 
@@ -120,7 +120,7 @@ module.exports = function (RED)
                     }
                     else
                     {
-                        node.status({ fill: "yellow", shape: "ring", text: "No change by value " + value });
+                        node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": No change by value " + value + "" });
                     }
                     break;
             }
@@ -130,7 +130,7 @@ module.exports = function (RED)
         {
         });
 
-        if (config.save_state && config.resend_on_start && nodeSettings.active && nodeSettings.lastMessage != null)
+        if (config.save_state && config.resend_on_start && nodeSettings.active != null && nodeSettings.lastMessage != null)
         {
             setTimeout(() =>
             {

@@ -34,7 +34,7 @@ module.exports = function (RED)
         }
         RED.events.on(event, handler);
 
-        node.status({ fill: "red", shape: "dot", text: "Stopped at " + Math.round(nodeSettings.last_position) + "%" });
+        node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped at " + Math.round(nodeSettings.last_position) + "%" });
 
         node.on("input", function (msg)
         {
@@ -94,7 +94,7 @@ module.exports = function (RED)
                     if (is_running && (msg.payload == 0 || msg.payload == 100))
                         is_running = false;
 
-                    node.status({ fill: "yellow", shape: "ring", text: "Position status received: " + msg.payload + "%" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Position status received: " + msg.payload + "%" });
                     return;
 
                 // This is only used to track starting of the shutter
@@ -103,16 +103,16 @@ module.exports = function (RED)
                     is_running = true;
 
                     if (nodeSettings.last_direction_up)
-                        node.status({ fill: "green", shape: "dot", text: "Up" });
+                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Up" });
                     else
-                        node.status({ fill: "green", shape: "dot", text: "Down" });
+                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Down" });
                     return;
 
                 case "up":
                     nodeSettings.last_direction_up = true;
                     is_running = true;
                     resultUpDown = false;
-                    node.status({ fill: "green", shape: "dot", text: "Up" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Up" });
                     startAutoOffIfNeeded(msg);
                     break;
 
@@ -120,14 +120,14 @@ module.exports = function (RED)
                     is_running = false;
                     resultStop = true;
                     stopAutoOff();
-                    node.status({ fill: "green", shape: "dot", text: "Stopped" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped" });
                     break;
 
                 case "down":
                     nodeSettings.last_direction_up = false;
                     is_running = true;
                     resultUpDown = true;
-                    node.status({ fill: "green", shape: "dot", text: "Down" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Down" });
                     startAutoOffIfNeeded(msg);
                     break;
 
@@ -138,7 +138,7 @@ module.exports = function (RED)
                     if (value > 100) value = 100;
                     // is_running = true; // Not guaranteed that the shutter starts running.
                     resultPosition = value;
-                    node.status({ fill: "green", shape: "dot", text: "Set position to " + value + "%" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Set position to " + value + "%" });
                     break;
             }
 
@@ -166,23 +166,23 @@ module.exports = function (RED)
             let timeMs = helper.getTimeInMsFromString(msg.time_on);
             if (isNaN(timeMs))
             {
-                node.status({ fill: "red", shape: "dot", text: "Invalid time_on value send: " + msg.time_on });
+                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Invalid time_on value send: " + msg.time_on });
                 return;
             }
 
             if (timeMs <= 0)
             {
-                node.status({ fill: "red", shape: "dot", text: "time_on value has to be greater than 0" });
+                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": time_on value has to be greater than 0" });
                 return;
             }
 
             // Stop if any timeout is set
             stopAutoOff();
 
-            node.status({ fill: "yellow", shape: "ring", text: "Wait " + (timeMs / 1000).toFixed(1) + " sec for auto off" });
+            node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Wait " + (timeMs / 1000).toFixed(1) + " sec for auto off" });
             max_time_on_timeout = setTimeout(() =>
             {
-                node.status({ fill: "green", shape: "dot", text: "Stopped" });
+                node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped" });
                 is_running = false;
                 node.send([null, { payload: true }, null]);
                 notifyCentral(false);

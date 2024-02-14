@@ -123,7 +123,7 @@ module.exports = function (RED)
                     resultUp = true;
                     startAutoOff(false, helper.getTimeInMsFromString(msg.time_on) || null);
                     if (!alarm_active)
-                        node.status({ fill: "green", shape: "dot", text: "Up" });
+                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Up" });
                     break;
 
                 case "stop":
@@ -141,7 +141,7 @@ module.exports = function (RED)
                     }
                     off_time = Date.now();
                     stopAutoOff();
-                    node.status({ fill: "red", shape: "dot", text: "Stopped at " + Math.round(nodeSettings.last_position) + "%" });
+                    node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped at " + Math.round(nodeSettings.last_position) + "%" });
                     break;
 
                 case "down":
@@ -164,7 +164,7 @@ module.exports = function (RED)
                     resultDown = true;
                     startAutoOff(true, helper.getTimeInMsFromString(msg.time_on) || null);
                     if (!alarm_active)
-                        node.status({ fill: "green", shape: "dot", text: "Down" });
+                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Down" });
                     break;
 
                 case "position":
@@ -188,7 +188,7 @@ module.exports = function (RED)
                         else
                             nodeSettings.last_position = Math.min(100, nodeSettings.last_position + change_percentage);
 
-                        node.status({ fill: "gray", shape: "dot", text: "Update current position to " + nodeSettings.last_position + "%" });
+                        node.status({ fill: "gray", shape: "dot", text: (new Date()).toLocaleString() + ": Update current position to " + nodeSettings.last_position + "%" });
 
                         // Runs in the wrong direction at the moment, so stop first
                         if (nodeSettings.last_direction_up && value > nodeSettings.last_position)
@@ -226,7 +226,7 @@ module.exports = function (RED)
                         return;
                     }
 
-                    node.status({ fill: "green", shape: "dot", text: "Set position from " + nodeSettings.last_position + "%  to " + value + "%" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Set position from " + nodeSettings.last_position + "%  to " + value + "%" });
                     break;
 
                 case "alarm":
@@ -234,7 +234,7 @@ module.exports = function (RED)
 
                     if (alarm_active)
                     {
-                        node.status({ fill: "red", shape: "dot", text: "ALARM is active" });
+                        node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": ALARM is active" });
 
                         switch (alarm_action)
                         {
@@ -290,12 +290,12 @@ module.exports = function (RED)
 
             if (wait_time_ms < 0)
             {
-                node.status({ fill: "red", shape: "dot", text: "time_on value has to be greater than 0" });
+                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": time_on value has to be greater than 0" });
                 return;
             }
 
             if (!alarm_active)
-                node.status({ fill: "yellow", shape: "ring", text: (down ? "Down" : "Up") + ", wait " + helper.formatMsToStatus(max_time_on, "until") + " for auto off" });
+                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + (down ? "Down" : "Up") + ", wait " + helper.formatMsToStatus(max_time_on, "until") + " for auto off" });
 
             max_time_timeout = setTimeout(() =>
             {
@@ -312,7 +312,7 @@ module.exports = function (RED)
             {
                 // console.log("stopAutoOff");
                 if (!alarm_active)
-                    node.status({ fill: "green", shape: "dot", text: "Stopped at " + Math.round(nodeSettings.last_position) + "%" });
+                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped at " + Math.round(nodeSettings.last_position) + "%" });
                 clearTimeout(max_time_timeout);
                 off_time = Date.now();
                 max_time_timeout = null;
@@ -396,7 +396,7 @@ module.exports = function (RED)
         setTimeout(() =>
         {
             node.send([{ payload: false }, { payload: false }, { payload: nodeSettings.last_position }]);
-            node.status({ fill: "red", shape: "dot", text: "Stopped at " + Math.round(nodeSettings.last_position) + "%" });
+            node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped at " + Math.round(nodeSettings.last_position) + "%" });
             notifyCentral(false);
         }, 10000);
     }

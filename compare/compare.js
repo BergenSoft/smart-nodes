@@ -129,7 +129,7 @@ module.exports = function (RED)
             if (result == null)
                 node.status({});
             else
-                node.status({ fill: "yellow", shape: "ring", text: nodeSettings.values.join(" " + getComparatorSign() + " ") + " => " + result });
+                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + nodeSettings.values.join(" " + getComparatorSign() + " ") + " => " + result });
         }
 
         node.on("close", function ()

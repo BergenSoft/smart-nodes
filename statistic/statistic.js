@@ -176,9 +176,9 @@ module.exports = function (RED)
                 return;
 
             if (operation === "ABS")
-                node.status({ fill: "yellow", shape: "ring", text: operation + " => " + msg.payload });
+                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + operation + " => " + msg.payload });
             else
-                node.status({ fill: "yellow", shape: "ring", text: operation + "(" + Object.entries(nodeSettings.values).map(v => v[1]).join(",") + ") => " + msg.payload });
+                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + operation + "(" + Object.entries(nodeSettings.values).map(v => v[1]).join(",") + ") => " + msg.payload });
         }
 
         if (config.save_state && config.resend_on_start && nodeSettings.lastMessage != null)

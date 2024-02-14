@@ -27,7 +27,7 @@ module.exports = function (RED)
 
             if (nodeSettings.enabled)
                 initTimeouts();
-            
+
             setStatus();
         }, 1000);
 
@@ -177,7 +177,7 @@ module.exports = function (RED)
                 node.status({
                     fill: "red",
                     shape: "dot",
-                    text: "Scheduler disabled"
+                    text: (new Date()).toLocaleString() + ": Scheduler disabled"
                 });
             }
             else if (nextEvents.filter(d => d).lenght == 0)
@@ -185,7 +185,7 @@ module.exports = function (RED)
                 node.status({
                     fill: "red",
                     shape: "dot",
-                    text: "No events planned"
+                    text: (new Date()).toLocaleString() + ": No events planned"
                 });
             }
             else
@@ -198,7 +198,7 @@ module.exports = function (RED)
                 node.status({
                     fill: "yellow",
                     shape: "dot",
-                    text: "Wait " + helper.formatMsToStatus(time, "until") + " to raise next event"
+                    text: (new Date()).toLocaleString() + ": Wait " + helper.formatMsToStatus(time, "until") + " to raise next event"
                 });
             }
         }

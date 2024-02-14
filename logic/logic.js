@@ -153,7 +153,7 @@ module.exports = function (RED)
             let result = getResult();
             let resultText = (invert_output ? "!" : "") + result;
 
-            node.status({ fill: "yellow", shape: "ring", text: "[" + state.join(", ") + "] => " + resultText });
+            node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": [" + state.join(", ") + "] => " + resultText });
         }
 
         if (config.save_state && config.resend_on_start && nodeSettings.last_message != null)
