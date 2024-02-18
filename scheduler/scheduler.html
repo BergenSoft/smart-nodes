@@ -14,6 +14,16 @@
     <div class="form-row node-scheduler-schedules-row">
         <ol id="node-scheduler-schedules"></ol>
     </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
+        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+    </div>
+    <div class="form-row" id="resend_on_start_row">
+        <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+    </div>
 </script>
 
 <script type="text/html" data-template-scheduler-row="">
@@ -117,6 +127,8 @@
                     return true;
                 },
             },
+            save_state: { value: true },
+            resend_on_start: { value: true }
         },
         inputs: 1,
         outputs: 1,
@@ -128,6 +140,15 @@
         oneditprepare: function ()
         {
             let node = this;
+
+            $("#node-input-save_state").on("change", ev =>
+            {
+                if (ev.target.checked)
+                    $("#resend_on_start_row").show();
+                else
+                    $("#resend_on_start_row").hide();
+            });
+            $("#node-input-save_state").trigger("change");
 
             /**
              * prepare schedule

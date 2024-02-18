@@ -88,6 +88,14 @@ module.exports = function (RED)
                 node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Forwarding disabled" });
         }
 
+        if (config.save_state && config.resend_on_start && nodeSettings.lastMessage != null)
+        {
+            setTimeout(() =>
+            {
+                node.send(nodeSettings.lastMessage);
+            }, 10000);
+        }
+
         setStatus();
     }
 

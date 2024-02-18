@@ -103,7 +103,7 @@ module.exports = function (RED)
 
             if (delay_only_on_change)
             {
-                if (timeout)
+                if (timeout != null)
                 {
                     // current delay runs already for the same payload, so don't start a new one.
                     if (next_payload == msg.payload)
@@ -151,6 +151,7 @@ module.exports = function (RED)
             node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Forward msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") + "' in " + helper.formatMsToStatus(delayMs, "at") });
             timeout = setTimeout(() =>
             {
+                timeout = null;
                 node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") });
                 nodeSettings.lastMessage = msg
 

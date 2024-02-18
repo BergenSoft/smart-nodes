@@ -167,7 +167,7 @@ This control parses a text and performs actions to the selected and matching sma
 
 [ text ] is optional
 
--   Turn on [the light in] the living room and int the kitchen off
+-   Turn on [the light in] the living room and the kitchen off
 -   Open [the shutter in] the kitchen and turn studio off
 -   Close [the shutter in the] sleeping room
 -   Living room to 10 %
