@@ -172,11 +172,11 @@ module.exports = function (RED)
                 schedule.second
             );
 
-            console.log({
-                i,
-                findNextDay,
-                nextEvent
-            });
+            // console.log({
+            //     i,
+            //     findNextDay,
+            //     nextEvent
+            // });
 
             return nextEvent;
         }
