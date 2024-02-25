@@ -137,7 +137,7 @@ module.exports = function (RED)
             // No delay if 0 or smaller
             if (delayMs <= 0)
             {
-                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") });
+                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + +msg.topic + "' msg.payload = '" + msg.payload + "'" });
                 nodeSettings.lastMessage = msg
 
                 if (config.save_state)
@@ -148,11 +148,11 @@ module.exports = function (RED)
             }
 
             // start new timeout
-            node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Forward msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") + "' in " + helper.formatMsToStatus(delayMs, "at") });
+            node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Forward msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "' in " + helper.formatMsToStatus(delayMs, "at") });
             timeout = setTimeout(() =>
             {
                 timeout = null;
-                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + (msg.topic ?? "null") + "' msg.payload = '" + (msg.payload ?? "null") });
+                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "'" });
                 nodeSettings.lastMessage = msg
 
                 if (config.save_state)
@@ -166,7 +166,7 @@ module.exports = function (RED)
         {
             setTimeout(() =>
             {
-                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + (nodeSettings.lastMessage.topic ?? "null") + "' msg.payload = '" + (nodeSettings.lastMessage.payload ?? "null") });
+                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + nodeSettings.lastMessage.topic + "' msg.payload = '" + nodeSettings.lastMessage.payload + "'" });
                 node.send(nodeSettings.lastMessage);
             }, 10000);
         }

@@ -69,6 +69,8 @@ module.exports = function (RED)
             // Send cloned message to all linked nodes
             config.links.forEach(link =>
             {
+                // console.log(node.id + " -> " + link);
+                // console.log(newMsg);
                 RED.events.emit("node:" + link, newMsg);
             });
         });

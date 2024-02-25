@@ -27,7 +27,7 @@ module.exports = function (RED)
         let max_time_on_timeout = null;
         let isPermanent = false;
         let isMotion = false;
-        let current_timeout_ms = 0;
+        let timeout_end_date = null;
         let alarm_active = false;
 
         // central handling
@@ -62,7 +62,9 @@ module.exports = function (RED)
                 case "status":
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
-                    doRestartTimer = nodeSettings.last_value != msg.payload;
+
+                    if (nodeSettings.last_value == msg.payload && max_time_on_timeout != null)
+                        doRestartTimer = false;
 
                     nodeSettings.last_value = msg.payload;
                     break;
@@ -178,7 +180,9 @@ module.exports = function (RED)
                 timeMs = max_time_on;
             }
 
-            current_timeout_ms = timeMs;
+            // calculate end date for status message
+            timeout_end_date = new Date();
+            timeout_end_date.setMilliseconds(timeout_end_date.getMilliseconds() + timeMs);
 
             // Stop if any timeout is set
             stopAutoOff();
@@ -216,10 +220,10 @@ module.exports = function (RED)
             }
             else if (nodeSettings.last_value)
             {
-                if (isPermanent || isMotion || current_timeout_ms <= 0)
+                if (isPermanent || isMotion || timeout_end_date == null)
                     node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": On" });
                 else if (max_time_on_timeout)
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Wait " + helper.formatMsToStatus(current_timeout_ms, "until") + " for auto off" });
+                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Wait " + helper.formatDateToStatus(timeout_end_date, "until") + " for auto off" });
             }
             else
             {
@@ -234,9 +238,15 @@ module.exports = function (RED)
 
             config.links.forEach(link =>
             {
+                // console.log(node.id + " -> " + link);
+                // console.log({ source: node.id, state: state });
                 RED.events.emit("node:" + link, { source: node.id, state: state });
             });
         }
+
+        // After node red restart, start also the timeout
+        if (nodeSettings.last_value)
+            startAutoOffIfNeeded(helper.getTimeInMsFromString(max_time_on));
 
         setStatus();
     }

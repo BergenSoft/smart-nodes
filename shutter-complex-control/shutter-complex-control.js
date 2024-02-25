@@ -388,6 +388,8 @@ module.exports = function (RED)
 
             config.links.forEach(link =>
             {
+                // console.log(node.id + " -> " + link);
+                // console.log({ source: node.id, state: state });
                 RED.events.emit("node:" + link, { source: node.id, state: state });
             });
         };

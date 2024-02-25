@@ -286,12 +286,12 @@ module.exports = function (RED)
         {
             if (action != null && affectedNodes.length > 0)
             {
-                for (const node of affectedNodes)
+                for (const targetNode of affectedNodes)
                 {
-                    if (mode == "light" && !["smart_light-control", "smart_scene-control"].includes(node.type))
+                    if (mode == "light" && !["smart_light-control", "smart_scene-control"].includes(targetNode.type))
                         continue;
 
-                    if (mode == "shutter" && !["smart_shutter-control", "smart_shutter-complex-control"].includes(node.type))
+                    if (mode == "shutter" && !["smart_shutter-control", "smart_shutter-complex-control"].includes(targetNode.type))
                         continue;
 
                     // node.log("Notify node " + node.id);
@@ -299,11 +299,17 @@ module.exports = function (RED)
                     {
                         // console.log({ "topic": action, "payload": number });
                         if (number != null)
-                            RED.events.emit("node:" + node.id, { "topic": action, "payload": number });
+                        {
+                            // console.log(node.id + " -> " + targetNode.id);
+                            // console.log({ "topic": action, "payload": number });
+                            RED.events.emit("node:" + targetNode.id, { "topic": action, "payload": number });
+                        }
                     }
                     else
                     {
-                        RED.events.emit("node:" + node.id, { "topic": action });
+                        // console.log(node.id + " -> " + targetNode.id);
+                        // console.log({ "topic": action });
+                        RED.events.emit("node:" + targetNode.id, { "topic": action });
                     }
                 }
 

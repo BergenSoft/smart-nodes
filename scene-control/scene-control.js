@@ -263,9 +263,17 @@ module.exports = function (RED)
 
             config.links.forEach(link =>
             {
+                // console.log(node.id + " -> " + link);
+                // console.log({ source: node.id, state: state });
                 RED.events.emit("node:" + link, { source: node.id, state: state });
             });
         }
+
+        // After node red restart, start also the timeout
+        if (getCurrentScene() != 0)
+            startAutoOffIfNeeded(helper.getTimeInMsFromString(max_time_on));
+
+        status();
     }
     RED.nodes.registerType("smart_scene-control", SceneControlNode);
 };

@@ -152,5 +152,41 @@ module.exports = {
             result = value + "." + result;
 
         return result;
+    },
+    formatDateToStatus(date, timeConcatWord = null)
+    {
+        let result = "";
+
+        if (timeConcatWord)
+            result = " " + timeConcatWord + " " + date.getHours() + ":" + ("" + date.getMinutes()).padStart(2, "0") + ":" + ("" + date.getSeconds()).padStart(2, "0");
+
+        let value = date - new Date();
+        if (value <= 0)
+            return "0:00" + result;
+
+        // value in sec
+        value = parseInt(value / 1000, 10);
+        result = (value % 60) + result;
+        if (value % 60 < 10)
+            result = "0" + result;
+
+        // value in min
+        value = parseInt(value / 60, 10);
+        result = (value % 60) + ":" + result;
+        if (value % 60 < 10)
+            result = "0" + result;
+
+        // value in hour
+        value = parseInt(value / 60, 10);
+        result = (value % 24) + ":" + result;
+        if (value % 24 < 10)
+            result = "0" + result;
+
+        // value in days
+        value = parseInt(value / 24, 10);
+        if (value > 0)
+            result = value + "." + result;
+
+        return result;
     }
 };

@@ -12,6 +12,8 @@ module.exports = function (RED)
         var nodeSettings = {
             active: null,
             lastMessage: null,
+            setpoint: parseFloat(config.setpoint),
+            hysteresis: parseFloat(config.hysteresis)
         };
 
         if (config.save_state)
@@ -42,8 +44,6 @@ module.exports = function (RED)
         }
 
         // dynamic config
-        let setpoint = parseFloat(config.setpoint);
-        let hysteresis = parseFloat(config.hysteresis);
         let out_higher = helper.evaluateNodeProperty(RED, config.out_higher, config.out_higher_type);
         let out_lower = helper.evaluateNodeProperty(RED, config.out_lower, config.out_lower_type);
 
@@ -63,7 +63,7 @@ module.exports = function (RED)
             switch (realTopic)
             {
                 case "setpoint":
-                    setpoint = value;
+                    nodeSettings.setpoint = value;
                     node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": New setpoint: " + value + "" });
 
                     if (config.save_state)
@@ -71,7 +71,7 @@ module.exports = function (RED)
                     break;
 
                 case "hysteresis":
-                    hysteresis = value;
+                    nodeSettings.hysteresis = value;
                     node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": New hysteresis: " + value + "" });
 
                     if (config.save_state)
@@ -96,22 +96,22 @@ module.exports = function (RED)
                     break;
 
                 default:
-                    if (value >= setpoint + hysteresis && nodeSettings.active !== true)
+                    if (value >= nodeSettings.setpoint + nodeSettings.hysteresis && nodeSettings.active !== true)
                     {
                         node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Turned higher by value " + value + "" });
                         nodeSettings.active = true;
-                        nodeSettings.lastMessage = out_higher ?? msg;
+                        nodeSettings.lastMessage = createMessage(out_higher ?? msg, value);
 
                         if (config.save_state)
                             smartContext.set(node.id, nodeSettings);
 
                         node.send([nodeSettings.lastMessage, null]);
                     }
-                    else if (value <= setpoint - hysteresis && nodeSettings.active !== false)
+                    else if (value <= nodeSettings.setpoint - nodeSettings.hysteresis && nodeSettings.active !== false)
                     {
                         node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Turned lower by value " + value + "" });
                         nodeSettings.active = false;
-                        nodeSettings.lastMessage = out_lower ?? msg;
+                        nodeSettings.lastMessage = createMessage(out_lower ?? msg, value);
 
                         if (config.save_state)
                             smartContext.set(node.id, nodeSettings);
@@ -129,6 +129,18 @@ module.exports = function (RED)
         node.on("close", function ()
         {
         });
+
+        let createMessage = (msg, value) =>
+        {
+            return Object.assign({}, msg, {
+                smart_info: {
+                    active: nodeSettings.active,
+                    hysteresis: nodeSettings.hysteresis,
+                    setpoint: nodeSettings.setpoint,
+                    last_value: value
+                }
+            })
+        };
 
         if (config.save_state && config.resend_on_start && nodeSettings.active != null && nodeSettings.lastMessage != null)
         {
