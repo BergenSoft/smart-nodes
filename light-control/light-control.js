@@ -1,11 +1,13 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function LightControlNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
         // used from text-exec node
@@ -15,9 +17,9 @@ module.exports = function (RED)
             node.exec_text_names = [];
 
         // persistent values
-        var nodeSettings = Object.assign({}, {
+        var node_settings = Object.assign({}, {
             last_value: false,
-        }, smartContext.get(node.id));
+        }, smart_context.get(node.id));
 
         // dynamic config
         let max_time_on = helper.getTimeInMs(config.max_time_on, config.max_time_on_unit);
@@ -44,7 +46,7 @@ module.exports = function (RED)
             handleTopic(msg);
 
             setStatus();
-            smartContext.set(node.id, nodeSettings);
+            smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -63,10 +65,10 @@ module.exports = function (RED)
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
 
-                    if (nodeSettings.last_value == msg.payload && max_time_on_timeout != null)
+                    if (node_settings.last_value == msg.payload && max_time_on_timeout != null)
                         doRestartTimer = false;
 
-                    nodeSettings.last_value = msg.payload;
+                    node_settings.last_value = msg.payload;
                     break;
 
                 case "off":
@@ -74,7 +76,7 @@ module.exports = function (RED)
                     if (msg.payload === false)
                         return;
 
-                    nodeSettings.last_value = false;
+                    node_settings.last_value = false;
                     break;
 
                 case "on":
@@ -82,19 +84,19 @@ module.exports = function (RED)
                     if (msg.payload === false)
                         return;
 
-                    nodeSettings.last_value = true;
+                    node_settings.last_value = true;
                     break;
 
                 case "set":
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
-                    nodeSettings.last_value = msg.payload;
+                    node_settings.last_value = msg.payload;
                     break;
 
                 case "set_permanent":
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
-                    nodeSettings.last_value = msg.payload;
+                    node_settings.last_value = msg.payload;
                     isPermanent = msg.payload;
                     break;
 
@@ -106,16 +108,16 @@ module.exports = function (RED)
                     if (msg.payload == false)
                     {
                         // It already was off, so don't turn on
-                        if (nodeSettings.last_value == false)
+                        if (node_settings.last_value == false)
                             return;
 
                         // If time is set to 0, then turn off immediately
                         if (helper.getTimeInMsFromString(msg.time_on ?? max_time_on) == 0)
-                            nodeSettings.last_value = false;
+                            node_settings.last_value = false;
                     }
                     else
                     {
-                        nodeSettings.last_value = true;
+                        node_settings.last_value = true;
                     }
                     break;
 
@@ -131,7 +133,7 @@ module.exports = function (RED)
                     if (msg.payload === false)
                         return;
 
-                    nodeSettings.last_value = !nodeSettings.last_value;
+                    node_settings.last_value = !node_settings.last_value;
                     break;
             }
 
@@ -146,24 +148,24 @@ module.exports = function (RED)
                 switch (alarm_action)
                 {
                     case "ON":
-                        nodeSettings.last_value = true;
+                        node_settings.last_value = true;
                         break;
 
                     default:
                     case "OFF":
-                        nodeSettings.last_value = false;
+                        node_settings.last_value = false;
                         break;
                 }
             }
 
             if (alarm_active || helper.getTopicName(msg.topic) != "status")
-                node.send({ payload: nodeSettings.last_value });
+                node.send({ payload: node_settings.last_value });
 
             // Output is on, now
-            if (nodeSettings.last_value && doRestartTimer)
+            if (node_settings.last_value && doRestartTimer)
                 startAutoOffIfNeeded(helper.getTimeInMsFromString(msg.time_on ?? max_time_on));
 
-            notifyCentral(nodeSettings.last_value);
+            notifyCentral(node_settings.last_value);
         }
 
         let startAutoOffIfNeeded = origTimeMs =>
@@ -188,18 +190,18 @@ module.exports = function (RED)
             stopAutoOff();
 
             // 0 = Always on
-            if (timeMs <= 0 || isPermanent || isMotion || !nodeSettings.last_value)
+            if (timeMs <= 0 || isPermanent || isMotion || !node_settings.last_value)
                 return;
 
             max_time_on_timeout = setTimeout(() =>
             {
                 max_time_on_timeout = null;
-                nodeSettings.last_value = false;
+                node_settings.last_value = false;
                 node.send({ payload: false });
                 notifyCentral(false);
 
                 setStatus();
-                smartContext.set(node.id, nodeSettings);
+                smart_context.set(node.id, node_settings);
             }, timeMs);
         };
 
@@ -216,18 +218,18 @@ module.exports = function (RED)
         {
             if (alarm_active)
             {
-                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": ALARM is active" });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": ALARM is active" });
             }
-            else if (nodeSettings.last_value)
+            else if (node_settings.last_value)
             {
                 if (isPermanent || isMotion || timeout_end_date == null)
-                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": On" });
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": On" });
                 else if (max_time_on_timeout)
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Wait " + helper.formatDateToStatus(timeout_end_date, "until") + " for auto off" });
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Wait " + helper.formatDateToStatus(timeout_end_date, "until") + " for auto off" });
             }
             else
             {
-                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Off" });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Off" });
             }
         }
 
@@ -245,7 +247,7 @@ module.exports = function (RED)
         }
 
         // After node red restart, start also the timeout
-        if (nodeSettings.last_value)
+        if (node_settings.last_value)
             startAutoOffIfNeeded(helper.getTimeInMsFromString(max_time_on));
 
         setStatus();

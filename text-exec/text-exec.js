@@ -1,5 +1,7 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function TextExecNode(config)
     {
         const node = this;
@@ -37,7 +39,7 @@ module.exports = function (RED)
                 return;
             }
 
-            node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": " + message });
+            node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + message });
             log = {
                 lookup: lookup,
                 actions: []

@@ -1,17 +1,18 @@
-
 module.exports = function (RED)
 {
+    "use strict";
+
     function HysteresisNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        var nodeSettings = {
+        var node_settings = {
             active: null,
-            lastMessage: null,
+            last_message: null,
             setpoint: parseFloat(config.setpoint),
             hysteresis: parseFloat(config.hysteresis)
         };
@@ -19,20 +20,20 @@ module.exports = function (RED)
         if (config.save_state)
         {
             // load old saved values
-            nodeSettings = Object.assign(nodeSettings, smartContext.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id));
 
-            switch (nodeSettings.active)
+            switch (node_settings.active)
             {
                 case true:
-                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Load last state: Higher" });
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Load last state: Higher" });
                     break;
 
                 case false:
-                    node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Load last state: Lower" });
+                    node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Load last state: Lower" });
                     break;
 
                 default:
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": No last state available" });
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": No last state available" });
                     break;
             }
         }
@@ -40,7 +41,7 @@ module.exports = function (RED)
         {
             // delete old saved values
             node.status({});
-            smartContext.del(node.id);
+            smart_context.del(node.id);
         }
 
         // dynamic config
@@ -52,75 +53,75 @@ module.exports = function (RED)
         node.on("input", function (msg)
         {
             let value = parseFloat(msg.payload);
-            let realTopic = helper.getTopicName(msg.topic);
+            let real_topic = helper.getTopicName(msg.topic);
 
-            if (isNaN(value) && realTopic !== "resend")
+            if (isNaN(value) && real_topic !== "resend")
             {
                 // node.error("Invalid payload: " + msg.payload);
                 return;
             }
 
-            switch (realTopic)
+            switch (real_topic)
             {
                 case "setpoint":
-                    nodeSettings.setpoint = value;
-                    node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": New setpoint: " + value + "" });
+                    node_settings.setpoint = value;
+                    node.status({ fill: node_settings.active ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": New setpoint: " + value + "" });
 
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 case "hysteresis":
-                    nodeSettings.hysteresis = value;
-                    node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": New hysteresis: " + value + "" });
+                    node_settings.hysteresis = value;
+                    node.status({ fill: node_settings.active ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": New hysteresis: " + value + "" });
 
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 case "resend":
-                    if (nodeSettings.active === true && nodeSettings.lastMessage != null)
+                    if (node_settings.active === true && node_settings.last_message != null)
                     {
-                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Resend higher value" });
-                        node.send([nodeSettings.lastMessage, null]);
+                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Resend higher value" });
+                        node.send([node_settings.last_message, null]);
                     }
-                    else if (nodeSettings.active === false && nodeSettings.lastMessage != null)
+                    else if (node_settings.active === false && node_settings.last_message != null)
                     {
-                        node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Resend lower value" });
-                        node.send([null, nodeSettings.lastMessage]);
+                        node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Resend lower value" });
+                        node.send([null, node_settings.last_message]);
                     }
                     else
                     {
-                        node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": No resend, state is unknown" });
+                        node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": No resend, state is unknown" });
                     }
                     break;
 
                 default:
-                    if (value >= nodeSettings.setpoint + nodeSettings.hysteresis && nodeSettings.active !== true)
+                    if (value >= node_settings.setpoint + node_settings.hysteresis && node_settings.active !== true)
                     {
-                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Turned higher by value " + value + "" });
-                        nodeSettings.active = true;
-                        nodeSettings.lastMessage = createMessage(out_higher ?? msg, value);
+                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Turned higher by value " + value + "" });
+                        node_settings.active = true;
+                        node_settings.last_message = createMessage(out_higher ?? msg, value);
 
                         if (config.save_state)
-                            smartContext.set(node.id, nodeSettings);
+                            smart_context.set(node.id, node_settings);
 
-                        node.send([nodeSettings.lastMessage, null]);
+                        node.send([node_settings.last_message, null]);
                     }
-                    else if (value <= nodeSettings.setpoint - nodeSettings.hysteresis && nodeSettings.active !== false)
+                    else if (value <= node_settings.setpoint - node_settings.hysteresis && node_settings.active !== false)
                     {
-                        node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Turned lower by value " + value + "" });
-                        nodeSettings.active = false;
-                        nodeSettings.lastMessage = createMessage(out_lower ?? msg, value);
+                        node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Turned lower by value " + value + "" });
+                        node_settings.active = false;
+                        node_settings.last_message = createMessage(out_lower ?? msg, value);
 
                         if (config.save_state)
-                            smartContext.set(node.id, nodeSettings);
+                            smart_context.set(node.id, node_settings);
 
-                        node.send([null, nodeSettings.lastMessage]);
+                        node.send([null, node_settings.last_message]);
                     }
                     else
                     {
-                        node.status({ fill: nodeSettings.active ? "green" : "red", shape: "ring", text: (new Date()).toLocaleString() + ": No change by value " + value + "" });
+                        node.status({ fill: node_settings.active ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": No change by value " + value + "" });
                     }
                     break;
             }
@@ -134,22 +135,22 @@ module.exports = function (RED)
         {
             return Object.assign({}, msg, {
                 smart_info: {
-                    active: nodeSettings.active,
-                    hysteresis: nodeSettings.hysteresis,
-                    setpoint: nodeSettings.setpoint,
+                    active: node_settings.active,
+                    hysteresis: node_settings.hysteresis,
+                    setpoint: node_settings.setpoint,
                     last_value: value
                 }
             })
         };
 
-        if (config.save_state && config.resend_on_start && nodeSettings.active != null && nodeSettings.lastMessage != null)
+        if (config.save_state && config.resend_on_start && node_settings.active != null && node_settings.last_message != null)
         {
             setTimeout(() =>
             {
-                if (nodeSettings.active)
-                    node.send([nodeSettings.lastMessage, null]);
+                if (node_settings.active)
+                    node.send([node_settings.last_message, null]);
                 else
-                    node.send([null, nodeSettings.lastMessage]);
+                    node.send([null, node_settings.last_message]);
             }, 10000);
         }
     }

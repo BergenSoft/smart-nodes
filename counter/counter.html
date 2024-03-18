@@ -1,0 +1,104 @@
+<script type="text/javascript">
+    RED.nodes.registerType("smart_counter", {
+        category: "Smart Nodes",
+        paletteLabel: "Counter",
+        color: "#6EE2D9",
+        defaults: {
+            name: { value: "" },
+            start: { value: 0 },
+            step: { value: 1 },
+            min: { value: 0 },
+            max: { value: 10 },
+            save_state: { value: true },
+            resend_on_start: { value: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "smart_counter.png",
+        label: function ()
+        {
+            return this.name || "Counter";
+        },
+        oneditprepare: function ()
+        {
+            $("#node-input-save_state").on("change", ev =>
+            {
+                if (ev.target.checked)
+                    $("#resend_on_start_row").show();
+                else
+                    $("#resend_on_start_row").hide();
+            });
+            $("#node-input-save_state").trigger("change");
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="smart_counter">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-start"><i class="fa fa-cog"></i> Start</label>
+        <input type="number" id="node-input-start" placeholder="Startwert">
+    </div>
+    <div class="form-row">
+        <label for="node-input-step"><i class="fa fa-forward"></i> Schritt</label>
+        <input type="number" id="node-input-step" placeholder="Schrittweite">
+    </div>
+    <div class="form-row">
+        <label for="node-input-min"><i class="fa fa-arrow-down"></i> Min</label>
+        <input type="number" id="node-input-min" placeholder="Min">
+    </div>
+    <div class="form-row">
+        <label for="node-input-max"><i class="fa fa-arrow-up"></i> Max</label>
+        <input type="number" id="node-input-max" placeholder="Max">
+    </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
+        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+    </div>
+    <div class="form-row" id="resend_on_start_row">
+        <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="smart_counter">
+    <p>Diese Node kann verwendet werden um nach oben oder unten zu zählen.</p>
+    <p>
+        Die Standardschrittweite kann vorgegeben oder durch einkommende Nachrichten temporär überschrieben werden.
+        Es sind auch Kommazahlen möglich.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>up</code></td>
+                    <td>Erhöht den Wert um <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) um die konfigurierte Schrittweite. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
+                </tr>
+                <tr>
+                    <td><code>down</code></td>
+                    <td>Verringert den Wert um <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) um die konfigurierte Schrittweite. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
+                </tr>
+                <tr>
+                    <td><code>reset</code></td>
+                    <td>Setzt den Wert auf <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) auf den Startwert zurück. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

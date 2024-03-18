@@ -1,11 +1,13 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function ShutterControlNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
         // used from text-exec node
@@ -15,10 +17,10 @@ module.exports = function (RED)
             node.exec_text_names = [];
 
         // persistent values
-        var nodeSettings = Object.assign({}, {
+        var node_settings = Object.assign({}, {
             last_position: 0,        // 0 = opened, 100 = closed
             last_direction_up: true, // remember last direction for toggle action
-        }, smartContext.get(node.id));
+        }, smart_context.get(node.id));
 
         // dynamic config
 
@@ -34,13 +36,13 @@ module.exports = function (RED)
         }
         RED.events.on(event, handler);
 
-        node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped at " + Math.round(nodeSettings.last_position) + "%" });
+        node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped at " + Math.round(node_settings.last_position) + "%" });
 
         node.on("input", function (msg)
         {
             handleTopic(msg);
 
-            smartContext.set(node.id, nodeSettings);
+            smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -55,64 +57,64 @@ module.exports = function (RED)
             var resultStop = null;
             var resultPosition = null;
 
-            var realTopic = helper.getTopicName(msg.topic);
+            var real_topic = helper.getTopicName(msg.topic);
 
             // set default topic
-            if (!["status", "status_position", "up_down", "up", "up_stop", "down", "down_stop", "stop", "toggle", "position"].includes(realTopic))
-                realTopic = "toggle";
+            if (!["status", "status_position", "up_down", "up", "up_stop", "down", "down_stop", "stop", "toggle", "position"].includes(real_topic))
+                real_topic = "toggle";
 
             // skip if button is released
-            if (msg.payload === false && ["up", "up_stop", "down", "down_stop", "stop", "toggle"].includes(realTopic))
+            if (msg.payload === false && ["up", "up_stop", "down", "down_stop", "stop", "toggle"].includes(real_topic))
                 return;
 
             // Correct next topic to avoid handling up_stop, down_stop or toggle separately.
-            if ((max_time_on_timeout != null || is_running) && (realTopic == "up_stop" || realTopic == "down_stop" || realTopic == "toggle"))
+            if ((max_time_on_timeout != null || is_running) && (real_topic == "up_stop" || real_topic == "down_stop" || real_topic == "toggle"))
             {
-                realTopic = "stop";
+                real_topic = "stop";
             }
             else if (max_time_on_timeout == null && !is_running)
             {
                 // shutter is not running, set next command depending on topic
-                if (realTopic == "up_stop")
-                    realTopic = "up";
-                else if (realTopic == "down_stop")
-                    realTopic = "down";
-                else if (nodeSettings.last_direction_up && realTopic == "toggle")
-                    realTopic = "down";
-                else if (!nodeSettings.last_direction_up && realTopic == "toggle")
-                    realTopic = "up";
+                if (real_topic == "up_stop")
+                    real_topic = "up";
+                else if (real_topic == "down_stop")
+                    real_topic = "down";
+                else if (node_settings.last_direction_up && real_topic == "toggle")
+                    real_topic = "down";
+                else if (!node_settings.last_direction_up && real_topic == "toggle")
+                    real_topic = "up";
             }
 
 
-            switch (realTopic)
+            switch (real_topic)
             {
                 case "status":
                 case "status_position":
-                    nodeSettings.last_direction_up = nodeSettings.last_position > msg.payload;
-                    nodeSettings.last_position = msg.payload;
+                    node_settings.last_direction_up = node_settings.last_position > msg.payload;
+                    node_settings.last_position = msg.payload;
 
                     if (is_running && (msg.payload == 0 || msg.payload == 100))
                         is_running = false;
 
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Position status received: " + msg.payload + "%" });
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Position status received: " + msg.payload + "%" });
                     return;
 
                 // This is only used to track starting of the shutter
                 case "up_down":
-                    nodeSettings.last_direction_up = !msg.payload;
+                    node_settings.last_direction_up = !msg.payload;
                     is_running = true;
 
-                    if (nodeSettings.last_direction_up)
-                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Up" });
+                    if (node_settings.last_direction_up)
+                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Up" });
                     else
-                        node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Down" });
+                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Down" });
                     return;
 
                 case "up":
-                    nodeSettings.last_direction_up = true;
+                    node_settings.last_direction_up = true;
                     is_running = true;
                     resultUpDown = false;
-                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Up" });
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Up" });
                     startAutoOffIfNeeded(msg);
                     break;
 
@@ -120,14 +122,14 @@ module.exports = function (RED)
                     is_running = false;
                     resultStop = true;
                     stopAutoOff();
-                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped" });
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped" });
                     break;
 
                 case "down":
-                    nodeSettings.last_direction_up = false;
+                    node_settings.last_direction_up = false;
                     is_running = true;
                     resultUpDown = true;
-                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Down" });
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Down" });
                     startAutoOffIfNeeded(msg);
                     break;
 
@@ -138,7 +140,7 @@ module.exports = function (RED)
                     if (value > 100) value = 100;
                     // is_running = true; // Not guaranteed that the shutter starts running.
                     resultPosition = value;
-                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Set position to " + value + "%" });
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Set position to " + value + "%" });
                     break;
             }
 
@@ -166,23 +168,23 @@ module.exports = function (RED)
             let timeMs = helper.getTimeInMsFromString(msg.time_on);
             if (isNaN(timeMs))
             {
-                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Invalid time_on value send: " + msg.time_on });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Invalid time_on value send: " + msg.time_on });
                 return;
             }
 
             if (timeMs <= 0)
             {
-                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": time_on value has to be greater than 0" });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": time_on value has to be greater than 0" });
                 return;
             }
 
             // Stop if any timeout is set
             stopAutoOff();
 
-            node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Wait " + (timeMs / 1000).toFixed(1) + " sec for auto off" });
+            node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Wait " + (timeMs / 1000).toFixed(1) + " sec for auto off" });
             max_time_on_timeout = setTimeout(() =>
             {
-                node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Stopped" });
+                node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped" });
                 is_running = false;
                 node.send([null, { payload: true }, null]);
                 notifyCentral(false);

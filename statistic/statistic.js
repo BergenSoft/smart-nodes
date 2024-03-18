@@ -1,14 +1,16 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function StatisticNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        var nodeSettings = {
+        var node_settings = {
             values: [],
             lastMessage: null,
         };
@@ -16,12 +18,12 @@ module.exports = function (RED)
         if (config.save_state)
         {
             // load old saved values
-            nodeSettings = Object.assign(nodeSettings, smartContext.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id));
         }
         else
         {
             // delete old saved values
-            smartContext.del(node.id);
+            smart_context.del(node.id);
         }
 
         // dynamic config
@@ -39,15 +41,15 @@ module.exports = function (RED)
                 return;
             }
 
-            let realTopic = helper.getTopicNumber(msg.topic) || 0;
-            // realTopic should be sended with 1-based, but internally 0-based is needed
-            realTopic--;
+            let real_topic = helper.getTopicNumber(msg.topic) || 0;
+            // real_topic should be sended with 1-based, but internally 0-based is needed
+            real_topic--;
 
             if (operation === "MOV_AVG")
             {
-                nodeSettings.values.push(parseFloat(msg.payload));
-                if (nodeSettings.values.length > count)
-                    nodeSettings.values.splice(0, 1);
+                node_settings.values.push(parseFloat(msg.payload));
+                if (node_settings.values.length > count)
+                    node_settings.values.splice(0, 1);
             }
             else if (operation != "ABS")
             {
@@ -56,7 +58,7 @@ module.exports = function (RED)
                     node.error("Topic not set");
                     return;
                 }
-                nodeSettings.values[realTopic] = parseFloat(msg.payload);
+                node_settings.values[real_topic] = parseFloat(msg.payload);
             }
 
             msg = getResult(msg);
@@ -64,12 +66,12 @@ module.exports = function (RED)
 
             if (msg)
             {
-                nodeSettings.lastMessage = msg;
+                node_settings.lastMessage = msg;
                 node.send(msg);
             }
 
             if (config.save_state)
-                smartContext.set(node.id, nodeSettings);
+                smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -81,7 +83,7 @@ module.exports = function (RED)
             let length;
             if (operation !== "MOV_AVG" && operation !== "ABS") 
             {
-                length = Object.entries(nodeSettings.values).length;
+                length = Object.entries(node_settings.values).length;
                 if (length == 0)
                     return null;
             }
@@ -90,7 +92,7 @@ module.exports = function (RED)
             switch (operation)
             {
                 case "MIN":
-                    result = Object.entries(nodeSettings.values).reduce((v1, v2) =>
+                    result = Object.entries(node_settings.values).reduce((v1, v2) =>
                     {
                         if (v1[1] <= v2[1])
                             return v1;
@@ -99,7 +101,7 @@ module.exports = function (RED)
                     break;
 
                 case "MAX":
-                    result = Object.entries(nodeSettings.values).reduce((v1, v2) =>
+                    result = Object.entries(node_settings.values).reduce((v1, v2) =>
                     {
                         if (v1[1] >= v2[1])
                             return v1;
@@ -108,18 +110,18 @@ module.exports = function (RED)
                     break;
 
                 case "SUM":
-                    result = Object.entries(nodeSettings.values).reduce((v1, v2) =>
+                    result = Object.entries(node_settings.values).reduce((v1, v2) =>
                     {
                         return [null, v1[1] + v2[1]];
                     });
                     break;
 
                 case "DIFF":
-                    if (nodeSettings.values.length >= 2)
+                    if (node_settings.values.length >= 2)
                     {
                         result = [
                             null,
-                            nodeSettings.values[0] - nodeSettings.values[1]
+                            node_settings.values[0] - node_settings.values[1]
                         ];
                     }
                     break;
@@ -129,17 +131,17 @@ module.exports = function (RED)
                     return msg;
 
                 case "ABS_DIFF":
-                    if (nodeSettings.values.length >= 2)
+                    if (node_settings.values.length >= 2)
                     {
                         result = [
                             null,
-                            Math.abs(nodeSettings.values[0] - nodeSettings.values[1])
+                            Math.abs(node_settings.values[0] - node_settings.values[1])
                         ];
                     }
                     break;
 
                 case "AVG":
-                    let value = Object.entries(nodeSettings.values).reduce((v1, v2) =>
+                    let value = Object.entries(node_settings.values).reduce((v1, v2) =>
                     {
                         return [null, v1[1] + v2[1]];
                     });
@@ -149,7 +151,7 @@ module.exports = function (RED)
                     };
 
                 case "MOV_AVG":
-                    msg.payload = nodeSettings.values.reduce((v1, v2) => v1 + v2) / nodeSettings.values.length;
+                    msg.payload = node_settings.values.reduce((v1, v2) => v1 + v2) / node_settings.values.length;
                     return msg;
             }
 
@@ -176,20 +178,20 @@ module.exports = function (RED)
                 return;
 
             if (operation === "ABS")
-                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + operation + " => " + msg.payload });
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + " => " + msg.payload });
             else
-                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + operation + "(" + Object.entries(nodeSettings.values).map(v => v[1]).join(",") + ") => " + msg.payload });
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + "(" + Object.entries(node_settings.values).map(v => v[1]).join(",") + ") => " + msg.payload });
         }
 
-        if (config.save_state && config.resend_on_start && nodeSettings.lastMessage != null)
+        if (config.save_state && config.resend_on_start && node_settings.lastMessage != null)
         {
             setTimeout(() =>
             {
-                node.send(nodeSettings.lastMessage);
+                node.send(node_settings.lastMessage);
             }, 10000);
         }
 
-        setStatus(nodeSettings.lastMessage);
+        setStatus(node_settings.lastMessage);
     }
 
     RED.nodes.registerType("smart_statistic", StatisticNode);

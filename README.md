@@ -1,7 +1,7 @@
 # General information
 
 The smart nodes was created to control smart home devices like lights, power outlets shutter and some more.
-This controls are designed to work with the [node-red-contrib-knx-ultimate](https://github.com/Supergiovane/node-red-contrib-knx-ultimate) but it could also work with other smart technologies.
+This nodes are designed to work with the [node-red-contrib-knx-ultimate](https://github.com/Supergiovane/node-red-contrib-knx-ultimate) but it could also work with other smart technologies.
 
 The knx binary input and output/switching modules should be configured very stupid. Closing a binary input should output 1 and releasing 0.
 Same for the output/switching modules, 1 should turn on and 0 turn out. That makes it easy to count the presses or check for short and long presses.
@@ -62,8 +62,8 @@ This node can control multiple light/scene controls or shutter controls at the s
 
 ## 5. Long press control
 
-This control is used to detect a short or a long press.
-The time can be configured in this control.
+This node is used to detect a short or a long press.
+The time can be configured in this node.
 
 ### **Features:**
 
@@ -71,8 +71,8 @@ The time can be configured in this control.
 
 ## 6. Multi press control
 
-This control is used to detect multiple presses on a button.
-The max wait time between presses can be configured in this control.
+This node is used to detect multiple presses on a button.
+The max wait time between presses can be configured in this node.
 You can also choose 2-4 press detection.
 
 ### **Features:**
@@ -81,7 +81,7 @@ You can also choose 2-4 press detection.
 
 ## 7. Hysteresis
 
-This control is checking if the input value reachs a defined value until the upper message is send. When the lower level is reached, the lower masssage will be send
+This node is checking if the input value reachs a defined value until the upper message is send. When the lower level is reached, the lower masssage will be send
 
 ### **Features:**
 
@@ -90,7 +90,7 @@ This control is checking if the input value reachs a defined value until the upp
 
 ## 8. Logic
 
-This control can be used for AND, OR and XOR logics.
+This node can be used for AND, OR and XOR logics.
 
 ### **Features:**
 
@@ -102,7 +102,7 @@ This control can be used for AND, OR and XOR logics.
 
 ## 9. Statistic
 
-This control can be used for getting the following types of values: Minimum, Maximum, Sum, Difference, Absolute Value, Absolute Difference, Average and Running average.
+This node can be used for getting the following types of values: Minimum, Maximum, Sum, Difference, Absolute Value, Absolute Difference, Average and Running average.
 
 ### **Features:**
 
@@ -113,7 +113,7 @@ This control can be used for getting the following types of values: Minimum, Max
 
 ## 10. Compare
 
-This control can compare 2 values with the following operators: < <= == >= > !=
+This node can compare 2 values with the following operators: < <= == >= > !=
 
 ### **Features:**
 
@@ -123,7 +123,7 @@ This control can compare 2 values with the following operators: < <= == >= > !=
 
 ## 11. Delay
 
-This control can delay incomming messages.
+This node can delay incomming messages.
 
 ### **Features:**
 
@@ -134,7 +134,7 @@ This control can delay incomming messages.
 
 ## 12. Forwarder
 
-This control can control if an incomming message should be forwarded or not.
+This node can control if an incomming message should be forwarded or not.
 
 ### **Features:**
 
@@ -144,7 +144,7 @@ This control can control if an incomming message should be forwarded or not.
 
 ## 13. Scheduler
 
-This control can send a defined message on defined times.
+This node can send a defined message on defined times.
 
 ### **Features:**
 
@@ -156,20 +156,50 @@ This control can send a defined message on defined times.
 
 ## 14. Text execution
 
-This control parses a text and performs actions to the selected and matching smart nodes
+This node parses a text and performs actions to the selected and matching smart nodes
 
 ### **Features:**
 
--   Control light and scenes (only on or off) in german and english
--   Control shutter in german and english
+-   Control light and scenes (only on or off) in german and english.
+-   Control shutter in german and english.
 
 ### Examples
 
 [ text ] is optional
 
--   Turn on [the light in] the living room and the kitchen off
--   Open [the shutter in] the kitchen and turn studio off
--   Close [the shutter in the] sleeping room
--   Living room to 10 %
--   Turn on living room except the couch light
--   Sends debug message to output
+-   Turn on [the light in] the living room and the kitchen off.
+-   Open [the shutter in] the kitchen and turn studio off.
+-   Close [the shutter in the] sleeping room.
+-   Living room to 10 %.
+-   Turn on living room except the couch light.
+-   Sends debug message to output.
+
+## 15. Mixing valve
+
+This node can control a mixing valve to get the required tput temperature. It is working for heating and cooling.
+
+### **Features:**
+
+-   Define target temperature.
+-   Support heating and cooling.
+-   Define off mode to do nothing, open or close the valve.
+
+## 16. Heating curve
+
+This node calculates the needed flow temperature regarding to the target room temperature and the current outside temperature.
+
+### **Features:**
+
+-   Define slope and offset values.
+-   Limit flow temperature with min and max values.
+-   Preview of different curves in the node editor.
+
+## 17. Counter
+
+This node countes up and down within a specified range.
+
+### **Features:**
+
+-   Define min, max and step values.
+-   Set to a specific value
+-   Increment and decrement by default or by a given value.

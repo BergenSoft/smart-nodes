@@ -1,0 +1,188 @@
+<script type="text/javascript">
+    RED.nodes.registerType("smart_mixing-valve", {
+        category: "Smart Nodes",
+        paletteLabel: "Mixing Valve",
+        color: "#3FADB5",
+        defaults: {
+            name: { value: "" },
+            enabled: { value: true },
+            setpoint: { value: 45 },
+            time_total: { value: 60 },
+            time_sampling: { value: 60 },
+            off_mode: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
+            valve_mode: { value: "HEATING" }, // HEATING | COOLING
+        },
+        inputs: 1,
+        outputs: 3,
+        outputLabels: ["Open", "Close", "Status Position"],
+        icon: "font-awesome/fa-arrows-h",
+        label: function ()
+        {
+            return this.name || "Mixing Valve";
+        },
+        oneditprepare: function ()
+        {
+            $("#node-input-setpoint")
+                .spinner({
+                    min: -30,
+                    max: 100,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                }).css("max-width", "4rem");
+
+            $("#node-input-time_total")
+                .spinner({
+                    min: 0,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                }).css("max-width", "4rem");
+
+            $("#node-input-time_sampling")
+                .spinner({
+                    min: 0,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                }).css("max-width", "4rem");
+
+            $("#node-input-off_mode").typedInput({
+                types: [
+                    {
+                        default: "NOTHING",
+                        options: [
+                            { value: "NOTHING", label: "Nichts" },
+                            { value: "OPEN", label: "Öffnen (100%)" },
+                            { value: "CLOSE", label: "Schließen (0%)" }
+                        ],
+                    },
+                ],
+            });
+
+            $("#node-input-valve_mode").typedInput({
+                types: [
+                    {
+                        default: "HEATING",
+                        options: [
+                            { value: "HEATING", label: "Heizen (normal)" },
+                            { value: "COOLING", label: "Kühlen (invertiert)" }
+                        ],
+                    },
+                ],
+            });
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="smart_mixing-valve">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-enabled" style="width: 20px;" />
+        <span for="node-input-enabled" style="width: 200px;"> Aktiviert</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-setpoint"><i class="fa fa-sliders"></i> Sollwert</label>
+        <input id="node-input-setpoint" value="0" /> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-time_total"><i class="fa fa-clock-o"></i> Laufzeit</label>
+        <input id="node-input-time_total" value="0" /> s
+    </div>
+    <div class="form-row">
+        <label for="node-input-time_sampling"><i class="fa fa-clock-o"></i> Abtastzeit</label>
+        <input id="node-input-time_sampling" value="0" /> s
+    </div>
+    <div class="form-row">
+        <label for="node-input-off_mode"><i class="fa fa-power-off"></i> Aus-Modus</label>
+        <input id="node-input-off_mode" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-valve_mode"><i class="fa fa-fire"></i> Modus</label>
+        <input id="node-input-valve_mode" />
+    </div>
+</script>
+
+<script type="text/html" data-help-name="smart_mixing-valve">
+    <p>
+        Diese Node steuert einen Heizungsmischer. Dieser kann sowohl fürs Heizen als auch fürs Kühlen verwendet werden.
+        Nach der eingestellten Abtastzeit wird geprüft, ob die Position des Mischers korrigiert werden muss.
+    </p>
+    <p>
+        Beim ersten Verwenden wird eine Kalibrierungsfahrt gestartet. D.h. der Mischer schließt für die eingestellte Laufzeit und befindet sich dann auf 0%.
+        Danach kann der Mischvorgang starten. Die zuletzt angefahrene Position wird persistent gespeichert, wodurch weitere Kalibrierungsfahrten in der Regel nicht mehr notwending sind.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>enable</code></td>
+                    <td>Aktiviert die Mischeransteuerung.</td>
+                </tr>
+                <tr>
+                    <td><code>disable</code></td>
+                    <td>Deaktiviert die Mischeransteuerung und fährt die Position an, die als Aus-Modus festgelegt ist.</td>
+                </tr>
+                <tr>
+                    <td><code>set_state</code></td>
+                    <td>Aktiviert das Weiterleiten, wenn <code>msg.payload = true</code> oder deaktiviert das Weiterleiten, wenn <code>msg.payload = false</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>setpoint</code></td>
+                    <td>Überschreibt den Sollwert mit <code>msg.payload</code> °C.</td>
+                </tr>
+                <tr>
+                    <td><code>off_mode</code></td>
+                    <td>
+                        Überschreibt den Aus-Modus mit <code>msg.payload</code>.
+                        Gültige Werte für <code>msg.payload</code> sind <code>"NOTHING"</code>, <code>"OPEN"</code> und <code>"CLOSE"</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>valve_mode</code></td>
+                    <td>
+                        Überschreibt den Modus mit <code>msg.payload</code>.
+                        Gültige Werte für <code>msg.payload</code> sind <code>"HEATING"</code> und <code>"COOLING"</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>current_temperature</code></td>
+                    <td>Setzt die aktuelle Temperatur auf <code>msg.payload</code> °C.</td>
+                </tr>
+                <tr>
+                    <td><code>calibrate</code></td>
+                    <td>Erzwingt eine Kalibrierungsfahrt.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

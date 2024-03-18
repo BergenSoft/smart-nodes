@@ -1,11 +1,13 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function SceneControlNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
         // used from text-exec node
@@ -15,9 +17,9 @@ module.exports = function (RED)
             node.exec_text_names = [];
 
         // persistent values
-        var nodeSettings = Object.assign({}, {
+        var node_settings = Object.assign({}, {
             last_values: [], // light is on or off for a scene
-        }, smartContext.get(node.id));
+        }, smart_context.get(node.id));
 
         // dynamic config
         let max_time_on = helper.getTimeInMs(config.max_time_on, config.max_time_on_unit);
@@ -36,10 +38,10 @@ module.exports = function (RED)
         RED.events.on(event, handler);
 
 
-        if (nodeSettings.last_values.length != config.scenes.length)
+        if (node_settings.last_values.length != config.scenes.length)
         {
             // Per default expect that all outputs are off
-            nodeSettings.last_values = new Array(config.outputs).fill(false);
+            node_settings.last_values = new Array(config.outputs).fill(false);
         }
 
         node.status({});
@@ -53,7 +55,7 @@ module.exports = function (RED)
                 startAutoOffIfNeeded(helper.getTimeInMsFromString(msg.time_on ?? max_time_on));
 
             status();
-            smartContext.set(node.id, nodeSettings);
+            smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -65,15 +67,15 @@ module.exports = function (RED)
         let handleTopic = msg =>
         {
             let currentScene = getCurrentScene();
-            let [realTopic, scenes] = helper.getTopicName(msg.topic).split("_");
+            let [real_topic, scenes] = helper.getTopicName(msg.topic).split("_");
             let number = helper.getTopicNumber(msg.topic) - 1; // number should be used 0-based
 
-            switch (realTopic)
+            switch (real_topic)
             {
                 case "status":
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
-                    nodeSettings.last_values[number] = msg.payload;
+                    node_settings.last_values[number] = msg.payload;
 
                     notifyCentral();
 
@@ -85,17 +87,17 @@ module.exports = function (RED)
                     return;
 
                 case "off":
-                    nodeSettings.last_values = new Array(config.outputs).fill(false);
+                    node_settings.last_values = new Array(config.outputs).fill(false);
                     break;
 
                 case "on":
-                    nodeSettings.last_values = new Array(config.outputs).fill(true);
+                    node_settings.last_values = new Array(config.outputs).fill(true);
                     break;
 
                 case "set":
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
-                    nodeSettings.last_values = new Array(config.outputs).fill(msg.payload);
+                    node_settings.last_values = new Array(config.outputs).fill(msg.payload);
 
                     // This happens because of splitting by _ for scenes
                     if (scenes == "permanent")
@@ -133,19 +135,19 @@ module.exports = function (RED)
 
                     if (nextSceneIndex == 0)
                     {
-                        nodeSettings.last_values = new Array(config.outputs).fill(false);
+                        node_settings.last_values = new Array(config.outputs).fill(false);
                     }
                     else
                     {
                         const scene = config.scenes[nextSceneIndex - 1]; // scene numbers are 1 based
                         const expectedOn = scene.outputs.split(",");
-                        for (let o = 0; o < nodeSettings.last_values.length; o++)
+                        for (let o = 0; o < node_settings.last_values.length; o++)
                         {
-                            const output = nodeSettings.last_values[o];
+                            const output = node_settings.last_values[o];
                             // Check if output has to be changed
                             if ((output && !expectedOn.includes("" + (o + 1))) || (!output && expectedOn.includes("" + (o + 1))))
                             {
-                                nodeSettings.last_values[o] = !output;
+                                node_settings.last_values[o] = !output;
                             }
                         }
                     }
@@ -156,20 +158,20 @@ module.exports = function (RED)
                     if (msg.payload === false)
                         return;
 
-                    nodeSettings.last_values = new Array(config.outputs).fill(currentScene == 0);
+                    node_settings.last_values = new Array(config.outputs).fill(currentScene == 0);
                     break;
             }
 
             stopAutoOff();
 
-            node.send(nodeSettings.last_values.map(val => { return { payload: val }; }));
+            node.send(node_settings.last_values.map(val => { return { payload: val }; }));
             notifyCentral();
         }
 
         let getCurrentScene = () =>
         {
             // All off ist scene 0
-            if (!nodeSettings.last_values.includes(true))
+            if (!node_settings.last_values.includes(true))
                 return 0;
 
             for (let s = 0; s < config.scenes.length; s++)
@@ -178,9 +180,9 @@ module.exports = function (RED)
                 const expectedOn = scene.outputs.split(",");
                 let skipScene = false;
 
-                for (let o = 0; o < nodeSettings.last_values.length; o++)
+                for (let o = 0; o < node_settings.last_values.length; o++)
                 {
-                    const output = nodeSettings.last_values[o];
+                    const output = node_settings.last_values[o];
                     // Check if one condition fails
                     if ((output && !expectedOn.includes("" + (o + 1))) || (!output && expectedOn.includes("" + (o + 1))))
                     {
@@ -220,12 +222,12 @@ module.exports = function (RED)
 
             max_time_on_timeout = setTimeout(() =>
             {
-                nodeSettings.last_values = new Array(config.outputs).fill(false);
-                node.send(nodeSettings.last_values.map(val => { return { payload: val }; }));
+                node_settings.last_values = new Array(config.outputs).fill(false);
+                node.send(node_settings.last_values.map(val => { return { payload: val }; }));
                 notifyCentral();
 
                 status();
-                smartContext.set(node.id, nodeSettings);
+                smart_context.set(node.id, node_settings);
             }, timeMs);
         }
 
@@ -244,13 +246,13 @@ module.exports = function (RED)
             if (scene != 0)
             {
                 if (isPermanent || current_timeout_ms <= 0)
-                    node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Scene " + scene + " active" });
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Scene " + scene + " active" });
                 else if (max_time_on_timeout)
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": Scene " + scene + " active, wait " + helper.formatMsToStatus(current_timeout_ms, "until") + " for auto off" });
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Scene " + scene + " active, wait " + helper.formatMsToStatus(current_timeout_ms, "until") + " for auto off" });
             }
             else
             {
-                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Off" });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Off" });
             }
         }
 

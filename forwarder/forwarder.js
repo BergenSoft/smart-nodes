@@ -1,33 +1,35 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function ForwarderNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        var nodeSettings = {
+        var node_settings = {
             enabled: config.enabled,
-            lastMessage: null,
+            last_message: null,
             last_msg_was_sended: true
         };
 
         if (config.save_state)
         {
             // load old saved values
-            nodeSettings = Object.assign(nodeSettings, smartContext.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id));
         }
         else
         {
             // delete old saved values
-            smartContext.del(node.id);
+            smart_context.del(node.id);
         }
 
         // dynamic config
-        let forwardTrue = config.always_forward_true;
-        let forwardFalse = config.always_forward_false;
+        let forward_true = config.always_forward_true;
+        let forward_false = config.always_forward_false;
         let forward_last_on_enable = config.forward_last_on_enable;
 
         // runtime values
@@ -35,29 +37,29 @@ module.exports = function (RED)
 
         node.on("input", function (msg)
         {
-            let newState = null;
+            let new_state = null;
             if (msg.topic == "enable" || (msg.topic == "set_state" && msg.payload))
-                newState = true;
+                new_state = true;
             else if (msg.topic == "disable" || (msg.topic == "set_state" && !msg.payload))
-                newState = false;
+                new_state = false;
 
             // Already the correct state
-            if (newState != null && nodeSettings.enabled == newState)
+            if (new_state != null && node_settings.enabled == new_state)
                 return;
 
-            switch (newState)
+            switch (new_state)
             {
                 case true:
                 case false:
-                    nodeSettings.enabled = newState;
+                    node_settings.enabled = new_state;
 
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
 
-                    if (nodeSettings.enabled && forward_last_on_enable && nodeSettings.lastMessage != null && !nodeSettings.last_msg_was_sended)
+                    if (node_settings.enabled && forward_last_on_enable && node_settings.last_message != null && !node_settings.last_msg_was_sended)
                     {
-                        node.send(nodeSettings.lastMessage);
-                        nodeSettings.last_msg_was_sended = true;
+                        node.send(node_settings.last_message);
+                        node_settings.last_msg_was_sended = true;
                     }
 
                     setStatus();
@@ -65,34 +67,34 @@ module.exports = function (RED)
 
                 default:
                     // Forward if enabled or forced
-                    if (nodeSettings.enabled || (forwardTrue && msg.payload) || (forwardFalse && !msg.payload))
+                    if (node_settings.enabled || (forward_true && msg.payload) || (forward_false && !msg.payload))
                     {
                         node.send(msg);
-                        nodeSettings.last_msg_was_sended = true;
+                        node_settings.last_msg_was_sended = true;
                     }
                     else
                     {
-                        nodeSettings.last_msg_was_sended = false;
+                        node_settings.last_msg_was_sended = false;
                     }
 
-                    nodeSettings.lastMessage = msg;
+                    node_settings.last_message = msg;
                     break;
             }
         });
 
         let setStatus = () =>
         {
-            if (nodeSettings.enabled)
-                node.status({ fill: "green", shape: "dot", text: (new Date()).toLocaleString() + ": Forwarding enabled" });
+            if (node_settings.enabled)
+                node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Forwarding enabled" });
             else
-                node.status({ fill: "red", shape: "dot", text: (new Date()).toLocaleString() + ": Forwarding disabled" });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Forwarding disabled" });
         }
 
-        if (config.save_state && config.resend_on_start && nodeSettings.lastMessage != null)
+        if (config.save_state && config.resend_on_start && node_settings.last_message != null)
         {
             setTimeout(() =>
             {
-                node.send(nodeSettings.lastMessage);
+                node.send(node_settings.last_message);
             }, 10000);
         }
 

@@ -1,36 +1,38 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function DelayNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        var nodeSettings = {
+        var node_settings = {
             on_delay_ms: helper.getTimeInMs(config.on_delay, config.on_delay_unit),
             off_delay_ms: helper.getTimeInMs(config.off_delay, config.off_delay_unit),
-            lastMessage: null,
+            last_message: null,
         };
 
         if (config.save_state)
         {
             // load old saved values
-            nodeSettings = Object.assign(nodeSettings, smartContext.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id));
 
-            switch (nodeSettings.lastMessage?.payload)
+            switch (node_settings.last_message?.payload)
             {
                 case true:
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Load last state: On" });
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "Load last state: On" });
                     break;
 
                 case false:
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Load last state: Off" });
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "Load last state: Off" });
                     break;
 
                 default:
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "No last state available" });
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "No last state available" });
                     break;
             }
         }
@@ -38,7 +40,7 @@ module.exports = function (RED)
         {
             // delete old saved values
             node.status({});
-            smartContext.del(node.id);
+            smart_context.del(node.id);
         }
 
         // dynamic config
@@ -53,28 +55,28 @@ module.exports = function (RED)
             switch (msg.topic)
             {
                 case "set_delay_on":
-                    nodeSettings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "New on delay: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
+                    node_settings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "New on delay: " + helper.formatMsToStatus(node_settings.on_delay_ms) });
 
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 case "set_delay_off":
-                    nodeSettings.off_delay_ms = helper.getTimeInMsFromString(msg.payload);
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "New off delay: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
+                    node_settings.off_delay_ms = helper.getTimeInMsFromString(msg.payload);
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "New off delay: " + helper.formatMsToStatus(node_settings.on_delay_ms) });
 
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 case "set_delays":
-                    nodeSettings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
-                    nodeSettings.off_delay_ms = nodeSettings.on_delay_ms;
-                    node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "New delays: " + helper.formatMsToStatus(nodeSettings.on_delay_ms) });
+                    node_settings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
+                    node_settings.off_delay_ms = node_settings.on_delay_ms;
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "New delays: " + helper.formatMsToStatus(node_settings.on_delay_ms) });
 
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 default:
@@ -94,12 +96,12 @@ module.exports = function (RED)
 
         let send = (msg) =>
         {
-            let delayMs = 0;
+            let delay_ms = 0;
 
             if (msg.payload)
-                delayMs = nodeSettings.on_delay_ms;
+                delay_ms = node_settings.on_delay_ms;
             else
-                delayMs = nodeSettings.off_delay_ms;
+                delay_ms = node_settings.off_delay_ms;
 
             if (delay_only_on_change)
             {
@@ -110,9 +112,9 @@ module.exports = function (RED)
                         return;
 
                     // payload changed back to last value => stop current delay
-                    if (nodeSettings.lastMessage?.payload == msg.payload)
+                    if (node_settings.last_message?.payload == msg.payload)
                     {
-                        node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Stopped delayed message" });
+                        node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Stopped delayed message" });
                         clearTimeout(timeout);
                         timeout = null;
 
@@ -120,7 +122,7 @@ module.exports = function (RED)
                     }
                 }
                 // payload hasn't changed
-                else if (nodeSettings.lastMessage?.payload == msg.payload)
+                else if (node_settings.last_message?.payload == msg.payload)
                 {
                     return;
                 }
@@ -135,39 +137,39 @@ module.exports = function (RED)
             }
 
             // No delay if 0 or smaller
-            if (delayMs <= 0)
+            if (delay_ms <= 0)
             {
-                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + +msg.topic + "' msg.payload = '" + msg.payload + "'" });
-                nodeSettings.lastMessage = msg
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended msg.topic = '" + +msg.topic + "' msg.payload = '" + msg.payload + "'" });
+                node_settings.last_message = msg
 
                 if (config.save_state)
-                    smartContext.set(node.id, nodeSettings);
+                    smart_context.set(node.id, node_settings);
 
                 node.send(msg);
                 return;
             }
 
             // start new timeout
-            node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + "Forward msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "' in " + helper.formatMsToStatus(delayMs, "at") });
+            node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "Forward msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "' in " + helper.formatMsToStatus(delay_ms, "at") });
             timeout = setTimeout(() =>
             {
                 timeout = null;
-                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "'" });
-                nodeSettings.lastMessage = msg
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "'" });
+                node_settings.last_message = msg
 
                 if (config.save_state)
-                    smartContext.set(node.id, nodeSettings);
+                    smart_context.set(node.id, node_settings);
 
                 node.send(msg);
-            }, delayMs);
+            }, delay_ms);
         }
 
-        if (config.save_state && config.resend_on_start && nodeSettings.lastMessage != null)
+        if (config.save_state && config.resend_on_start && node_settings.last_message != null)
         {
             setTimeout(() =>
             {
-                node.status({ fill: "yellow", shape: "dot", text: (new Date()).toLocaleString() + ": " + "Sended msg.topic = '" + nodeSettings.lastMessage.topic + "' msg.payload = '" + nodeSettings.lastMessage.payload + "'" });
-                node.send(nodeSettings.lastMessage);
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended msg.topic = '" + node_settings.last_message.topic + "' msg.payload = '" + node_settings.last_message.payload + "'" });
+                node.send(node_settings.last_message);
             }, 10000);
         }
     }

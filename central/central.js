@@ -1,5 +1,7 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function CentralControlNode(config)
     {
         const node = this;
@@ -33,7 +35,7 @@ module.exports = function (RED)
         node.on("input", function (msg)
         {
             // copy message, so original message stays unchanged
-            let newMsg = Object.assign({}, msg);
+            let new_msg = Object.assign({}, msg);
 
             // make connected nodes behavior homogenous
             switch (config.mode)
@@ -42,16 +44,16 @@ module.exports = function (RED)
                     if (msg.topic == "up_stop")
                     {
                         if (isAllOff())
-                            newMsg.topic = "up";
+                            new_msg.topic = "up";
                         else
-                            newMsg.topic = "stop";
+                            new_msg.topic = "stop";
                     }
                     else if (msg.topic == "down_stop")
                     {
                         if (isAllOff())
-                            newMsg.topic = "down";
+                            new_msg.topic = "down";
                         else
-                            newMsg.topic = "stop";
+                            new_msg.topic = "stop";
                     }
                     break;
 
@@ -59,9 +61,9 @@ module.exports = function (RED)
                     if (msg.topic == "toggle")
                     {
                         if (isAllOff())
-                            newMsg.topic = "on";
+                            new_msg.topic = "on";
                         else
-                            newMsg.topic = "off";
+                            new_msg.topic = "off";
                     }
                     break;
             }
@@ -71,7 +73,7 @@ module.exports = function (RED)
             {
                 // console.log(node.id + " -> " + link);
                 // console.log(newMsg);
-                RED.events.emit("node:" + link, newMsg);
+                RED.events.emit("node:" + link, new_msg);
             });
         });
 

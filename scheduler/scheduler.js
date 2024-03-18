@@ -1,14 +1,16 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function SchedulerNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        var nodeSettings = {
+        var node_settings = {
             enabled: config.enabled,
             lastMessage: null,
         };
@@ -16,12 +18,12 @@ module.exports = function (RED)
         if (config.save_state)
         {
             // load old saved values
-            nodeSettings = Object.assign(nodeSettings, smartContext.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id));
         }
         else
         {
             // delete old saved values
-            smartContext.del(node.id);
+            smart_context.del(node.id);
         }
 
         let timeout = null;
@@ -38,7 +40,7 @@ module.exports = function (RED)
                 schedule.days = schedule.days.split(",");
             }
 
-            if (nodeSettings.enabled)
+            if (node_settings.enabled)
                 initNextTimeout();
 
             setStatus();
@@ -50,43 +52,43 @@ module.exports = function (RED)
             switch (helper.getTopicName(msg.topic))
             {
                 case "enable":
-                    if (nodeSettings.enabled)
+                    if (node_settings.enabled)
                         return;
 
-                    nodeSettings.enabled = true;
+                    node_settings.enabled = true;
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 case "disable":
-                    if (!nodeSettings.enabled)
+                    if (!node_settings.enabled)
                         return;
 
-                    nodeSettings.enabled = false;
+                    node_settings.enabled = false;
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 case "set_state":
-                    if (nodeSettings.enabled == !!msg.payload)
+                    if (node_settings.enabled == !!msg.payload)
                         return;
 
-                    nodeSettings.enabled = !!msg.payload;
+                    node_settings.enabled = !!msg.payload;
                     if (config.save_state)
-                        smartContext.set(node.id, nodeSettings);
+                        smart_context.set(node.id, node_settings);
                     break;
 
                 default:
                     return;
             }
 
-            if (nodeSettings.enabled)
+            if (node_settings.enabled)
                 initTimeouts();
             else
                 clearTimeouts();
 
             setStatus();
-            smartContext.set(node.id, nodeSettings);
+            smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -185,15 +187,15 @@ module.exports = function (RED)
         {
             const schedule = config.schedules[i];
 
-            if (!nodeSettings.enabled)
+            if (!node_settings.enabled)
                 return;
 
             timeout = null;
             node.send(schedule.message);
-            nodeSettings.lastMessage = schedule.message;
+            node_settings.lastMessage = schedule.message;
 
             if (config.save_state)
-                smartContext.set(node.id, nodeSettings);
+                smart_context.set(node.id, node_settings);
 
             initNextTimeout();
             setStatus();
@@ -201,12 +203,12 @@ module.exports = function (RED)
 
         let setStatus = () =>
         {
-            if (!nodeSettings.enabled)
+            if (!node_settings.enabled)
             {
                 node.status({
                     fill: "red",
                     shape: "dot",
-                    text: (new Date()).toLocaleString() + ": Scheduler disabled"
+                    text: helper.getCurrentTimeForStatus() + ": Scheduler disabled"
                 });
             }
             else if (nextEvent == null)
@@ -214,7 +216,7 @@ module.exports = function (RED)
                 node.status({
                     fill: "red",
                     shape: "dot",
-                    text: (new Date()).toLocaleString() + ": No events planned"
+                    text: helper.getCurrentTimeForStatus() + ": No events planned"
                 });
             }
             else
@@ -226,16 +228,16 @@ module.exports = function (RED)
                 node.status({
                     fill: "yellow",
                     shape: "dot",
-                    text: (new Date()).toLocaleString() + ": Wait " + helper.formatMsToStatus(time, "until") + " to raise next event"
+                    text: helper.getCurrentTimeForStatus() + ": Wait " + helper.formatMsToStatus(time, "until") + " to raise next event"
                 });
             }
         }
 
-        if (config.save_state && config.resend_on_start && nodeSettings.lastMessage != null)
+        if (config.save_state && config.resend_on_start && node_settings.lastMessage != null)
         {
             setTimeout(() =>
             {
-                node.send(nodeSettings.lastMessage);
+                node.send(node_settings.lastMessage);
             }, 10000);
         }
     }

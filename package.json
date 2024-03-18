@@ -1,6 +1,6 @@
 {
     "name": "smart-nodes",
-    "version": "0.3.22",
+    "version": "0.3.26",
     "description": "Smart Nodes",
     "keywords": [
         "node-red",
@@ -18,8 +18,12 @@
         "compare",
         "comparator",
         "statistic",
+        "counter",
         "scheduler",
         "central",
+        "heating",
+        "mixing valve",
+        "heating curve",
         "text execution"
     ],
     "scripts": {
@@ -41,9 +45,12 @@
             "compare": "compare/compare.js",
             "hysteresis": "hysteresis/hysteresis.js",
             "statistic": "statistic/statistic.js",
+            "counter": "counter/counter.js",
             "scheduler": "scheduler/scheduler.js",
             "delay": "delay/delay.js",
             "central": "central/central.js",
+            "mixing-valve": "mixing-valve/mixing-valve.js",
+            "heating-curve": "heating-curve/heating-curve.js",
             "text-exec": "text-exec/text-exec.js"
         }
     },

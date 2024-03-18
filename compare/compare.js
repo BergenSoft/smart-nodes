@@ -1,34 +1,38 @@
 module.exports = function (RED)
 {
+    "use strict";
+
     function CompareNode(config)
     {
         const node = this;
         RED.nodes.createNode(node, config);
 
-        const smartContext = require("../persistence.js")(RED);
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        var nodeSettings = {
+        var node_settings = {
             values: [
                 helper.evaluateNodeProperty(RED, config.value1, config.value1_type),
                 helper.evaluateNodeProperty(RED, config.value2, config.value2_type)
             ],
-            lastResult: null,
+            last_message: null,
         };
 
         if (config.save_state)
         {
             // load old saved values
-            nodeSettings = Object.assign(nodeSettings, smartContext.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id));
         }
         else
         {
             // delete old saved values
-            smartContext.del(node.id);
+            smart_context.del(node.id);
         }
 
         // dynamic config
         let comparator = config.comparator;
+        let out_true = helper.evaluateNodeProperty(RED, config.out_true, config.out_true_type);
+        let out_false = helper.evaluateNodeProperty(RED, config.out_false, config.out_false_type);
 
         // runtime values
 
@@ -51,47 +55,59 @@ module.exports = function (RED)
             }
 
             // Save new value
-            nodeSettings.values[input - 1] = num;
+            node_settings.values[input - 1] = num;
 
             let result = getResult();
             setStatus(result);
 
             if (result != null)
             {
-                nodeSettings.lastResult = result;
+                let msg = result ? out_true : out_false;
+
+                if (msg != null)
+                {
+                    msg = Object.assign(
+                        {},
+                        msg,
+                        { payload: result, comparator: comparator }
+                    );
+                }
+
+                node_settings.last_message = msg;
 
                 if (config.save_state)
-                    smartContext.set(node.id, nodeSettings);
+                    smart_context.set(node.id, node_settings);
 
-                node.send({ payload: result, comparator: comparator });
+                if (msg != null)
+                    node.send(msg);
             }
         });
 
         let getResult = () =>
         {
             // Wait until both values are set
-            if (nodeSettings.values[0] == null || nodeSettings.values[1] == null)
+            if (node_settings.values[0] == null || node_settings.values[1] == null)
                 return null;
 
             switch (comparator)
             {
                 case "SMALLER":
-                    return nodeSettings.values[0] < nodeSettings.values[1];
+                    return node_settings.values[0] < node_settings.values[1];
 
                 case "SMALLER_EQUAL":
-                    return nodeSettings.values[0] <= nodeSettings.values[1];
+                    return node_settings.values[0] <= node_settings.values[1];
 
                 case "EQUAL":
-                    return nodeSettings.values[0] === nodeSettings.values[1];
+                    return node_settings.values[0] === node_settings.values[1];
 
                 case "UNEQUAL":
-                    return nodeSettings.values[0] !== nodeSettings.values[1];
+                    return node_settings.values[0] !== node_settings.values[1];
 
                 case "GREATER_EQUAL":
-                    return nodeSettings.values[0] >= nodeSettings.values[1];
+                    return node_settings.values[0] >= node_settings.values[1];
 
                 case "GREATER":
-                    return nodeSettings.values[0] > nodeSettings.values[1];
+                    return node_settings.values[0] > node_settings.values[1];
             }
 
             return null;
@@ -129,22 +145,22 @@ module.exports = function (RED)
             if (result == null)
                 node.status({});
             else
-                node.status({ fill: "yellow", shape: "ring", text: (new Date()).toLocaleString() + ": " + nodeSettings.values.join(" " + getComparatorSign() + " ") + " => " + result });
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + node_settings.values.join(" " + getComparatorSign() + " ") + " => " + result });
         }
 
         node.on("close", function ()
         {
         });
 
-        if (config.save_state && config.resend_on_start && nodeSettings.lastResult != null)
+        if (config.save_state && config.resend_on_start && node_settings.last_message != null)
         {
             setTimeout(() =>
             {
-                node.send({ payload: nodeSettings.lastResult, comparator: comparator });
+                node.send(node_settings.last_message);
             }, 10000);
         }
 
-        setStatus(nodeSettings.lastResult);
+        setStatus(node_settings.last_message?.payload);
     }
 
     RED.nodes.registerType("smart_compare", CompareNode);

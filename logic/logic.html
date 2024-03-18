@@ -10,7 +10,9 @@
             inverts: { value: "" },
             invert_output: { value: false },
             out_false: { value: '{"topic": ""}' },
+            out_false_type: { value: 'json' },
             out_true: { value: '{"topic": ""}' },
+            out_true_type: { value: 'json' },
             save_state: { value: true },
             resend_on_start: { value: true }
         },
@@ -66,12 +68,24 @@
 
             $("#node-input-out_true").typedInput({
                 type: "json",
-                types: ["json"]
+                types: ["json", {
+                    value: "null",
+                    label: "Nichts senden",
+                    icon: "fa fa-times",
+                    hasValue: false,
+                }],
+                typeField: "#node-input-out_true_type"
             });
 
             $("#node-input-out_false").typedInput({
                 type: "json",
-                types: ["json"]
+                types: ["json", {
+                    value: "null",
+                    label: "Nichts senden",
+                    icon: "fa fa-times",
+                    hasValue: false,
+                }],
+                typeField: "#node-input-out_false_type"
             });
 
             $("#node-input-save_state").on("change", ev =>
@@ -137,10 +151,12 @@
     <div class="form-row">
         <label for="node-input-out_true"><i class="fa fa-check-circle"></i> Wahr</label>
         <input type="text" id="node-input-out_true"/>
+        <input type="hidden" id="node-input-out_true_type">
     </div>
     <div class="form-row">
         <label for="node-input-out_false"><i class="fa fa-times-circle"></i> Falsch</label>
         <input type="text" id="node-input-out_false" />
+        <input type="hidden" id="node-input-out_false_type">
     </div>
     <div class="form-row">
         <span><strong>Hinweis:</strong> <code>msg.payload</code> wird automatisch auf das Logik-Ergebnis gesetzt.</span>
