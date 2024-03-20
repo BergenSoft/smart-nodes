@@ -7,6 +7,8 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+        const helper = require("../smart_helper.js");
+
         node.status({});
 
         let log = [];
