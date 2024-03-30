@@ -11,16 +11,21 @@
             out_higher_type: { value: 'json' },
             out_lower: { value: '{"topic": ""}' },
             out_lower_type: { value: 'json' },
+            send_only_change: { value: true },
+            outputs: { value: 1 },
             save_state: { value: true },
             resend_on_start: { value: true }
         },
         inputs: 1,
         outputs: 2,
-        outputLabels: ["Über", "Unter"],
         icon: "font-awesome/fa-arrows-v",
         label: function ()
         {
             return this.name || this.comparator || "Hysteresis";
+        },
+        outputLabels: function (index)
+        {
+            return this.outputs == 1 ? "" : ["Höher", "Niedriger"][index];
         },
         oneditprepare: function ()
         {
@@ -34,27 +39,65 @@
                 types: ["num"]
             });
 
+
+
             $("#node-input-out_higher").typedInput({
                 type: "json",
-                types: ["json", {
-                    value: "null",
-                    label: "Originalnachricht",
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
+                types: ["json",
+                    {
+                        value: "null",
+                        label: "Nichts senden",
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }, {
+                        value: "original",
+                        label: "Originalnachricht",
+                        icon: "fa fa-arrow-right",
+                        hasValue: false,
+                    }],
                 typeField: "#node-input-out_higher_type"
             });
 
             $("#node-input-out_lower").typedInput({
                 type: "json",
-                types: ["json", {
-                    value: "null",
-                    label: "Originalnachricht",
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
+                types: ["json",
+                    {
+                        value: "null",
+                        label: "Nichts senden",
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }, {
+                        value: "original",
+                        label: "Originalnachricht",
+                        icon: "fa fa-arrow-right",
+                        hasValue: false,
+                    }],
                 typeField: "#node-input-out_lower_type"
             });
+
+            $("#node-input-send_only_change").typedInput({
+                type: "bool",
+                types: [{
+                    value: "1",
+                    options: [
+                        { value: "true", label: "Nur bei Änderung" },
+                        { value: "false", label: "Immer" },
+                    ]
+                }]
+            });
+
+            $("#node-input-outputs").typedInput({
+                type: "num",
+                types: [{
+                    value: "1",
+                    options: [
+                        { value: "1", label: "Gemeinsamer Ausgang" },
+                        { value: "2", label: "Separate Ausgänge" },
+                    ]
+                }]
+            });
+
+
 
             $("#node-input-save_state").on("change", ev =>
             {
@@ -98,6 +141,20 @@
         <input type="text" id="node-input-out_lower" />
         <input type="hidden" id="node-input-out_lower_type">
     </div>
+    <div class="form-row">
+        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> Senden</label>
+        <input id="node-input-send_only_change" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> Ausgänge</label>
+        <input id="node-input-outputs" />
+    </div>
+    <div class="form-row">
+        <div><strong>Hinweis:</strong></div>
+        <div><code>msg.payload</code> wird automatisch auf das Hystere-Ergebnis gesetzt,</div>
+        <div>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.</div>
+        <div><code>true</code>, wenn höher, <code>false</code> wenn niedriger.</div>
+    </div>
     <hr/>
     <h4 style="margin: 0.5rem 0;">Systemstart</h4>
     <div class="form-row">
@@ -138,10 +195,6 @@
                 <tr>
                     <td><code>hysteresis</code></td>
                     <td>Überschreibt die Hysterese mit <code>msg.payload</code>.</td>
-                </tr>
-                <tr>
-                    <td><code>resend</code></td>
-                    <td>Sendet den aktuellen Zustand erneut.</td>
                 </tr>
             </tbody>
         </table>

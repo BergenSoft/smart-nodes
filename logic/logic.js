@@ -10,19 +10,10 @@ module.exports = function (RED)
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        // dynamic config
-        let logic = config.logic;
-        let out_true = helper.evaluateNodeProperty(RED, config.out_true, config.out_true_type || "json");
-        let out_false = helper.evaluateNodeProperty(RED, config.out_false, config.out_false_type || "json");
-        let logic_inputs = config.logic_inputs;
-        let inverts = config.inverts.split(",").map(n => parseInt(n));
-        let invert_output = config.invert_output;
-
-        // runtime values
-
-
+        // persistant values
         var node_settings = {
-            input_states: Array.from({ length: logic_inputs }).fill(false),
+            input_states: Array.from({ length: config.logic_inputs }).fill(false),
+            last_result: null,
             last_message: null,
         };
 
@@ -36,6 +27,18 @@ module.exports = function (RED)
             // delete old saved values
             smart_context.del(node.id);
         }
+
+        // dynamic config
+        let logic = config.logic;
+        let out_true = helper.evaluateNodeProperty(RED, config.out_true, config.out_true_type || "json");
+        let out_false = helper.evaluateNodeProperty(RED, config.out_false, config.out_false_type || "json");
+        let logic_inputs = config.logic_inputs;
+        let inverts = config.inverts.split(",").map(n => parseInt(n));
+        let invert_output = config.invert_output;
+        let send_only_change = helper.evaluateNodeProperty(RED, config.send_only_change, "bool");
+        let outputs = helper.evaluateNodeProperty(RED, config.outputs, "num");
+
+        // runtime values
 
         node.on("input", function (msg)
         {
@@ -57,26 +60,45 @@ module.exports = function (RED)
             else
                 node_settings.input_states[input - 1] = !!msg.payload; // !! => Convert to boolean
 
-            setStatus();
             let result = getResult();
+            let out_msg = null;
 
+            setStatus();
+
+            // Get custom output message
             if (invert_output ? !result : result)
             {
-                result = out_true;
-                if (result !== null)
-                    result.payload = true;
+                if (out_true !== null)
+                    out_msg = Object.assign({}, out_true);
             }
             else
             {
-                result = out_false;
-                if (result !== null)
-                    result.payload = false;
+                if (out_false !== null)
+                    out_msg = Object.assign({}, out_false);
             }
 
-            if (result !== null && node_settings.last_message?.payload != result.payload)
-                node.send(result);
+            if (out_msg !== null)
+            {
+                // Overwrite automatic values, if not already defined
+                if (typeof out_msg.payload === "undefined")
+                    out_msg.payload = result;
 
-            node_settings.last_message = result;
+                // Separate outputs if needed
+                if (outputs == 2)
+                {
+                    if (result)
+                        out_msg = [out_msg, null];
+                    else
+                        out_msg = [null, out_msg];
+                }
+
+                // Send only if needed
+                if (send_only_change == false || node_settings.last_result != result)
+                    node.send(out_msg);
+            }
+
+            node_settings.last_result = result;
+            node_settings.last_message = out_msg;
 
             if (config.save_state)
                 smart_context.set(node.id, node_settings);

@@ -46,7 +46,7 @@ module.exports = function (RED)
                     let new_setpoint = parseFloat(msg.payload);
                     if (isNaN(new_setpoint) && !isFinite(new_setpoint))
                     {
-                        node.error("Invalid payload: " + msg.payload);
+                        // node.error("Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -58,7 +58,7 @@ module.exports = function (RED)
                     let new_temp = parseFloat(msg.payload);
                     if (isNaN(new_temp) && !isFinite(new_temp))
                     {
-                        node.error("Invalid payload: " + msg.payload);
+                        // node.error("Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -70,7 +70,7 @@ module.exports = function (RED)
                     let new_flow_min = parseFloat(msg.payload);
                     if (isNaN(new_flow_min) && !isFinite(new_flow_min))
                     {
-                        node.error("Invalid payload: " + msg.payload);
+                        // node.error("Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -82,7 +82,7 @@ module.exports = function (RED)
                     let new_flow_max = parseFloat(msg.payload);
                     if (isNaN(new_flow_max) && !isFinite(new_flow_max))
                     {
-                        node.error("Invalid payload: " + msg.payload);
+                        // node.error("Invalid payload: " + msg.payload);
                         return;
                     }
 

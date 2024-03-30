@@ -15,6 +15,8 @@
             out_false_type: { value: 'json' },
             out_true: { value: '{"topic": ""}' },
             out_true_type: { value: 'json' },
+            send_only_change: { value: true },
+            outputs: { value: 1 },
             save_state: { value: true },
             resend_on_start: { value: true }
         },
@@ -24,6 +26,10 @@
         label: function ()
         {
             return this.name || this.comparator || "Compare";
+        },
+        outputLabels: function (index)
+        {
+            return this.outputs == 1 ? "" : ["Wahr", "Falsch"][index];
         },
         oneditprepare: function ()
         {
@@ -65,6 +71,8 @@
                 typeField: "#node-input-value2_type"
             });
 
+
+
             $("#node-input-out_true").typedInput({
                 type: "json",
                 types: ["json", {
@@ -86,6 +94,30 @@
                 }],
                 typeField: "#node-input-out_false_type"
             });
+
+            $("#node-input-send_only_change").typedInput({
+                type: "bool",
+                types: [{
+                    value: "1",
+                    options: [
+                        { value: "true", label: "Nur bei Änderung" },
+                        { value: "false", label: "Immer" },
+                    ]
+                }]
+            });
+
+            $("#node-input-outputs").typedInput({
+                type: "num",
+                types: [{
+                    value: "1",
+                    options: [
+                        { value: "1", label: "Gemeinsamer Ausgang" },
+                        { value: "2", label: "Separate Ausgänge" },
+                    ]
+                }]
+            });
+
+
 
             $("#node-input-save_state").on("change", ev =>
             {
@@ -109,7 +141,8 @@
         <input id="node-input-comparator" />
     </div>
     <div class="form-row">
-        <div>Defaultwerte werden hier gesetzt und können durch die einkommenden Nachrichten überschrieben werden.</div>
+        <div>Defaultwerte werden hier gesetzt und können durch</div>
+        <div>die einkommenden Nachrichten überschrieben werden.</div>
     </div>
     <div class="form-row">
         <label for="node-input-value1"><i class="fa fa-hashtag"></i> Wert 1</label>
@@ -134,13 +167,19 @@
         <input type="hidden" id="node-input-out_false_type">
     </div>
     <div class="form-row">
-        <span><strong>Hinweis:</strong></span>
+        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> Senden</label>
+        <input id="node-input-send_only_change" />
     </div>
     <div class="form-row">
-        <span>
-            <code>msg.payload</code> wird automatisch auf das Logik-Ergebnis gesetzt.<br/>
-            <code>msg.comperator</code> wird automatisch auf den Logik-Operator gesetzt.
-        </span>
+        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> Ausgänge</label>
+        <input id="node-input-outputs" />
+    </div>
+    <div class="form-row">
+        <div><strong>Hinweis:</strong></div>
+        <div><code>msg.payload</code> wird automatisch auf das Vergleichs-Ergebnis gesetzt,</div>
+        <div>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.</div>
+        <div><code>msg.comperator</code> wird automatisch auf den Vergleichs-Operator gesetzt,</div>
+        <div>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.</div>
     </div>
     <hr/>
     <h4 style="margin: 0.5rem 0;">Systemstart</h4>
@@ -182,4 +221,11 @@
         </table>
     </p>
     <p>Texte werden anhand ihres Ascii-Codes verglichen.<code>"c" &lt; "b"</code> ergibt <code>false</code><code>"C" &lt; "b"</code> ergibt <code>true</code>.</p>
+    <p>
+        <strong>Hinweis:</strong><br/>
+        <code>msg.payload</code> wird automatisch auf das Vergleichs-Ergebnis gesetzt,
+        sofern es nicht bereits in der Konfiguration gesetzt wurde.<br/>
+        <code>msg.comperator</code> wird automatisch auf den Vergleichs-Operator gesetzt,
+        sofern es nicht bereits in der Konfiguration gesetzt wurde.
+    </p>
 </script>

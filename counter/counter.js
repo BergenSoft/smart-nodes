@@ -31,6 +31,7 @@ module.exports = function (RED)
         let step = config.step;
         let min = config.min;
         let max = config.max;
+        let out_message = helper.evaluateNodeProperty(RED, config.out_message, config.out_message_type);
 
         // runtime values
 
@@ -47,6 +48,18 @@ module.exports = function (RED)
             let temp_value;
             switch (real_topic)
             {
+                case "set_min":
+                    min = parseFloat(msg.payload);
+                    break;
+
+                case "set_max":
+                    max = parseFloat(msg.payload);
+                    break;
+
+                case "set_step":
+                    step = parseFloat(msg.payload);
+                    break;
+
                 case "up":
                     temp_value = parseFloat(msg.payload);
                     if (isNaN(temp_value) && !isFinite(temp_value))
@@ -86,7 +99,12 @@ module.exports = function (RED)
             if (node_settings.value == node_settings.last_message?.payload)
                 return;
 
-            node_settings.last_message = { payload: node_settings.value };
+            // if out_message is set, use this instead of the default message
+            if (out_message)
+                node_settings.last_message = Object.assign({}, out_message, { payload: node_settings.value });
+            else
+                node_settings.last_message = { payload: node_settings.value };
+
             smart_context.set(node.id, node_settings);
 
             node.send(node_settings.last_message);
@@ -102,7 +120,7 @@ module.exports = function (RED)
             if (node_settings.value == null)
                 node.status({});
             else
-                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Value = " + node_settings.value });
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Min = " + min + " |  Max = " + max + " | Value = " + node_settings.value });
         }
 
         if (config.save_state && config.resend_on_start && node_settings.last_message != null)

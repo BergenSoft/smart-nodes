@@ -2,13 +2,15 @@
     RED.nodes.registerType("smart_counter", {
         category: "Smart Nodes",
         paletteLabel: "Counter",
-        color: "#6EE2D9",
+        color: "#E2D96E",
         defaults: {
             name: { value: "" },
             start: { value: 0 },
             step: { value: 1 },
             min: { value: 0 },
             max: { value: 10 },
+            out_message: { value: '{"topic": ""}' },
+            out_message_type: { value: 'json' },
             save_state: { value: true },
             resend_on_start: { value: true }
         },
@@ -21,6 +23,17 @@
         },
         oneditprepare: function ()
         {
+            $("#node-input-out_message").typedInput({
+                type: "json",
+                types: ["json", {
+                    value: "null",
+                    label: "Standard",
+                    icon: "fa fa-times",
+                    hasValue: false,
+                }],
+                typeField: "#node-input-out_message_type"
+            });
+
             $("#node-input-save_state").on("change", ev =>
             {
                 if (ev.target.checked)
@@ -55,6 +68,21 @@
         <input type="number" id="node-input-max" placeholder="Max">
     </div>
     <hr/>
+    <h4 style="margin: 0.5rem 0;">Ausgangsnachricht</h4>
+    <div class="form-row">
+        <label for="node-input-out_message"><i class="fa fa-check-circle"></i> Nachricht</label>
+        <input type="text" id="node-input-out_message"/>
+        <input type="hidden" id="node-input-out_message_type">
+    </div>
+    <div class="form-row">
+        <span><strong>Hinweis:</strong></span>
+    </div>
+    <div class="form-row">
+        <span>
+            <code>msg.payload</code> wird immer automatisch auf den Ergebnis-Wert gesetzt.
+        </span>
+    </div>
+    <hr/>
     <h4 style="margin: 0.5rem 0;">Systemstart</h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
@@ -86,6 +114,18 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td><code>set_min</code></td>
+                    <td>Überschreibt den eingestellten Min-Wert mit <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>set_max</code></td>
+                    <td>Überschreibt den eingestellten Max-Wert mit <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>set_step</code></td>
+                    <td>Überschreibt die eingestellte Schrittweite mit <code>msg.payload</code>.</td>
+                </tr>
                 <tr>
                     <td><code>up</code></td>
                     <td>Erhöht den Wert um <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) um die konfigurierte Schrittweite. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>

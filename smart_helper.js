@@ -5,7 +5,7 @@ module.exports = {
      * If a type is unknown the NodeRed function is used for conversation.
      * 
      * Known types are:
-     * - null, which will return always null
+     * - "null", which will return always null
      */
     evaluateNodeProperty(RED, value, type)
     {
@@ -26,6 +26,7 @@ module.exports = {
             console.error(value);
             console.error(type);
             console.error(error);
+            console.error(msg);
             return null;
         }
     },

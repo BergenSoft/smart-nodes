@@ -93,7 +93,7 @@ module.exports = function (RED)
                     let new_setpoint = parseFloat(msg.payload);
                     if (isNaN(new_setpoint) && !isFinite(new_setpoint))
                     {
-                        node.error("Invalid payload: " + msg.payload);
+                        // node.error("Invalid payload: " + msg.payload);
                         return;
                     }
                     node_settings.setpoint = new_setpoint;
@@ -136,7 +136,7 @@ module.exports = function (RED)
                     let new_temp = parseFloat(msg.payload);
                     if (isNaN(new_temp) && !isFinite(new_temp))
                     {
-                        node.error("Invalid payload: " + msg.payload);
+                        // node.error("Invalid payload: " + msg.payload);
                         return;
                     }
                     current_temperature = new_temp;

@@ -22,8 +22,17 @@ module.exports = function (RED)
             last_direction_up: true, // remember last direction for toggle action
         }, smart_context.get(node.id));
 
+        // Backward compatibility
+        if (typeof config.max_time != "undefined")
+        {
+            config.max_time_up = config.max_time;
+            config.max_time_down = config.max_time;
+            delete config.max_time;
+        }
+
         // dynamic config
-        let max_time = parseInt(config.max_time || 60);
+        let max_time_up = parseInt(config.max_time_up || 60);
+        let max_time_down = parseInt(config.max_time_down || 60);
         let revert_time_ms = parseInt(config.revert_time_ms || 100);
         let alarm_action = config.alarm_action || "NOTHING";
 
@@ -123,9 +132,7 @@ module.exports = function (RED)
 
                     on_time = Date.now();
                     resultUp = true;
-                    startAutoOff(false, helper.getTimeInMsFromString(msg.time_on) || null);
-                    if (!alarm_active)
-                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Up" });
+                    startAutoOff(false, helper.getTimeInMsFromString(msg.time_on) || null, null, msg.exact);
                     break;
 
                 case "stop":
@@ -135,15 +142,19 @@ module.exports = function (RED)
                     resultStop = true;
                     if (max_time_timeout != null)
                     {
-                        const change_percentage = (Date.now() - on_time) / 1000 / max_time * 100;
                         if (node_settings.last_direction_up)
+                        {
+                            const change_percentage = (Date.now() - on_time) / 1000 / max_time_up * 100;
                             node_settings.last_position = Math.max(0, node_settings.last_position - change_percentage);
+                        }
                         else
+                        {
+                            const change_percentage = (Date.now() - on_time) / 1000 / max_time_down * 100;
                             node_settings.last_position = Math.min(100, node_settings.last_position + change_percentage);
+                        }
                     }
                     off_time = Date.now();
                     stopAutoOff();
-                    node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped at " + Math.round(node_settings.last_position) + "%" });
                     break;
 
                 case "down":
@@ -164,9 +175,7 @@ module.exports = function (RED)
 
                     on_time = Date.now();
                     resultDown = true;
-                    startAutoOff(true, helper.getTimeInMsFromString(msg.time_on) || null);
-                    if (!alarm_active)
-                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Down" });
+                    startAutoOff(true, helper.getTimeInMsFromString(msg.time_on) || null, null, msg.exact);
                     break;
 
                 case "position":
@@ -184,13 +193,16 @@ module.exports = function (RED)
                     {
                         // Change position while running,
                         // Calculate current position first
-                        const change_percentage = (now - on_time) / 1000 / max_time * 100;
                         if (node_settings.last_direction_up)
+                        {
+                            const change_percentage = (now - on_time) / 1000 / max_time_up * 100;
                             node_settings.last_position = Math.max(0, node_settings.last_position - change_percentage);
+                        }
                         else
+                        {
+                            const change_percentage = (now - on_time) / 1000 / max_time_down * 100;
                             node_settings.last_position = Math.min(100, node_settings.last_position + change_percentage);
-
-                        node.status({ fill: "gray", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Update current position to " + node_settings.last_position + "%" });
+                        }
 
                         // Runs in the wrong direction at the moment, so stop first
                         if (node_settings.last_direction_up && value > node_settings.last_position)
@@ -213,13 +225,13 @@ module.exports = function (RED)
                     {
                         // Go up
                         resultUp = true;
-                        startAutoOff(false, (node_settings.last_position - value) / 100 * max_time * 1000, value);
+                        startAutoOff(false, (node_settings.last_position - value) / 100 * max_time_up * 1000, value);
                     }
                     else if (value > node_settings.last_position)
                     {
                         // Go down
                         resultDown = true;
-                        startAutoOff(true, (value - node_settings.last_position) / 100 * max_time * 1000, value);
+                        startAutoOff(true, (value - node_settings.last_position) / 100 * max_time_down * 1000, value);
                     }
                     else
                     {
@@ -227,8 +239,6 @@ module.exports = function (RED)
                         handleTopic({ topic: "stop" });
                         return;
                     }
-
-                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Set position from " + node_settings.last_position + "%  to " + value + "%" });
                     break;
 
                 case "alarm":
@@ -236,7 +246,7 @@ module.exports = function (RED)
 
                     if (alarm_active)
                     {
-                        node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": ALARM is active" });
+                        node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": ALARM turned on" });
 
                         switch (alarm_action)
                         {
@@ -249,13 +259,17 @@ module.exports = function (RED)
                                 break;
                         }
                     }
+                    else
+                    {
+                        node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": ALARM turned off" });
+                    }
                     break;
             }
 
-            sendResult(resultUp, resultDown, resultStop);
+            sendResult(resultUp, resultDown, resultStop, msg.exact);
         };
 
-        let startAutoOff = (down, wait_time_ms = null, new_position = null) =>
+        let startAutoOff = (down, wait_time_ms = null, new_position = null, exact = false) =>
         {
             // console.log("startAutoOff (" + down + ", " + wait_time_ms + ", " + new_position + ");");
 
@@ -276,16 +290,20 @@ module.exports = function (RED)
                     down = true;
                 }
             }
+
             if (wait_time_ms == null)
             {
                 if (down)
-                    wait_time_ms = (100 - node_settings.last_position) * max_time / 100 * 1000;
+                    wait_time_ms = (100 - node_settings.last_position) * max_time_down / 100 * 1000;
                 else
-                    wait_time_ms = node_settings.last_position * max_time / 100 * 1000;
+                    wait_time_ms = node_settings.last_position * max_time_up / 100 * 1000;
 
-                // Run at least for 5 seconds
-                if (wait_time_ms < 5000)
-                    wait_time_ms = 5000;
+                if (exact !== true)
+                {
+                    // Run at least for 5 seconds
+                    if (wait_time_ms < 5000)
+                        wait_time_ms = 5000;
+                }
             }
 
             if (wait_time_ms < 0)
@@ -293,6 +311,9 @@ module.exports = function (RED)
                 node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": time_on value has to be greater than 0" });
                 return;
             }
+
+            if (wait_time_ms == 0)
+                return;
 
             if (!alarm_active)
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + (down ? "Down" : "Up") + ", wait " + helper.formatMsToStatus(wait_time_ms, "until") + " for auto off" });
@@ -319,8 +340,18 @@ module.exports = function (RED)
             }
         };
 
-        let sendResult = (up, down, stop) =>
+        let sendResult = (up, down, stop, exact) =>
         {
+            if (exact === true)
+            {
+                console.log({ up, down, stop, exact, last_pos: node_settings.last_position });
+                // Don't start moving if exact is enabled and already on top/bottom.
+                if (down && node_settings.last_position == 100)
+                    return;
+                if (up && node_settings.last_position == 0)
+                    return;
+            }
+
             // console.log("sendResult(" + up + ", " + down + ", " + stop + ");");
             if ((up && wait_for_down) || (down && wait_for_up))
             {
@@ -343,7 +374,7 @@ module.exports = function (RED)
                     wait_timeout = setTimeout(() =>
                     {
                         wait_timeout = null;
-                        sendResult(up, down, stop);
+                        sendResult(up, down, stop, exact);
                     }, off_time + revert_time_ms - now);
                     return;
                 }
@@ -355,7 +386,7 @@ module.exports = function (RED)
                 wait_timeout = null;
             }
 
-            // console.log("really sendResult(" + up + ", " + down + ", " + stop + ");");
+            // console.log("really sendResult(" + up + ", " + down + ", " + stop + ", " + exact + ");");
             if (up)
             {
                 if (!alarm_active || alarm_action === "UP")
@@ -363,6 +394,7 @@ module.exports = function (RED)
                     node_settings.last_direction_up = true;
                     node.send([{ payload: true }, { payload: false }, { payload: node_settings.last_position }]);
                     notifyCentral(true);
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Up" });
                 }
             }
             else if (down)
@@ -372,12 +404,14 @@ module.exports = function (RED)
                     node_settings.last_direction_up = false;
                     node.send([{ payload: false }, { payload: true }, { payload: node_settings.last_position }]);
                     notifyCentral(true);
+                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Down" });
                 }
             }
             else if (stop && !alarm_active)
             {
                 node.send([{ payload: false }, { payload: false }, { payload: node_settings.last_position }]);
                 notifyCentral(false);
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped at " + Math.round(node_settings.last_position) + "%" });
             }
         };
 
@@ -395,7 +429,7 @@ module.exports = function (RED)
         };
 
         // For security reason, stop shutter at node start
-        setTimeout(() =>
+        wait_timeout = setTimeout(() =>
         {
             node.send([{ payload: false }, { payload: false }, { payload: node_settings.last_position }]);
             node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped at " + Math.round(node_settings.last_position) + "%" });

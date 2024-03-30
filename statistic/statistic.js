@@ -28,6 +28,7 @@ module.exports = function (RED)
 
         // dynamic config
         let operation = config.operation
+        let out_message = helper.evaluateNodeProperty(RED, config.out_message, config.out_message_type);
         let count = config.count;
 
         // runtime values
@@ -66,6 +67,10 @@ module.exports = function (RED)
 
             if (msg)
             {
+                // if out_message is set, use this instead of the default message
+                if (out_message)
+                    msg = Object.assign({}, out_message, { payload: msg.payload });
+
                 node_settings.lastMessage = msg;
                 node.send(msg);
             }
@@ -180,7 +185,7 @@ module.exports = function (RED)
             if (operation === "ABS")
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + " => " + msg.payload });
             else
-                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + "(" + Object.entries(node_settings.values).map(v => v[1]).join(",") + ") => " + msg.payload });
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + "(" + Object.entries(node_settings.values).map(v => v[1]).join(", ") + ") => " + msg.payload });
         }
 
         if (config.save_state && config.resend_on_start && node_settings.lastMessage != null)

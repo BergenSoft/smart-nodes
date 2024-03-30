@@ -7,6 +7,8 @@
             name: { value: "" },
             operation: { value: "MIN" }, // MIN, MAX, SUM, DIFF, ABS, ABS_DIFF, AVG, MOV_AVG
             count: { value: 10 },
+            out_message: { value: '{"topic": ""}' },
+            out_message_type: { value: 'json' },
             save_state: { value: true },
             resend_on_start: { value: true }
         },
@@ -58,6 +60,17 @@
                     $(".statistic-moving-average-row").hide();
             });
 
+            $("#node-input-out_message").typedInput({
+                type: "json",
+                types: ["json", {
+                    value: "null",
+                    label: "Standard",
+                    icon: "fa fa-times",
+                    hasValue: false,
+                }],
+                typeField: "#node-input-out_message_type"
+            });
+
             $("#node-input-save_state").on("change", ev =>
             {
                 if (ev.target.checked)
@@ -82,6 +95,21 @@
     <div class="form-row statistic-moving-average-row" style="display: none;">
         <label for="node-input-count"><i class="fa fa-hashtag"></i> Anzahl</label>
         <input id="node-input-count" />
+    </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;">Ausgangsnachricht</h4>
+    <div class="form-row">
+        <label for="node-input-out_message"><i class="fa fa-check-circle"></i> Nachricht</label>
+        <input type="text" id="node-input-out_message"/>
+        <input type="hidden" id="node-input-out_message_type">
+    </div>
+    <div class="form-row">
+        <span><strong>Hinweis:</strong></span>
+    </div>
+    <div class="form-row">
+        <span>
+            <code>msg.payload</code> wird immer automatisch auf den Ergebnis-Wert gesetzt.
+        </span>
     </div>
     <hr/>
     <h4 style="margin: 0.5rem 0;">Systemstart</h4>

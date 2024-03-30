@@ -94,7 +94,7 @@ module.exports = function (RED)
             }
         });
 
-        let send = (msg) =>
+        let send = msg =>
         {
             let delay_ms = 0;
 
@@ -139,7 +139,7 @@ module.exports = function (RED)
             // No delay if 0 or smaller
             if (delay_ms <= 0)
             {
-                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended msg.topic = '" + +msg.topic + "' msg.payload = '" + msg.payload + "'" });
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
                 node_settings.last_message = msg
 
                 if (config.save_state)
@@ -150,11 +150,11 @@ module.exports = function (RED)
             }
 
             // start new timeout
-            node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "Forward msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "' in " + helper.formatMsToStatus(delay_ms, "at") });
+            node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "Forward " + getMessageStatusText(msg) + " in " + helper.formatMsToStatus(delay_ms, "at") });
             timeout = setTimeout(() =>
             {
                 timeout = null;
-                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended msg.topic = '" + msg.topic + "' msg.payload = '" + msg.payload + "'" });
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
                 node_settings.last_message = msg
 
                 if (config.save_state)
@@ -164,11 +164,25 @@ module.exports = function (RED)
             }, delay_ms);
         }
 
+        let getMessageStatusText = msg =>
+        {
+            let text = "";
+            if (msg.topic != null)
+                text += " topic = '" + msg.topic + "'";
+            if (msg.payload != null)
+                text += " payload = '" + msg.payload + "'";
+
+            if (text == "")
+                return "a message";
+
+            return text.trim();
+        }
+
         if (config.save_state && config.resend_on_start && node_settings.last_message != null)
         {
             setTimeout(() =>
             {
-                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended msg.topic = '" + node_settings.last_message.topic + "' msg.payload = '" + node_settings.last_message.payload + "'" });
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(node_settings.last_message) });
                 node.send(node_settings.last_message);
             }, 10000);
         }
