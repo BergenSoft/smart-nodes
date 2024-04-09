@@ -97,18 +97,22 @@ module.exports = function (RED)
                     if (typeof out_msg.payload === "undefined")
                         out_msg.payload = result ?? node_settings.last_result;
 
-                    // Separate outputs if needed
-                    if (outputs == 2)
-                    {
-                        if (result)
-                            out_msg = [out_msg, null];
-                        else
-                            out_msg = [null, out_msg];
-                    }
-
                     // Send only if needed
                     if (send_only_change == false || node_settings.last_result != result)
-                        node.send(out_msg);
+                    {
+                        // Separate outputs if needed
+                        if (outputs == 2)
+                        {
+                            if (result)
+                                out_msg = [out_msg, null];
+                            else
+                                out_msg = [null, out_msg];
+                        }
+                        else
+                        {
+                            node.send(out_msg);
+                        }
+                    }
 
                     node_settings.last_value = value;
                     node_settings.last_result = result;
