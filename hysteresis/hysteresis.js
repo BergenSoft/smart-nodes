@@ -87,34 +87,39 @@ module.exports = function (RED)
                     let result = getResult(value);
                     let out_msg = null;
 
-                    // Get custom output message
-                    if (result)
-                        out_msg = createMessage(out_higher, config.out_higher_type, msg, value);
-                    else
-                        out_msg = createMessage(out_lower, config.out_lower_type, msg, value);
-
-                    // Overwrite automatic values, if not already defined
-                    if (typeof out_msg.payload === "undefined")
-                        out_msg.payload = result ?? node_settings.last_result;
-
-                    // Separate outputs if needed
-                    if (outputs == 2)
+                    // No change, nothing to send
+                    if (result !== null)
                     {
+                        // Get custom output message
                         if (result)
-                            out_msg = [out_msg, null];
+                            out_msg = createMessage(out_higher, config.out_higher_type, msg, value);
                         else
-                            out_msg = [null, out_msg];
+                            out_msg = createMessage(out_lower, config.out_lower_type, msg, value);
+
+                        // Overwrite automatic values, if not already defined
+                        if (typeof out_msg.payload === "undefined")
+                            out_msg.payload = result ?? node_settings.last_result;
+
+                        // Separate outputs if needed
+                        if (outputs == 2)
+                        {
+                            if (result)
+                                out_msg = [out_msg, null];
+                            else
+                                out_msg = [null, out_msg];
+                        }
+
+                        // Send only if needed
+                        if (send_only_change == false || node_settings.last_result != result)
+                            node.send(out_msg);
+
+                        node_settings.last_result = result;
                     }
 
-                    // Send only if needed
-                    if (send_only_change == false || node_settings.last_result != result)
-                        node.send(out_msg);
-
                     node_settings.last_value = value;
-                    node_settings.last_result = result;
                     node_settings.last_message = out_msg;
 
-                    setStatus();
+                    setStatus(result === null);
 
                     if (config.save_state)
                         smart_context.set(node.id, node_settings);
@@ -137,14 +142,14 @@ module.exports = function (RED)
             return null;
         }
 
-        let setStatus = () =>
+        let setStatus = noChange =>
         {
-            if (node_settings.last_result === true)
+            if (noChange)
+                node.status({ fill: node_settings.last_result ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": No change by value " + node_settings.last_value + "" });
+            else if (node_settings.last_result === true)
                 node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Turned higher by value " + node_settings.last_value + "" });
             else if (node_settings.last_result === false)
                 node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Turned lower by value " + node_settings.last_value + "" });
-            else
-                node.status({ fill: node_settings.last_result ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": No change by value " + node_settings.last_value + "" });
         }
 
         let createMessage = (out_msg, out_type, msg, value) =>

@@ -139,6 +139,7 @@
             defaults: {
                 name: { value: "" },
                 exec_text_names: { value: "" },
+                short_time_on_ms: { value: 200 },
                 links: { value: [], type: "smart_central-control[]" }
             },
             inputs: 1,
@@ -154,6 +155,19 @@
                 let node = this;
                 onEditPrepare(this, ["smart_central-control"]);
                 initTreeList(node, ["smart_central-control"]);
+
+                $("#node-input-short_time_on_ms").spinner({
+                    min: 10,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value)
+                            $(this).spinner("value", value);
+                    }
+                });
             },
             onadd: function ()
             {
@@ -173,6 +187,10 @@
         <label for="node-input-exec_text_names"><i class="fa fa-comments-o"></i> Text</label>
         <input id="node-input-exec_text_names" type="text" />
         <div style="max-width: 450px;">Diese Node kann über die eingegebenen Wörter gesteuert werden. Mehrere Wörter werden durch ein Komma getrennt.</div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-short_time_on_ms"><i class="fa fa-clock-o"></i> Zeit kurz</label>
+        <input id="node-input-short_time_on_ms" placeholder="200" /> ms
     </div>
     <span><i class="fa fa-link"></i>Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:</span>
     <div class="form-row node-input-link-row node-input-link-rows"></div>
@@ -217,6 +235,14 @@
                     <td>
                         Nimmt einen Befehl von Home Assistant entgegen um informiert zu werden ob der Rollladen läuft und in welche Richtung.<br/>
                         <strong>Wichtig:</strong> Dieses Topic startet den Rollladen <u>nicht</u>, da die Gruppenadresse direkt mit dem Jalousiemodul verbunden sein muss.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>short_up_down</code></td>
+                    <td>
+                        Sendet bei <code>msg.payload = false</code> einen kurzen Hochfahrbefehl und bei <code>msg.payload = true</code> einen kurzen Runterfahrbefehl.<br/>
+                        Es wird dabei die im Baustein hinterlegte Zeit verwendet. Diese kann aber durch setzen von <code>msg.time_on = 1500</code> oder <code>msg.time_on = "1.5s"</code> einmalig überschrieben werden.
                     </td>
                     <td>Nein</td>
                 </tr>

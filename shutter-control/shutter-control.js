@@ -23,6 +23,7 @@ module.exports = function (RED)
         }, smart_context.get(node.id));
 
         // dynamic config
+        let short_time_on_ms = config.short_time_on_ms || 200;
 
         // runtime values
         let is_running = false;         // remember if shutter is running, this is only recognized when starting within this control or position 0% or 100% is reached.
@@ -60,7 +61,7 @@ module.exports = function (RED)
             var real_topic = helper.getTopicName(msg.topic);
 
             // set default topic
-            if (!["status", "status_position", "up_down", "up", "up_stop", "down", "down_stop", "stop", "toggle", "position"].includes(real_topic))
+            if (!["status", "status_position", "up_down", "up", "up_stop", "down", "down_stop", "stop", "toggle", "position", "short_up_down"].includes(real_topic))
                 real_topic = "toggle";
 
             // skip if button is released
@@ -110,6 +111,10 @@ module.exports = function (RED)
                         node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Down" });
                     return;
 
+                case "short_up_down":
+                    handleTopic({ topic: msg.payload ? "down" : "up", time_on: msg.time_on ?? short_time_on_ms });
+                    return;
+
                 case "up":
                     node_settings.last_direction_up = true;
                     is_running = true;
@@ -122,7 +127,7 @@ module.exports = function (RED)
                     is_running = false;
                     resultStop = true;
                     stopAutoOff();
-                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped" });
+                    node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped" });
                     break;
 
                 case "down":
@@ -168,7 +173,7 @@ module.exports = function (RED)
             let timeMs = helper.getTimeInMsFromString(msg.time_on);
             if (isNaN(timeMs))
             {
-                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Invalid time_on value send: " + msg.time_on });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Invalid time_on value send: '" + msg.time_on + "'" });
                 return;
             }
 
@@ -184,7 +189,7 @@ module.exports = function (RED)
             node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Wait " + (timeMs / 1000).toFixed(1) + " sec for auto off" });
             max_time_on_timeout = setTimeout(() =>
             {
-                node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped" });
+                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Stopped" });
                 is_running = false;
                 node.send([null, { payload: true }, null]);
                 notifyCentral(false);

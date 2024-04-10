@@ -83,7 +83,7 @@ module.exports = {
      */
     getTimeInMs(value, unit)
     {
-        value = parseInt(value, 10);
+        value = parseFloat(value);
         if (isNaN(value) || value == 0)
             return 0;
 
@@ -157,22 +157,13 @@ module.exports = {
             return 0;
 
         // Split 123min into ["123", "min"]
-        let values = value.match(/^([0-9]+)(ms|s|sec|m|min|h)?$/)
+        let values = value.match(/^([0-9]+[,.]?[0-9]*)(ms|s|sec|m|min|h|)?$/);
 
         // string doesn't match
         if (values == null)
             return 0;
 
-        // default is ms
-        if (values.length == 2)
-            return this.getTimeInMs(values[1], "ms");
-
-        // default is ms
-        if (values.length == 3)
-            return this.getTimeInMs(values[1], values[2]);
-
-        // Something went wrong
-        return 0;
+        return this.getTimeInMs(values[1].replace(",", "."), values[2] || "ms");
     },
 
     /**
