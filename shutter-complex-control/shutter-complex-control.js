@@ -344,7 +344,8 @@ module.exports = function (RED)
         {
             if (exact === true)
             {
-                console.log({ up, down, stop, exact, last_pos: node_settings.last_position });
+                // console.log({ up, down, stop, exact, last_pos: node_settings.last_position });
+                
                 // Don't start moving if exact is enabled and already on top/bottom.
                 if (down && node_settings.last_position == 100)
                     return;

@@ -65,8 +65,11 @@ module.exports = function (RED)
 
             setStatus();
 
+            if (invert_output)
+                result = !result;
+
             // Get custom output message
-            if (invert_output ? !result : result)
+            if (result)
             {
                 if (out_true !== null)
                     out_msg = Object.assign({}, out_true);
