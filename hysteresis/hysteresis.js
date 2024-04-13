@@ -139,7 +139,10 @@ module.exports = function (RED)
             if (value <= node_settings.setpoint - node_settings.hysteresis && node_settings.last_result !== false)
                 return false;
 
-            return null;
+            if (send_only_change)
+                return null;
+
+            return node_settings.last_result;
         }
 
         let setStatus = noChange =>
