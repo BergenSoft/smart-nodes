@@ -114,10 +114,10 @@ module.exports = function (RED)
                             node.send(out_msg);
 
                         node_settings.last_result = result;
+                        node_settings.last_message = out_msg;
                     }
 
                     node_settings.last_value = value;
-                    node_settings.last_message = out_msg;
 
                     setStatus(result === null);
 
@@ -168,7 +168,7 @@ module.exports = function (RED)
             })
         };
 
-        if (config.save_state && config.resend_on_start && node_settings.last_result != null && node_settings.last_message != null)
+        if (config.save_state && config.resend_on_start && node_settings.last_result !== null && node_settings.last_message !== null)
         {
             setTimeout(() =>
             {

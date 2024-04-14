@@ -222,7 +222,7 @@ module.exports = function (RED)
             }
             else if (node_settings.last_value)
             {
-                if (isPermanent || isMotion || timeout_end_date == null)
+                if (isPermanent || isMotion || max_time_on_timeout == null)
                     node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": On" });
                 else if (max_time_on_timeout)
                     node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Wait " + helper.formatDateToStatus(timeout_end_date, "until") + " for auto off" });
