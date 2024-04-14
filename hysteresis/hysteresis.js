@@ -172,10 +172,17 @@ module.exports = function (RED)
         {
             setTimeout(() =>
             {
-                if (node_settings.last_result)
-                    node.send([node_settings.last_message, null]);
+                if (outputs == 2)
+                {
+                    if (node_settings.last_result)
+                        node.send([node_settings.last_message, null]);
+                    else
+                        node.send([null, node_settings.last_message]);
+                }
                 else
-                    node.send([null, node_settings.last_message]);
+                {
+                    node.send(node_settings.last_message);
+                }
             }, 10000);
         }
     }
