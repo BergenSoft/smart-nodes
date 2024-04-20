@@ -1,3 +1,5 @@
+const smart_helper = require("../smart_helper.js");
+
 module.exports = function (RED)
 {
     "use strict";
@@ -140,7 +142,7 @@ module.exports = function (RED)
             if (delay_ms <= 0)
             {
                 node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
-                node_settings.last_message = msg
+                node_settings.last_message = helper.cloneObject(msg);
 
                 if (config.save_state)
                     smart_context.set(node.id, node_settings);
@@ -155,7 +157,7 @@ module.exports = function (RED)
             {
                 timeout = null;
                 node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
-                node_settings.last_message = msg
+                node_settings.last_message = helper.cloneObject(msg);
 
                 if (config.save_state)
                     smart_context.set(node.id, node_settings);

@@ -295,5 +295,15 @@ module.exports = {
         return date.getHours().toString().padStart(2, "0") + ":" +
             date.getMinutes().toString().padStart(2, "0") + ":" +
             date.getSeconds().toString().padStart(2, "0");
+    },
+
+    /**
+     * Creates a new independend object and copies all properties to the new one
+     * @param {*} obj The Object to copy
+     * @returns A new Object
+     */
+    cloneObject(obj)
+    {
+        return Object.assign({}, obj);
     }
 };

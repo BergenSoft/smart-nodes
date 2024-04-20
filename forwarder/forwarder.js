@@ -77,7 +77,7 @@ module.exports = function (RED)
                         node_settings.last_msg_was_sended = false;
                     }
 
-                    node_settings.last_message = msg;
+                    node_settings.last_message = helper.cloneObject(msg);;
                     break;
             }
         });
