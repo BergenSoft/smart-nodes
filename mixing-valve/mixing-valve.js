@@ -336,10 +336,10 @@ module.exports = function (RED)
             if (calibration_timeout !== null)
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": In calibration" });
             else
-                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + node_settings.setpoint.toFixed(1) + "°C, Cur: " + current_temperature?.toFixed(1) + "°C, Pos: " + node_settings.last_position.toFixed(1) + "%" });
+                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + node_settings.setpoint?.toFixed(1) + "°C, Cur: " + current_temperature?.toFixed(1) + "°C, Pos: " + node_settings.last_position?.toFixed(1) + "%" });
         }
 
-        if (node_settings.last_position === null)
+        if (node_settings.last_position == null)
         {
             // Start calibration after 10s
             setTimeout(calibrate, 10 * 1000);
