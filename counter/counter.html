@@ -27,7 +27,7 @@
                 type: "json",
                 types: ["json", {
                     value: "null",
-                    label: "Standard",
+                    label: this._("default"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -48,24 +48,24 @@
 
 <script type="text/html" data-template-name="smart_counter">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="counter.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]counter.ui.name">
     </div>
     <div class="form-row">
-        <label for="node-input-start"><i class="fa fa-cog"></i> Start</label>
-        <input type="number" id="node-input-start" placeholder="Startwert">
+        <label for="node-input-start"><i class="fa fa-cog"></i> <span data-i18n="counter.ui.start"></label>
+        <input type="number" id="node-input-start"  data-i18n="[placeholder]counter.ui.start">
     </div>
     <div class="form-row">
-        <label for="node-input-step"><i class="fa fa-forward"></i> Schritt</label>
-        <input type="number" id="node-input-step" placeholder="Schrittweite">
+        <label for="node-input-step"><i class="fa fa-forward"></i> <span data-i18n="counter.ui.step"></label>
+        <input type="number" id="node-input-step"  data-i18n="[placeholder]counter.ui.step">
     </div>
     <div class="form-row">
-        <label for="node-input-min"><i class="fa fa-arrow-down"></i> Min</label>
-        <input type="number" id="node-input-min" placeholder="Min">
+        <label for="node-input-min"><i class="fa fa-arrow-down"></i> <span data-i18n="counter.ui.min"></label>
+        <input type="number" id="node-input-min"  data-i18n="[placeholder]counter.ui.min">
     </div>
     <div class="form-row">
-        <label for="node-input-max"><i class="fa fa-arrow-up"></i> Max</label>
-        <input type="number" id="node-input-max" placeholder="Max">
+        <label for="node-input-max"><i class="fa fa-arrow-up"></i> <span data-i18n="counter.ui.max"></label>
+        <input type="number" id="node-input-max"  data-i18n="[placeholder]counter.ui.max">
     </div>
     <hr/>
     <h4 style="margin: 0.5rem 0;">Ausgangsnachricht</h4>
@@ -92,53 +92,4 @@
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
         <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_counter">
-    <p>Diese Node kann verwendet werden um nach oben oder unten zu zählen.</p>
-    <p>
-        Die Standardschrittweite kann vorgegeben oder durch einkommende Nachrichten temporär überschrieben werden.
-        Es sind auch Kommazahlen möglich.
-    </p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
-    </p>
-    <p>
-        Folgende topics werden akzeptiert:
-        <table>
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Beschreibung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>set_min</code></td>
-                    <td>Überschreibt den eingestellten Min-Wert mit <code>msg.payload</code>.</td>
-                </tr>
-                <tr>
-                    <td><code>set_max</code></td>
-                    <td>Überschreibt den eingestellten Max-Wert mit <code>msg.payload</code>.</td>
-                </tr>
-                <tr>
-                    <td><code>set_step</code></td>
-                    <td>Überschreibt die eingestellte Schrittweite mit <code>msg.payload</code>.</td>
-                </tr>
-                <tr>
-                    <td><code>up</code></td>
-                    <td>Erhöht den Wert um <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) um die konfigurierte Schrittweite. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
-                </tr>
-                <tr>
-                    <td><code>down</code></td>
-                    <td>Verringert den Wert um <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) um die konfigurierte Schrittweite. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
-                </tr>
-                <tr>
-                    <td><code>reset</code></td>
-                    <td>Setzt den Wert auf <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) auf den Startwert zurück. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
-                </tr>
-            </tbody>
-        </table>
-    </p>
 </script>

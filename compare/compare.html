@@ -34,26 +34,25 @@
         oneditprepare: function ()
         {
             $("#node-input-comparator").typedInput({
-                types: [
-                    {
-                        default: "EQUAL",
-                        options: [
-                            { value: "SMALLER", label: "< Kleiner" },
-                            { value: "SMALLER_EQUAL", label: "<= Kleiner oder gleich" },
-                            { value: "EQUAL", label: "== Gleich" },
-                            { value: "UNEQUAL", label: "!= Ungleich" },
-                            { value: "GREATER_EQUAL", label: ">= Größer oder gleich" },
-                            { value: "GREATER", label: "> Größer" }
-                        ],
-                    },
-                ],
+                types: [{
+                    default: "EQUAL",
+                    value: "comperator",
+                    options: [
+                        { value: "SMALLER", label: "< Kleiner" },
+                        { value: "SMALLER_EQUAL", label: "<= Kleiner oder gleich" },
+                        { value: "EQUAL", label: "== Gleich" },
+                        { value: "UNEQUAL", label: "!= Ungleich" },
+                        { value: "GREATER_EQUAL", label: ">= Größer oder gleich" },
+                        { value: "GREATER", label: "> Größer" }
+                    ],
+                }],
             });
 
             $("#node-input-value1").typedInput({
                 type: "num",
                 types: ["str", "num", "bool", {
                     value: "null",
-                    label: "Kein Wert",
+                    label: this._("compare.ui.no_value"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -64,7 +63,7 @@
                 type: "num",
                 types: ["str", "num", "bool", {
                     value: "null",
-                    label: "Kein Wert",
+                    label: this._("compare.ui.no_value"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -77,7 +76,7 @@
                 type: "json",
                 types: ["json", {
                     value: "null",
-                    label: "Nichts senden",
+                    label: this._("compare.ui.send_nothing"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -88,7 +87,7 @@
                 type: "json",
                 types: ["json", {
                     value: "null",
-                    label: "Nichts senden",
+                    label: this._("compare.ui.send_nothing"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -99,9 +98,10 @@
                 type: "bool",
                 types: [{
                     value: "1",
+                    value: "send_only_change",
                     options: [
-                        { value: "true", label: "Nur bei Änderung" },
-                        { value: "false", label: "Immer" },
+                        { value: "true", label: this._("compare.ui.only_on_change") },
+                        { value: "false", label: this._("compare.ui.always") },
                     ]
                 }]
             });
@@ -110,9 +110,10 @@
                 type: "num",
                 types: [{
                     value: "1",
+                    value: "outputs",
                     options: [
-                        { value: "1", label: "Gemeinsamer Ausgang" },
-                        { value: "2", label: "Separate Ausgänge" },
+                        { value: "1", label: this._("compare.ui.common_output") },
+                        { value: "2", label: this._("compare.ui.separate_output") },
                     ]
                 }]
             });
@@ -133,99 +134,59 @@
 
 <script type="text/html" data-template-name="smart_compare">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="compare.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]compare.ui.name"/>
     </div>
     <div class="form-row">
-        <label for="node-input-comparator"><i class="fa fa-sort"></i> Vergleich</label>
+        <label for="node-input-comparator"><i class="fa fa-sort"></i> <span data-i18n="compare.ui.compare"></span></label>
         <input id="node-input-comparator" />
     </div>
-    <div class="form-row">
-        <div>Defaultwerte werden hier gesetzt und können durch</div>
-        <div>die einkommenden Nachrichten überschrieben werden.</div>
+    <div class="form-row" style="max-width: 28rem">
+        <span data-i18n="compare.ui.note_default_values"></span>
     </div>
     <div class="form-row">
-        <label for="node-input-value1"><i class="fa fa-hashtag"></i> Wert 1</label>
+        <label for="node-input-value1"><i class="fa fa-hashtag"></i> <span data-i18n="compare.ui.value_1"></span></label>
         <input type="text" id="node-input-value1">
         <input type="hidden" id="node-input-value1_type">
     </div>
     <div class="form-row">
-        <label for="node-input-value2"><i class="fa fa-hashtag"></i> Wert 2</label>
+        <label for="node-input-value2"><i class="fa fa-hashtag"></i> <span data-i18n="compare.ui.value_2"></span></label>
         <input type="text" id="node-input-value2"/>
         <input type="hidden" id="node-input-value2_type">
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Ausgangsnachrichten</h4>
+    <h4 style="margin: 0.5rem 0;"><span data-i18n="compare.ui.output_messages"></span></h4>
     <div class="form-row">
-        <label for="node-input-out_true"><i class="fa fa-check-circle"></i> Wahr</label>
+        <label for="node-input-out_true"><i class="fa fa-check-circle"></i> <span data-i18n="compare.ui.true"></span></label>
         <input type="text" id="node-input-out_true"/>
         <input type="hidden" id="node-input-out_true_type">
     </div>
     <div class="form-row">
-        <label for="node-input-out_false"><i class="fa fa-times-circle"></i> Falsch</label>
+        <label for="node-input-out_false"><i class="fa fa-times-circle"></i> <span data-i18n="compare.ui.false"></span></label>
         <input type="text" id="node-input-out_false" />
         <input type="hidden" id="node-input-out_false_type">
     </div>
     <div class="form-row">
-        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> Senden</label>
+        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> <span data-i18n="compare.ui.send"></span></label>
         <input id="node-input-send_only_change" />
     </div>
     <div class="form-row">
-        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> Ausgänge</label>
+        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> <span data-i18n="compare.ui.outputs"></span></label>
         <input id="node-input-outputs" />
     </div>
-    <div class="form-row">
-        <div><strong>Hinweis:</strong></div>
-        <div><code>msg.payload</code> wird automatisch auf das Vergleichs-Ergebnis gesetzt,</div>
-        <div>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.</div>
-        <div><code>msg.comperator</code> wird automatisch auf den Vergleichs-Operator gesetzt,</div>
-        <div>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.</div>
+    <div class="form-row" style="max-width: 28rem">
+        <div><strong><span data-i18n="compare.ui.note"></span>:</strong></div>
+        <div><code>msg.payload</code> <span data-i18n="compare.ui.note_payload"></span></div>
+        <div><code>msg.comperator</code> <span data-i18n="compare.ui.note_comperator"></span></div>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <h4 style="margin: 0.5rem 0;"><span data-i18n="compare.ui.system_start"></span></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
-        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+        <label for="node-input-save_state" style="width: calc(100% - 30px);"><span data-i18n="compare.ui.save_state"></span></label>
     </div>
     <div class="form-row" id="resend_on_start_row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);"><span data-i18n="compare.ui.send_after_start"></span></label>
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_compare">
-    <p>Diese Node führt verschiedene Vergleiche aus. Dabei können nicht nur Zahlen, sondern auch Texte verglichen werden.</p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>nummer</code>. <code>name</code> und <code>#</code> sind dabei optional.
-    </p>
-    <p>
-        Folgende topics werden akzeptiert:
-        <table>
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Beschreibung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>1</code></td>
-                    <td>Setzt den linken zu vergleichenden Wert</td>
-                </tr>
-                <tr>
-                    <td><code>2</code></td>
-                    <td>Setzt den rechten zu vergleichenden Wert</td>
-                </tr>
-            </tbody>
-        </table>
-    </p>
-    <p>Texte werden anhand ihres Ascii-Codes verglichen.<code>"c" &lt; "b"</code> ergibt <code>false</code><code>"C" &lt; "b"</code> ergibt <code>true</code>.</p>
-    <p>
-        <strong>Hinweis:</strong><br/>
-        <code>msg.payload</code> wird automatisch auf das Vergleichs-Ergebnis gesetzt,
-        sofern es nicht bereits in der Konfiguration gesetzt wurde.<br/>
-        <code>msg.comperator</code> wird automatisch auf den Vergleichs-Operator gesetzt,
-        sofern es nicht bereits in der Konfiguration gesetzt wurde.
-    </p>
 </script>

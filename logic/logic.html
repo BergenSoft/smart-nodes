@@ -32,16 +32,15 @@
         oneditprepare: function ()
         {
             $("#node-input-logic").typedInput({
-                types: [
-                    {
-                        default: "AND",
-                        options: [
-                            { value: "AND", label: "AND" },
-                            { value: "OR", label: "OR" },
-                            { value: "XOR", label: "XOR" }
-                        ],
-                    },
-                ],
+                types: [{
+                    value: "logic",
+                    default: "AND",
+                    options: [
+                        { value: "AND", label: "AND" },
+                        { value: "OR", label: "OR" },
+                        { value: "XOR", label: "XOR" }
+                    ],
+                }],
             });
 
             $("#node-input-logic_inputs").spinner({
@@ -61,12 +60,11 @@
 
             $("#node-input-inverts")
                 .typedInput({
-                    types: [
-                        {
-                            multiple: true,
-                            options: []
-                        },
-                    ],
+                    types: [{
+                        value: "inverts",
+                        multiple: true,
+                        options: []
+                    }],
                 });
             refreshInverts(this.logic_inputs);
             $("#node-input-inverts").typedInput("value", this.inverts);
@@ -97,7 +95,7 @@
             $("#node-input-send_only_change").typedInput({
                 type: "bool",
                 types: [{
-                    value: "1",
+                    value: "send_only_change",
                     options: [
                         { value: "true", label: "Nur bei Änderung" },
                         { value: "false", label: "Immer" },
@@ -108,7 +106,7 @@
             $("#node-input-outputs").typedInput({
                 type: "num",
                 types: [{
-                    value: "1",
+                    value: "outputs",
                     options: [
                         { value: "1", label: "Gemeinsamer Ausgang" },
                         { value: "2", label: "Separate Ausgänge" },
@@ -143,12 +141,11 @@
         }
 
         $("#node-input-inverts")
-            .typedInput('types', [
-                {
-                    multiple: true,
-                    options: options
-                },
-            ]);
+            .typedInput("types", [{
+                value: "inverts",
+                multiple: true,
+                options: options
+            }]);
 
         $("#node-input-inverts").typedInput("value", newValues.join(","));
     }

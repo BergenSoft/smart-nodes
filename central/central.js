@@ -16,7 +16,7 @@ module.exports = function (RED)
         {
             if (typeof msg.source == "undefined" || typeof msg.state == "undefined")
             {
-                console.warn("Unknown message received in smart_node central", msg);
+                console.warn(RED._("central.errors.unknown_message"), msg);
                 return;
             }
 
@@ -24,9 +24,9 @@ module.exports = function (RED)
             states.set(msg.source, msg.state);
 
             if (isAllOff())
-                node.status({ fill: "red", shape: "dot", text: "All off" });
+                node.status({ fill: "red", shape: "dot", text: "central.status.all_off" });
             else
-                node.status({ fill: "green", shape: "dot", text: "Something is on" });
+                node.status({ fill: "green", shape: "dot", text: "central.status.Something_is_on" });
         }
         RED.events.on(event, handler);
 

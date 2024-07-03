@@ -1,0 +1,36 @@
+<script type="text/html" data-help-name="smart_compare">
+    <p>This node performs various comparisons. Not only numbers, but also texts can be compared.</p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so that different smart nodes can be controlled with the same topic.<br/>
+        This node only uses the <code>number</code> part. <code>name</code> and <code>#</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>1</code></td>
+                    <td>Sets the left value to compare</td>
+                </tr>
+                <tr>
+                    <td><code>2</code></td>
+                    <td>Sets the right value to compare</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>Texts are compared based on their ASCII code.<code>"c" &lt; "b"</code> returns <code>false</code><code>"C" &lt; "b"</code> results in <code>true</code>.</p>
+    <p>
+        <strong>Note:</strong><br/>
+        <code>msg.payload</code> is automatically set to the comparison result,
+        if it has not already been set in the configuration.<br/>
+        <code>msg.comperator</code> is automatically set to the comparison operator,
+        if it has not already been set in the configuration.
+    </p>
+</script>

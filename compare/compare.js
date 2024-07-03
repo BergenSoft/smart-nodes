@@ -46,7 +46,7 @@ module.exports = function (RED)
             let input = helper.getTopicNumber(msg.topic);
             if (input == null || input < 1 || input > 2)    
             {
-                node.error("Topic has to be 1 or 2, send: " + msg.topic);
+                node.error(RED._("compare.errors.wrong_topic") + msg.topic);
                 return;
             }
 

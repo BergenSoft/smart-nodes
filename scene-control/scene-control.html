@@ -204,7 +204,8 @@
             {
                 let value = $(inputs[i]).typedInput("value");
                 $(inputs[i]).typedInput("types", [{
-                    multiple: "true",
+                    value: "output",
+                    multiple: true,
                     options: options
                 }]);
                 $(inputs[i]).typedInput("value", value);
@@ -326,10 +327,11 @@
                             .css("width", "calc(70% - 55px)")
                             .appendTo(row)
                             .typedInput({
+                                type: "output",
                                 types: [{
-                                    multiple: "true",
-                                    options: [
-                                    ]
+                                    value: "output",
+                                    multiple: true,
+                                    options: []
                                 }]
                             });
 
@@ -404,17 +406,16 @@
                 $("#node-input-max_time_on_unit")
                     .css("max-width", "10rem")
                     .typedInput({
-                        types: [
-                            {
-                                default: "s",
-                                options: [
-                                    { value: "ms", label: "Millisekunden" },
-                                    { value: "s", label: "Sekunden" },
-                                    { value: "min", label: "Minuten" },
-                                    { value: "h", label: "Stunden" },
-                                ],
-                            },
-                        ],
+                        types: [{
+                            default: "s",
+                            value: "max_time_on_unit",
+                            options: [
+                                { value: "ms", label: "Millisekunden" },
+                                { value: "s", label: "Sekunden" },
+                                { value: "min", label: "Minuten" },
+                                { value: "h", label: "Stunden" },
+                            ],
+                        }],
                     });
             },
             oneditsave: function ()

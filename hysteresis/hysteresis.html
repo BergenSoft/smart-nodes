@@ -54,7 +54,8 @@
                         label: "Originalnachricht",
                         icon: "fa fa-arrow-right",
                         hasValue: false,
-                    }],
+                    }
+                ],
                 typeField: "#node-input-out_higher_type"
             });
 
@@ -71,14 +72,15 @@
                         label: "Originalnachricht",
                         icon: "fa fa-arrow-right",
                         hasValue: false,
-                    }],
+                    }
+                ],
                 typeField: "#node-input-out_lower_type"
             });
 
             $("#node-input-send_only_change").typedInput({
                 type: "bool",
                 types: [{
-                    value: "1",
+                    value: "send_only_change",
                     options: [
                         { value: "true", label: "Nur bei Änderung" },
                         { value: "false", label: "Immer" },
@@ -89,7 +91,7 @@
             $("#node-input-outputs").typedInput({
                 type: "num",
                 types: [{
-                    value: "1",
+                    value: "outputs",
                     options: [
                         { value: "1", label: "Gemeinsamer Ausgang" },
                         { value: "2", label: "Separate Ausgänge" },

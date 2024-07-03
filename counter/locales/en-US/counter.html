@@ -1,0 +1,48 @@
+<script type="text/html" data-help-name="smart_counter">
+    <p>This node can be used to count up or down.</p>
+    <p>
+        The standard step size can be specified or temporarily overwritten by incoming messages.
+        Decimal numbers are also possible.
+    </p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so different smart nodes can be controlled with the same topic.<br/>
+        This node only uses the <code>name</code> part. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>set_min</code></td>
+                    <td>Overwrites the set min value with <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>set_max</code></td>
+                    <td>Overwrites the set max value with <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>set_step</code></td>
+                    <td>Overwrites the set step size with <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>up</code></td>
+                    <td>Increases the value by <code>msg.payload</code> or, if not set (or <code>null</code>), by the configured step size. The new value is always within the min and max values.</td>
+                </tr>
+                <tr>
+                    <td><code>down</code></td>
+                    <td>Decreases the value by <code>msg.payload</code> or, if not set (or <code>null</code>), by the configured step size. The new value is always within the min and max values.</td>
+                </tr>
+                <tr>
+                    <td><code>reset</code></td>
+                    <td>Resets the value to <code>msg.payload</code> or, if not set (or <code>null</code>), to the start value. The new value is always within the min and max values.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

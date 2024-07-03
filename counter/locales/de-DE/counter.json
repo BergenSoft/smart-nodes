@@ -1,0 +1,24 @@
+{
+    "counter": {
+        "errors": {
+            "wrong_topic": "Topic muss 1 oder 2 sein, gesendet: "
+        },
+        "ui": {
+            "name": "Name",
+            "start": "Start",
+            "step": "Schritt",
+            "min": "Min",
+            "max": "Max",
+
+            "system_start": "Systemstart",
+            "save_state": "Zustand speichern",
+            "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden",
+            "no_value": "Kein Wert",
+            "send_nothing": "Nichts senden",
+            "only_on_change": "Nur bei Änderung",
+            "always": "Immer",
+            "common_output": "Gemeinsamer Ausgang",
+            "separate_output": "Separate Ausgänge"
+        }
+    }
+}

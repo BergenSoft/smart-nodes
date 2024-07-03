@@ -63,28 +63,26 @@
                 }).css("max-width", "4rem");
 
             $("#node-input-off_mode").typedInput({
-                types: [
-                    {
-                        default: "NOTHING",
-                        options: [
-                            { value: "NOTHING", label: "Nichts" },
-                            { value: "OPEN", label: "Öffnen (100%)" },
-                            { value: "CLOSE", label: "Schließen (0%)" }
-                        ],
-                    },
-                ],
+                types: [{
+                    default: "NOTHING",
+                    value: "off_mode",
+                    options: [
+                        { value: "NOTHING", label: "Nichts" },
+                        { value: "OPEN", label: "Öffnen (100%)" },
+                        { value: "CLOSE", label: "Schließen (0%)" }
+                    ],
+                }],
             });
 
             $("#node-input-valve_mode").typedInput({
-                types: [
-                    {
-                        default: "HEATING",
-                        options: [
-                            { value: "HEATING", label: "Heizen (normal)" },
-                            { value: "COOLING", label: "Kühlen (invertiert)" }
-                        ],
-                    },
-                ],
+                types: [{
+                    default: "HEATING",
+                    value: "valve_mode",
+                    options: [
+                        { value: "HEATING", label: "Heizen (normal)" },
+                        { value: "COOLING", label: "Kühlen (invertiert)" }
+                    ],
+                }],
             });
         },
     });

@@ -160,15 +160,14 @@
                 $("#node-input-icon")
                     .css("max-width", "10rem")
                     .typedInput({
-                        types: [
-                            {
-                                default: "light",
-                                options: [
-                                    { value: "light", label: "Licht" },
-                                    { value: "outlet", label: "Steckdose" }
-                                ],
-                            },
-                        ],
+                        types: [{
+                            value: "light",
+                            default: "light",
+                            options: [
+                                { value: "light", label: "Licht" },
+                                { value: "outlet", label: "Steckdose" }
+                            ],
+                        }],
                     });
 
                 $("#node-input-max_time_on")
@@ -187,30 +186,28 @@
                 $("#node-input-max_time_on_unit")
                     .css("max-width", "10rem")
                     .typedInput({
-                        types: [
-                            {
-                                default: "s",
-                                options: [
-                                    { value: "ms", label: "Millisekunden" },
-                                    { value: "s", label: "Sekunden" },
-                                    { value: "min", label: "Minuten" },
-                                    { value: "h", label: "Stunden" },
-                                ],
-                            },
-                        ],
+                        types: [{
+                            value: "max_time_on_unit",
+                            default: "s",
+                            options: [
+                                { value: "ms", label: "Millisekunden" },
+                                { value: "s", label: "Sekunden" },
+                                { value: "min", label: "Minuten" },
+                                { value: "h", label: "Stunden" },
+                            ],
+                        }],
                     });
 
                 $("#node-input-alarm_action").typedInput({
-                    types: [
-                        {
-                            default: "NOTHING",
-                            options: [
-                                { value: "NOTHING", label: "Keine Aktion" },
-                                { value: "ON", label: "Einschalten" },
-                                { value: "OFF", label: "Ausschalten" }
-                            ],
-                        },
-                    ],
+                    types: [{
+                        value: "alarm_action",
+                        default: "NOTHING",
+                        options: [
+                            { value: "NOTHING", label: "Keine Aktion" },
+                            { value: "ON", label: "Einschalten" },
+                            { value: "OFF", label: "Ausschalten" }
+                        ],
+                    }],
                 });
             },
             onadd: function ()

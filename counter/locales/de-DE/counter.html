@@ -1,0 +1,48 @@
+<script type="text/html" data-help-name="smart_counter">
+    <p>Diese Node kann verwendet werden um nach oben oder unten zu zählen.</p>
+    <p>
+        Die Standardschrittweite kann vorgegeben oder durch einkommende Nachrichten temporär überschrieben werden.
+        Es sind auch Kommazahlen möglich.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>set_min</code></td>
+                    <td>Überschreibt den eingestellten Min-Wert mit <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>set_max</code></td>
+                    <td>Überschreibt den eingestellten Max-Wert mit <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>set_step</code></td>
+                    <td>Überschreibt die eingestellte Schrittweite mit <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>up</code></td>
+                    <td>Erhöht den Wert um <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) um die konfigurierte Schrittweite. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
+                </tr>
+                <tr>
+                    <td><code>down</code></td>
+                    <td>Verringert den Wert um <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) um die konfigurierte Schrittweite. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
+                </tr>
+                <tr>
+                    <td><code>reset</code></td>
+                    <td>Setzt den Wert auf <code>msg.payload</code> oder falls nicht gesetzt (oder <code>null</code>) auf den Startwert zurück. Der neue Wert ist dabei immer innerhalb der Min- und Max-Werte.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

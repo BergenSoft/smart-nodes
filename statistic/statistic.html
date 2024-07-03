@@ -23,21 +23,20 @@
         {
             $("#node-input-operation")
                 .typedInput({
-                    types: [
-                        {
-                            default: "MIN",
-                            options: [
-                                { value: "MIN", label: "Minimum" },
-                                { value: "MAX", label: "Maximum" },
-                                { value: "SUM", label: "Summe" },
-                                { value: "DIFF", label: "Differenz" },
-                                { value: "ABS", label: "Absoluter Wert" },
-                                { value: "ABS_DIFF", label: "Absolute Differenz" },
-                                { value: "AVG", label: "Durchschnitt" },
-                                { value: "MOV_AVG", label: "Gleitender Mittelwert" }
-                            ],
-                        },
-                    ],
+                    types: [{
+                        default: "MIN",
+                        value: "operation",
+                        options: [
+                            { value: "MIN", label: "Minimum" },
+                            { value: "MAX", label: "Maximum" },
+                            { value: "SUM", label: "Summe" },
+                            { value: "DIFF", label: "Differenz" },
+                            { value: "ABS", label: "Absoluter Wert" },
+                            { value: "ABS_DIFF", label: "Absolute Differenz" },
+                            { value: "AVG", label: "Durchschnitt" },
+                            { value: "MOV_AVG", label: "Gleitender Mittelwert" }
+                        ],
+                    }],
                 });
 
             $("#node-input-count").css("max-width", "4rem").spinner({

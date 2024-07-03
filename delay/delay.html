@@ -36,17 +36,16 @@
             });
 
             $("#node-input-on_delay_unit").css("max-width", "10rem").typedInput({
-                types: [
-                    {
-                        default: "s",
-                        options: [
-                            { value: "ms", label: "Millisekunden" },
-                            { value: "s", label: "Sekunden" },
-                            { value: "min", label: "Minuten" },
-                            { value: "h", label: "Stunden" },
-                        ]
-                    }
-                ]
+                types: [{
+                    default: "s",
+                    value: "on_delay_unit",
+                    options: [
+                        { value: "ms", label: "Millisekunden" },
+                        { value: "s", label: "Sekunden" },
+                        { value: "min", label: "Minuten" },
+                        { value: "h", label: "Stunden" },
+                    ]
+                }]
             });
 
             $("#node-input-off_delay").spinner({
@@ -63,17 +62,16 @@
             });
 
             $("#node-input-off_delay_unit").css("max-width", "10rem").typedInput({
-                types: [
-                    {
-                        default: "s",
-                        options: [
-                            { value: "ms", label: "Millisekunden" },
-                            { value: "s", label: "Sekunden" },
-                            { value: "min", label: "Minuten" },
-                            { value: "h", label: "Stunden" },
-                        ]
-                    }
-                ]
+                types: [{
+                    default: "s",
+                    value: "on_delay_unit",
+                    options: [
+                        { value: "ms", label: "Millisekunden" },
+                        { value: "s", label: "Sekunden" },
+                        { value: "min", label: "Minuten" },
+                        { value: "h", label: "Stunden" },
+                    ]
+                }]
             });
 
             $("#node-input-save_state").on("change", ev =>

@@ -1,0 +1,25 @@
+{
+    "compare": {
+        "errors": {
+            "wrong_topic": "Topic has to be 1 or 2, sended: "
+        },
+        "ui": {
+            "name": "Name",
+            "compare": "Compare",
+            "note_default_values": "Default values ​​are set here and can be overwritten by incoming messages.",
+            "value_1": "Value 1",
+            "value_2": "Value 2",
+            "output_messages": "Output message",
+            "true": "True",
+            "false": "False",
+            "send": "Send",
+            "outputs": "Outputs",
+            "note": "Note",
+            "note_payload": "is automatically set to the comparison result, unless it has already been set here in the configuration.",
+            "note_comperator": "is automatically set to the comparison operator if it has not already been set here in the configuration.",
+            "system_start": "System start",
+            "save_state": "Save state",
+            "send_after_start": "Send last message 10 seconds after the start"
+        }
+    }
+}

@@ -210,16 +210,15 @@
                 });
 
                 $("#node-input-alarm_action").typedInput({
-                    types: [
-                        {
-                            default: "NOTHING",
-                            options: [
-                                { value: "NOTHING", label: "Keine Aktion" },
-                                { value: "UP", label: "Hoch / Öffnen" },
-                                { value: "DOWN", label: "Runter / Schließen" }
-                            ],
-                        },
-                    ],
+                    types: [{
+                        default: "NOTHING",
+                        value: "alarm_action",
+                        options: [
+                            { value: "NOTHING", label: "Keine Aktion" },
+                            { value: "UP", label: "Hoch / Öffnen" },
+                            { value: "DOWN", label: "Runter / Schließen" }
+                        ],
+                    }],
                 });
             },
             onadd: function ()
