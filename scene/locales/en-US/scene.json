@@ -1,0 +1,20 @@
+{
+    "scene": {
+        "ui": {
+            "name": "Name",
+            "text": "Text",
+            "controlled_by_words": "This node can be controlled using the words entered. Multiple words are separated by a comma.",
+            "time_on": "Time On",
+            "controlled_by_central": "This block is controlled by the following central blocks:",
+
+            "outputs": "Outputs",
+            "scenes": "Scenes",
+            "links": "Links",
+
+            "milliseconds": "Milliseconds",
+            "seconds": "Seconds",
+            "minutes": "Minutes",
+            "hours": "Hours"
+        }
+    }
+}

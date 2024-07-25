@@ -1,0 +1,13 @@
+{
+    "long-press": {
+        "ui": {
+            "name": "Name",
+            "time_for_long": "Zeit für lang",
+            "time_for_long_placeholder": "Zeit in ms für einen langen Druck",
+            "milliseconds": "Millisekunden",
+            "output_messages": "Ausgangsnachrichten",
+            "short": "Kurz",
+            "long": "Lang"
+        }
+    }
+}

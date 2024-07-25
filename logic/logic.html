@@ -31,6 +31,8 @@
         },
         oneditprepare: function ()
         {
+            let node = this;
+
             $("#node-input-logic").typedInput({
                 types: [{
                     value: "logic",
@@ -73,8 +75,8 @@
             $("#node-input-out_true").typedInput({
                 type: "json",
                 types: ["json", {
-                    value: "null",
-                    label: "Nichts senden",
+                    value: "NOTHING",
+                    label: node._("logic.ui.send_nothing"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -84,8 +86,8 @@
             $("#node-input-out_false").typedInput({
                 type: "json",
                 types: ["json", {
-                    value: "null",
-                    label: "Nichts senden",
+                    value: "NOTING",
+                    label: node._("logic.ui.send_nothing"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -97,8 +99,8 @@
                 types: [{
                     value: "send_only_change",
                     options: [
-                        { value: "true", label: "Nur bei Änderung" },
-                        { value: "false", label: "Immer" },
+                        { value: "true", label: node._("logic.ui.send_only_change") },
+                        { value: "false", label: node._("logic.ui.always") },
                     ]
                 }]
             });
@@ -108,12 +110,11 @@
                 types: [{
                     value: "outputs",
                     options: [
-                        { value: "1", label: "Gemeinsamer Ausgang" },
-                        { value: "2", label: "Separate Ausgänge" },
+                        { value: "1", label: node._("logic.ui.common_output") },
+                        { value: "2", label: node._("logic.ui.separate_output") },
                     ]
                 }]
             });
-
 
 
             $("#node-input-save_state").on("change", ev =>
@@ -153,72 +154,58 @@
 
 <script type="text/html" data-template-name="smart_logic">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="logic.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]logic.ui.name" />
     </div>
     <div class="form-row">
-        <label for="node-input-logic"><i class="fa fa-microchip"></i> Logik</label>
+        <label for="node-input-logic"><i class="fa fa-microchip"></i> <span data-i18n="logic.ui.logic"></span></label>
         <input id="node-input-logic" />
     </div>
     <div class="form-row">
-        <label for="node-input-logic_inputs"><i class="fa fa-hashtag"></i> Eingänge</label>
+        <label for="node-input-logic_inputs"><i class="fa fa-hashtag"></i> <span data-i18n="logic.ui.inputs"></span></label>
         <input id="node-input-logic_inputs" />
     </div>
     <div class="form-row">
-        <label for="node-input-inverts"><i class="fa fa-circle-o"></i> Invertieren</label>
+        <label for="node-input-inverts"><i class="fa fa-circle-o"></i> <span data-i18n="logic.ui.invert"></span></label>
         <input id="node-input-inverts" />
     </div>
     <div class="form-row">
-        <label for="node-input-invert_output"><i class="fa fa-circle-o"></i> Ausgang</label>
+        <label for="node-input-invert_output"><i class="fa fa-circle-o"></i> <span data-i18n="logic.ui.output"></span></label>
         <input type="checkbox" id="node-input-invert_output" style="width: unset; margin: 0;" />
-        <label for="node-input-invert_output">&nbsp;Invertieren</label>
+        <label for="node-input-invert_output" data-i18n="logic.ui.invert"></label>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Ausgangsnachrichten</h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="logic.ui.output_messages"></h4>
     <div class="form-row">
-        <label for="node-input-out_true"><i class="fa fa-check-circle"></i> Wahr</label>
+        <label for="node-input-out_true"><i class="fa fa-check-circle"></i> <span data-i18n="logic.ui.true"></span></label>
         <input type="text" id="node-input-out_true"/>
         <input type="hidden" id="node-input-out_true_type">
     </div>
     <div class="form-row">
-        <label for="node-input-out_false"><i class="fa fa-times-circle"></i> Falsch</label>
+        <label for="node-input-out_false"><i class="fa fa-times-circle"></i> <span data-i18n="logic.ui.false"></span></label>
         <input type="text" id="node-input-out_false" />
         <input type="hidden" id="node-input-out_false_type">
     </div>
     <div class="form-row">
-        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> Senden</label>
+        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> <span data-i18n="logic.ui.send"></span></label>
         <input id="node-input-send_only_change" />
     </div>
     <div class="form-row">
-        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> Ausgänge</label>
+        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> <span data-i18n="logic.ui.outputs"></span></label>
         <input id="node-input-outputs" />
     </div>
     <div class="form-row">
-        <div><strong>Hinweis:</strong></div>
-        <div><code>msg.payload</code> wird automatisch auf das Logik-Ergebnis gesetzt,</div>
-        <div>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.</div>
+        <div><strong data-i18n="logic.ui.note"></strong></div>
+        <div data-i18n="[html]logic.ui.note_text"></div>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="logic.ui.system_start"></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
-        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+        <label for="node-input-save_state" style="width: calc(100% - 30px);" data-i18n="logic.ui.save_state"></label>
     </div>
     <div class="form-row" id="resend_on_start_row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);" data-i18n="logic.ui.send_after_start"></label>
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_logic">
-    <p>Dieser Knoten bietet verschiedene Logikoperationen, wie AND, OR und XOR an.</p>
-    <p>Alle Eingänge, sowie der Ausgang lassen sich gezielt invertieren, womit weitere komplexe Logiken abgebildet werden können.</p>
-    <p>Um beispielsweise eine NOT Logik zu erstellen, wird die Anzahl der Eingänge auf 1 gesetzt, die Logik auf AND oder OR und der Ausgang invertiert.</p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>nummer</code>. <code>name</code> und <code>#</code> sind dabei optional.
-    </p>
-    <p>
-        <strong>Hinweis:</strong> <code>msg.payload</code> wird automatisch auf das Logik-Ergebnis gesetzt, sofern es nicht bereits in der Konfiguration gesetzt wurde.
-    </p>
 </script>

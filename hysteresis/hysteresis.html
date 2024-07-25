@@ -29,6 +29,8 @@
         },
         oneditprepare: function ()
         {
+            let node = this;
+
             $("#node-input-setpoint").typedInput({
                 type: "num",
                 types: ["num"]
@@ -45,13 +47,13 @@
                 type: "json",
                 types: ["json",
                     {
-                        value: "null",
-                        label: "Nichts senden",
+                        value: "NOTHING",
+                        label: node._("hysteresis.ui.send_nothing"),
                         icon: "fa fa-times",
                         hasValue: false,
                     }, {
-                        value: "original",
-                        label: "Originalnachricht",
+                        value: "ORIGINAL",
+                        label: node._("hysteresis.ui.original_message"),
                         icon: "fa fa-arrow-right",
                         hasValue: false,
                     }
@@ -63,13 +65,13 @@
                 type: "json",
                 types: ["json",
                     {
-                        value: "null",
-                        label: "Nichts senden",
+                        value: "NOTHING",
+                        label: node._("hysteresis.ui.send_nothing"),
                         icon: "fa fa-times",
                         hasValue: false,
                     }, {
-                        value: "original",
-                        label: "Originalnachricht",
+                        value: "ORIGINAL",
+                        label: node._("hysteresis.ui.original_message"),
                         icon: "fa fa-arrow-right",
                         hasValue: false,
                     }
@@ -82,8 +84,8 @@
                 types: [{
                     value: "send_only_change",
                     options: [
-                        { value: "true", label: "Nur bei Änderung" },
-                        { value: "false", label: "Immer" },
+                        { value: "true", label: node._("hysteresis.ui.send_only_change") },
+                        { value: "false", label: node._("hysteresis.ui.always") },
                     ]
                 }]
             });
@@ -93,8 +95,8 @@
                 types: [{
                     value: "outputs",
                     options: [
-                        { value: "1", label: "Gemeinsamer Ausgang" },
-                        { value: "2", label: "Separate Ausgänge" },
+                        { value: "1", label: node._("hysteresis.ui.common_output") },
+                        { value: "2", label: node._("hysteresis.ui.separate_output") },
                     ]
                 }]
             });
@@ -109,9 +111,24 @@
                     $("#resend_on_start_row").hide();
             });
             $("#node-input-save_state").trigger("change");
+
+            // Backward compatibility
+            if (this.out_higher_type == "null")
+            {
+                this.out_higher_type = "NOTHING";
+                $("#node-input-out_higher_type").val("NOTHING");
+            }
+
+            if (this.out_lower_type == "null")
+            {
+                this.out_lower_type = "NOTHING";
+                $("#node-input-out_lower_type").val("NOTHING");
+            }
         },
         oneditsave: function ()
         {
+            let node = this;
+
             this.setpoint = parseFloat(this.setpoint);
             this.hysteresis = parseFloat(this.hysteresis);
         }
@@ -120,88 +137,49 @@
 
 <script type="text/html" data-template-name="smart_hysteresis">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="hysteresis.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]hysteresis.ui.name" />
     </div>
     <div class="form-row">
-        <label for="node-input-setpoint"><i class="fa fa-sign-out"></i> Sollwert</label>
+        <label for="node-input-setpoint"><i class="fa fa-sign-out"></i> <span data-i18n="hysteresis.ui.setpoint"></span></label>
         <input id="node-input-setpoint" />
     </div>
     <div class="form-row">
-        <label for="node-input-hysteresis"><i class="fa fa-sort"></i> Hysterese</label>
+        <label for="node-input-hysteresis"><i class="fa fa-sort"></i> <span data-i18n="hysteresis.ui.hysteresis"></span></label>
         <input id="node-input-hysteresis" />
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Ausgangsnachrichten</h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="hysteresis.ui.output_messages"></h4>
     <div class="form-row">
-        <label for="node-input-out_higher"><i class="fa fa-arrow-up"></i> Über</label>
+        <label for="node-input-out_higher"><i class="fa fa-arrow-up"></i> <span data-i18n="hysteresis.ui.over"></span></label>
         <input type="text" id="node-input-out_higher"/>
         <input type="hidden" id="node-input-out_higher_type">
     </div>
     <div class="form-row">
-        <label for="node-input-out_lower"><i class="fa fa-arrow-down"></i> Unter</label>
+        <label for="node-input-out_lower"><i class="fa fa-arrow-down"></i> <span data-i18n="hysteresis.ui.under"></span></label>
         <input type="text" id="node-input-out_lower" />
         <input type="hidden" id="node-input-out_lower_type">
     </div>
     <div class="form-row">
-        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> Senden</label>
+        <label for="node-input-send_only_change"><i class="fa fa-repeat"></i> <span data-i18n="hysteresis.ui.send"></span></label>
         <input id="node-input-send_only_change" />
     </div>
     <div class="form-row">
-        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> Ausgänge</label>
+        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> <span data-i18n="hysteresis.ui.outputs"></span></label>
         <input id="node-input-outputs" />
     </div>
     <div class="form-row">
-        <div><strong>Hinweis:</strong></div>
-        <div><code>msg.payload</code> wird automatisch auf das Hystere-Ergebnis gesetzt,</div>
-        <div>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.</div>
-        <div><code>true</code>, wenn höher, <code>false</code> wenn niedriger.</div>
+        <div><strong data-i18n="hysteresis.ui.note"></strong></div>
+        <div data-i18n="[html]hysteresis.ui.note_text"></div>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="hysteresis.ui.system_start"></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
-        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+        <label for="node-input-save_state" style="width: calc(100% - 30px);" data-i18n="hysteresis.ui.save_state"></label>
     </div>
     <div class="form-row" id="resend_on_start_row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);" data-i18n="hysteresis.ui.send_after_start"></label>
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_hysteresis">
-    <p>
-        Diese Node sendet die einkommende Nachricht an den Ausgang <code>Über</code>, wenn der einkommende Wert größer gleich dem Sollwert plus Hysterese ist und
-        die einkommende Nachricht an den Ausgang <code>Unter</code>, wenn der einkommende Wert kleiner gleich dem Sollwert minus Hysterese ist.<br/>
-        Die Nachricht wird dabei nur einmalig bei über- bzw. unterschreiten des Grenzwertes weitergeleitet.<br/>
-        Die Note behält den aktuellen Zustand auch nach dem Deploy bei.
-    </p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
-    </p>
-    <p>
-        Folgende topics werden akzeptiert:
-        <table>
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Beschreibung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>setpoint</code></td>
-                    <td>Überschreibt den Sollwert mit <code>msg.payload</code>.</td>
-                </tr>
-                <tr>
-                    <td><code>hysteresis</code></td>
-                    <td>Überschreibt die Hysterese mit <code>msg.payload</code>.</td>
-                </tr>
-            </tbody>
-        </table>
-    </p>
-    <p>
-        Die einkommende Nachricht wird mit den angegebenen Ausgangsnachrichten ergänzt, sofern nicht Originalnachricht ausgewählt wurde.
-    </p>
 </script>

@@ -1,0 +1,32 @@
+<script type="text/html" data-help-name="smart_forwarder">
+    <p>Diese Node leitet eine Nachricht weiter, wenn er enabled wurde oder das dauerhafte Weiterleiten für die Nachricht aktiviert ist.</p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>enable</code></td>
+                    <td>Aktiviert das Weiterleiten.</td>
+                </tr>
+                <tr>
+                    <td><code>disable</code></td>
+                    <td>Deaktiviert das Weiterleiten.</td>
+                </tr>
+                <tr>
+                    <td><code>set_state</code></td>
+                    <td>Aktiviert das Weiterleiten, wenn <code>msg.payload = true</code> oder deaktiviert das Weiterleiten, wenn <code>msg.payload = false</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

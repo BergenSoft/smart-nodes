@@ -21,20 +21,22 @@
         },
         oneditprepare: function ()
         {
+            let node = this;
+
             $("#node-input-operation")
                 .typedInput({
                     types: [{
                         default: "MIN",
                         value: "operation",
                         options: [
-                            { value: "MIN", label: "Minimum" },
-                            { value: "MAX", label: "Maximum" },
-                            { value: "SUM", label: "Summe" },
-                            { value: "DIFF", label: "Differenz" },
-                            { value: "ABS", label: "Absoluter Wert" },
-                            { value: "ABS_DIFF", label: "Absolute Differenz" },
-                            { value: "AVG", label: "Durchschnitt" },
-                            { value: "MOV_AVG", label: "Gleitender Mittelwert" }
+                            { value: "MIN", label: node._("statistic.ui.minimum") },
+                            { value: "MAX", label: node._("statistic.ui.maximum") },
+                            { value: "SUM", label: node._("statistic.ui.sum") },
+                            { value: "DIFF", label: node._("statistic.ui.difference") },
+                            { value: "ABS", label: node._("statistic.ui.absolute_value") },
+                            { value: "ABS_DIFF", label: node._("statistic.ui.absolute_difference") },
+                            { value: "AVG", label: node._("statistic.ui.average") },
+                            { value: "MOV_AVG", label: node._("statistic.ui.moving_average") }
                         ],
                     }],
                 });
@@ -62,8 +64,8 @@
             $("#node-input-out_message").typedInput({
                 type: "json",
                 types: ["json", {
-                    value: "null",
-                    label: "Standard",
+                    value: "DEFAULT",
+                    label: node._("statistic.ui.default"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -78,57 +80,51 @@
                     $("#resend_on_start_row").hide();
             });
             $("#node-input-save_state").trigger("change");
+
+
+            // Backward compatibility
+            if (this.out_message_type == "null")
+            {
+                this.out_message_type = "DEFAULT";
+                $("#node-input-out_message_type").val("DEFAULT");
+            }
+
         }
     });
 </script>
 
 <script type="text/html" data-template-name="smart_statistic">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="statistic.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]statistic.ui.name" />
     </div>
     <div class="form-row">
-        <label for="node-input-operation"><i class="fa fa-sort"></i> Operation</label>
+        <label for="node-input-operation"><i class="fa fa-sort"></i> <span data-i18n="statistic.ui.operation"></span></label>
         <input id="node-input-operation" />
     </div>
     <div class="form-row statistic-moving-average-row" style="display: none;">
-        <label for="node-input-count"><i class="fa fa-hashtag"></i> Anzahl</label>
+        <label for="node-input-count"><i class="fa fa-hashtag"></i> <span data-i18n="statistic.ui.count"></span></label>
         <input id="node-input-count" />
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Ausgangsnachricht</h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="statistic.ui.output_messages"></h4>
     <div class="form-row">
-        <label for="node-input-out_message"><i class="fa fa-check-circle"></i> Nachricht</label>
+        <label for="node-input-out_message"><i class="fa fa-check-circle"></i> <span data-i18n="statistic.ui.message"></span></label>
         <input type="text" id="node-input-out_message"/>
         <input type="hidden" id="node-input-out_message_type">
     </div>
     <div class="form-row">
-        <span><strong>Hinweis:</strong></span>
-    </div>
-    <div class="form-row">
-        <span>
-            <code>msg.payload</code> wird immer automatisch auf den Ergebnis-Wert gesetzt.
-        </span>
+        <div><strong data-i18n="statistic.ui.note"></strong></div>
+        <div data-i18n="[html]statistic.ui.note_text"></div>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="statistic.ui.system_start"></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
-        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+        <label for="node-input-save_state" style="width: calc(100% - 30px);" data-i18n="statistic.ui.save_state"></label>
     </div>
     <div class="form-row" id="resend_on_start_row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);" data-i18n="statistic.ui.send_after_start"></label>
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_statistic">
-    <p>Dieser Knoten berechnet das Minimum, Maximum, die Summe, die Differenz, den absoluten Wert, die absolute Differenz, den Durchschnitt sowie den gleitenden Mittelwert verschiedener Werte.</p>
-    <p>Jeder Wert muss mit einem eigenen Topic gesendet werden. Kommt ein zweiter Wert mit dem gleichen Topic, wird der entsprechende Wert überschrieben.</p>
-    <p>Im Falle von MIN, MAX und ABS wird das entsprechende Topic, welches mit den Werten kam, mit ausgegeben. Bei SUM, DIFF, AVG und MOV_AVG handelt es sich um kombinierte Ergebnisse, weshalb Topic hier immer nicht gesetzt ist.</p>
-    <p>Für den absoluten Wert sowie den gleitenden Mittelwert spielt das Topic keine Rolle, jeder Wert der empfangen wird, wird für die Berechnung verwendet.</p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>nummer</code>. <code>name</code> und <code>#</code> sind dabei optional.
-    </p>
 </script>

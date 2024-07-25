@@ -1,0 +1,19 @@
+{
+    "mixing-valve": {
+        "ui": {
+            "name": "Name",
+            "enabled": "Enabled",
+            "setpoint": "Setpoint",
+            "runtime": "Runtime",
+            "sampling": "Sampling",
+            "power_off": "Off mode",
+            "mode": "Mode",
+
+            "nothing": "Nothing",
+            "open": "Open (100%)",
+            "close": "Close (0%)",
+            "heating": "Heating (normal)",
+            "cooling": "Cooling (inverted)"
+        }
+    }
+}

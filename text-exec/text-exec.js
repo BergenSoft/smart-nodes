@@ -7,15 +7,52 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
+        const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
+
+
+        // #####################
+        // # persistent values #
+        // #####################
+
+
+        // ##################
+        // # Dynamic config #
+        // ##################
+
+
+        // ##################
+        // # Runtime values #
+        // ##################
+
+        // Here the ouput message for logging purposes is saved.
+        // It will be cleared with every new node input
+        let log;
+
+        // Holds a list with all room names, sorted from the longest to the shortest
+        // Format: Index => RoomName
+        let rooms = [];
+
+        // Holds references to the nodes to access them by room name
+        // Format: RoomName => [Node1, Node2, ..., NodeX]
+        let lookup = [];
+
 
         node.status({});
 
-        let log = [];
-        let rooms = [];
 
-        let lookup = [];
-
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
             let mode = "light"; // light || shutter
@@ -214,6 +251,10 @@ module.exports = function (RED)
 
             // Show what happened in debug bar
             node.send(log);
+        });
+
+        node.on("close", function ()
+        {
         });
 
         /**

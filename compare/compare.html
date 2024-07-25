@@ -3,14 +3,13 @@
         category: "Smart Nodes",
         paletteLabel: "Compare",
         color: "#E2D96E",
-        color: "#E2D96E",
         defaults: {
             name: { value: "" },
             comparator: { value: "EQUAL" }, // EQUAL, GREATER, GREATER_EQUAL, SMALLER, SMALLER_EQUAL, UNEQUAL
             value1: { value: "" },
-            value1_type: { value: "null" },
+            value1_type: { value: "NOTHING" },
             value2: { value: "" },
-            value2_type: { value: "null" },
+            value2_type: { value: "NOTHING" },
             out_false: { value: '{"topic": ""}' },
             out_false_type: { value: 'json' },
             out_true: { value: '{"topic": ""}' },
@@ -33,17 +32,19 @@
         },
         oneditprepare: function ()
         {
+            let node = this;
+
             $("#node-input-comparator").typedInput({
                 types: [{
                     default: "EQUAL",
                     value: "comperator",
                     options: [
-                        { value: "SMALLER", label: "< Kleiner" },
-                        { value: "SMALLER_EQUAL", label: "<= Kleiner oder gleich" },
-                        { value: "EQUAL", label: "== Gleich" },
-                        { value: "UNEQUAL", label: "!= Ungleich" },
-                        { value: "GREATER_EQUAL", label: ">= Größer oder gleich" },
-                        { value: "GREATER", label: "> Größer" }
+                        { value: "SMALLER", label: node._("compare.ui.smaller") },
+                        { value: "SMALLER_EQUAL", label: node._("compare.ui.smaller_equal") },
+                        { value: "EQUAL", label: node._("compare.ui.equal") },
+                        { value: "UNEQUAL", label: node._("compare.ui.unequal") },
+                        { value: "GREATER_EQUAL", label: node._("compare.ui.greater_equal") },
+                        { value: "GREATER", label: node._("compare.ui.greater") },
                     ],
                 }],
             });
@@ -51,8 +52,8 @@
             $("#node-input-value1").typedInput({
                 type: "num",
                 types: ["str", "num", "bool", {
-                    value: "null",
-                    label: this._("compare.ui.no_value"),
+                    value: "NOTHING",
+                    label: node._("compare.ui.no_value"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -62,8 +63,8 @@
             $("#node-input-value2").typedInput({
                 type: "num",
                 types: ["str", "num", "bool", {
-                    value: "null",
-                    label: this._("compare.ui.no_value"),
+                    value: "NOTHING",
+                    label: node._("compare.ui.no_value"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -75,8 +76,8 @@
             $("#node-input-out_true").typedInput({
                 type: "json",
                 types: ["json", {
-                    value: "null",
-                    label: this._("compare.ui.send_nothing"),
+                    value: "NOTHING",
+                    label: node._("compare.ui.send_nothing"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -86,8 +87,8 @@
             $("#node-input-out_false").typedInput({
                 type: "json",
                 types: ["json", {
-                    value: "null",
-                    label: this._("compare.ui.send_nothing"),
+                    value: "NOTHING",
+                    label: node._("compare.ui.send_nothing"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -100,8 +101,8 @@
                     value: "1",
                     value: "send_only_change",
                     options: [
-                        { value: "true", label: this._("compare.ui.only_on_change") },
-                        { value: "false", label: this._("compare.ui.always") },
+                        { value: "true", label: node._("compare.ui.send_only_change") },
+                        { value: "false", label: node._("compare.ui.always") },
                     ]
                 }]
             });
@@ -112,8 +113,8 @@
                     value: "1",
                     value: "outputs",
                     options: [
-                        { value: "1", label: this._("compare.ui.common_output") },
-                        { value: "2", label: this._("compare.ui.separate_output") },
+                        { value: "1", label: node._("compare.ui.common_output") },
+                        { value: "2", label: node._("compare.ui.separate_output") },
                     ]
                 }]
             });
@@ -128,6 +129,22 @@
                     $("#resend_on_start_row").hide();
             });
             $("#node-input-save_state").trigger("change");
+
+
+
+            // Backward compatibility
+            if (this.value1_type == "null")
+            {
+                this.value1_type = "NOTHING";
+                $("#node-input-value1_type").val("NOTHING");
+            }
+
+            if (this.value2_type == "null")
+            {
+                this.value2_type = "NOTHING";
+                $("#node-input-value2_type").val("NOTHING");
+            }
+
         },
     });
 </script>
@@ -175,9 +192,8 @@
         <input id="node-input-outputs" />
     </div>
     <div class="form-row" style="max-width: 28rem">
-        <div><strong><span data-i18n="compare.ui.note"></span>:</strong></div>
-        <div><code>msg.payload</code> <span data-i18n="compare.ui.note_payload"></span></div>
-        <div><code>msg.comperator</code> <span data-i18n="compare.ui.note_comperator"></span></div>
+        <div><strong data-i18n="compare.ui.note"></strong></div>
+        <div data-i18n="[html]compare.ui.note_text"></div>
     </div>
     <hr/>
     <h4 style="margin: 0.5rem 0;"><span data-i18n="compare.ui.system_start"></span></h4>

@@ -22,6 +22,8 @@
         },
         oneditprepare: function ()
         {
+            let node = this;
+
             $("#node-input-setpoint")
                 .spinner({
                     min: -30,
@@ -67,9 +69,9 @@
                     default: "NOTHING",
                     value: "off_mode",
                     options: [
-                        { value: "NOTHING", label: "Nichts" },
-                        { value: "OPEN", label: "Öffnen (100%)" },
-                        { value: "CLOSE", label: "Schließen (0%)" }
+                        { value: "NOTHING", label: node._("mixing-valve.ui.nothing") },
+                        { value: "OPEN", label: node._("mixing-valve.ui.open") },
+                        { value: "CLOSE", label: node._("mixing-valve.ui.close") }
                     ],
                 }],
             });
@@ -79,8 +81,8 @@
                     default: "HEATING",
                     value: "valve_mode",
                     options: [
-                        { value: "HEATING", label: "Heizen (normal)" },
-                        { value: "COOLING", label: "Kühlen (invertiert)" }
+                        { value: "HEATING", label: node._("mixing-valve.ui.heating") },
+                        { value: "COOLING", label: node._("mixing-valve.ui.cooling") }
                     ],
                 }],
             });
@@ -90,97 +92,31 @@
 
 <script type="text/html" data-template-name="smart_mixing-valve">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="mixing-valve.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]mixing-valve.ui.name" />
     </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-enabled" style="width: 20px;" />
-        <span for="node-input-enabled" style="width: 200px;"> Aktiviert</span>
+        <span for="node-input-enabled" style="width: 200px;"> <span data-i18n="mixing-valve.ui.enabled"></span></span>
     </div>
     <div class="form-row">
-        <label for="node-input-setpoint"><i class="fa fa-sliders"></i> Sollwert</label>
+        <label for="node-input-setpoint"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.setpoint"></span></label>
         <input id="node-input-setpoint" value="0" /> °C
     </div>
     <div class="form-row">
-        <label for="node-input-time_total"><i class="fa fa-clock-o"></i> Laufzeit</label>
+        <label for="node-input-time_total"><i class="fa fa-clock-o"></i> <span data-i18n="mixing-valve.ui.runtime"></span></label>
         <input id="node-input-time_total" value="0" /> s
     </div>
     <div class="form-row">
-        <label for="node-input-time_sampling"><i class="fa fa-clock-o"></i> Abtastzeit</label>
+        <label for="node-input-time_sampling"><i class="fa fa-clock-o"></i> <span data-i18n="mixing-valve.ui.sampling"></span></label>
         <input id="node-input-time_sampling" value="0" /> s
     </div>
     <div class="form-row">
-        <label for="node-input-off_mode"><i class="fa fa-power-off"></i> Aus-Modus</label>
+        <label for="node-input-off_mode"><i class="fa fa-power-off"></i> <span data-i18n="mixing-valve.ui.power_off"></span></label>
         <input id="node-input-off_mode" />
     </div>
     <div class="form-row">
-        <label for="node-input-valve_mode"><i class="fa fa-fire"></i> Modus</label>
+        <label for="node-input-valve_mode"><i class="fa fa-fire"></i> <span data-i18n="mixing-valve.ui.mode"></span></label>
         <input id="node-input-valve_mode" />
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_mixing-valve">
-    <p>
-        Diese Node steuert einen Heizungsmischer. Dieser kann sowohl fürs Heizen als auch fürs Kühlen verwendet werden.
-        Nach der eingestellten Abtastzeit wird geprüft, ob die Position des Mischers korrigiert werden muss.
-    </p>
-    <p>
-        Beim ersten Verwenden wird eine Kalibrierungsfahrt gestartet. D.h. der Mischer schließt für die eingestellte Laufzeit und befindet sich dann auf 0%.
-        Danach kann der Mischvorgang starten. Die zuletzt angefahrene Position wird persistent gespeichert, wodurch weitere Kalibrierungsfahrten in der Regel nicht mehr notwending sind.
-    </p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
-    </p>
-    <p>
-        Folgende topics werden akzeptiert:
-        <table>
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Beschreibung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>enable</code></td>
-                    <td>Aktiviert die Mischeransteuerung.</td>
-                </tr>
-                <tr>
-                    <td><code>disable</code></td>
-                    <td>Deaktiviert die Mischeransteuerung und fährt die Position an, die als Aus-Modus festgelegt ist.</td>
-                </tr>
-                <tr>
-                    <td><code>set_state</code></td>
-                    <td>Aktiviert das Weiterleiten, wenn <code>msg.payload = true</code> oder deaktiviert das Weiterleiten, wenn <code>msg.payload = false</code>.</td>
-                </tr>
-                <tr>
-                    <td><code>setpoint</code></td>
-                    <td>Überschreibt den Sollwert mit <code>msg.payload</code> °C.</td>
-                </tr>
-                <tr>
-                    <td><code>off_mode</code></td>
-                    <td>
-                        Überschreibt den Aus-Modus mit <code>msg.payload</code>.
-                        Gültige Werte für <code>msg.payload</code> sind <code>"NOTHING"</code>, <code>"OPEN"</code> und <code>"CLOSE"</code>.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code>valve_mode</code></td>
-                    <td>
-                        Überschreibt den Modus mit <code>msg.payload</code>.
-                        Gültige Werte für <code>msg.payload</code> sind <code>"HEATING"</code> und <code>"COOLING"</code>.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code>current_temperature</code></td>
-                    <td>Setzt die aktuelle Temperatur auf <code>msg.payload</code> °C.</td>
-                </tr>
-                <tr>
-                    <td><code>calibrate</code></td>
-                    <td>Erzwingt eine Kalibrierungsfahrt.</td>
-                </tr>
-            </tbody>
-        </table>
-    </p>
 </script>

@@ -1,0 +1,36 @@
+<script type="text/html" data-help-name="smart_hysteresis">
+    <p>
+        This node sends the incoming message to the output <code>Over</code> if the incoming value is greater than or equal to the setpoint plus hysteresis and
+        the incoming message to the output <code>Under</code> if the incoming value is less than or equal to the setpoint minus hysteresis.<br />
+        The message is only forwarded once when the limit is exceeded or not reached.<br />
+        The node retains the current state even after deployment.
+    </p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so that different smart nodes can be controlled with the same topic.<br />
+        This node only uses the part <code>name</code>. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>setpoint</code></td>
+                    <td>Overwrites the setpoint with <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>hysteresis</code></td>
+                    <td>Overwrites the hysteresis with <code>msg.payload</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        The incoming message is supplemented with the specified outgoing messages, unless the original message was selected.
+    </p>
+</script>

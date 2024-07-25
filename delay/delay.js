@@ -9,9 +9,22 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
+
+        // #####################
+        // # persistent values #
+        // #####################
         var node_settings = {
             on_delay_ms: helper.getTimeInMs(config.on_delay, config.on_delay_unit),
             off_delay_ms: helper.getTimeInMs(config.off_delay, config.off_delay_unit),
@@ -45,16 +58,58 @@ module.exports = function (RED)
             smart_context.del(node.id);
         }
 
-        // dynamic config
+
+        // ##################
+        // # Dynamic config #
+        // ##################
         let delay_only_on_change = config.delay_only_on_change;
 
-        // runtime values
+
+        // ##################
+        // # Runtime values #
+        // ##################
+
+        // Here the setTimeout return value is stored to send the delayed message.
         let timeout = null;
+
+        // Saves the next payload that needs to be send.
+        // This is used to avoid restarting the timeout for the same payload.
         let next_payload = null;
 
+
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
-            switch (msg.topic)
+            handleTopic(msg);
+
+            // setStatus();
+
+            if (config.save_state)
+                smart_context.set(node.id, node_settings);
+        });
+
+        node.on("close", function ()
+        {
+            if (timeout != null)
+            {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+        });
+
+
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
+        let handleTopic = msg =>
+        {
+            let real_topic = helper.getTopicName(msg.topic);
+
+            switch (real_topic)
             {
                 case "set_delay_on":
                     node_settings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
@@ -85,16 +140,7 @@ module.exports = function (RED)
                     send(msg);
                     break;
             }
-        });
-
-        node.on("close", function ()
-        {
-            if (timeout != null)
-            {
-                clearTimeout(timeout);
-                timeout = null;
-            }
-        });
+        }
 
         let send = msg =>
         {
@@ -144,10 +190,7 @@ module.exports = function (RED)
                 node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
                 node_settings.last_message = helper.cloneObject(msg);
 
-                if (config.save_state)
-                    smart_context.set(node.id, node_settings);
-
-                node.send(msg);
+                node.send(node_settings.last_message);
                 return;
             }
 
@@ -159,10 +202,10 @@ module.exports = function (RED)
                 node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
                 node_settings.last_message = helper.cloneObject(msg);
 
+                node.send(node_settings.last_message);
+
                 if (config.save_state)
                     smart_context.set(node.id, node_settings);
-
-                node.send(msg);
             }, delay_ms);
         }
 
@@ -185,7 +228,7 @@ module.exports = function (RED)
             setTimeout(() =>
             {
                 node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(node_settings.last_message) });
-                node.send(node_settings.last_message);
+                node.send(helper.cloneObject(node_settings.last_message));
             }, 10000);
         }
     }

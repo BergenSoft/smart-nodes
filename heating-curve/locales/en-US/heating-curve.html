@@ -1,0 +1,38 @@
+<script type="text/html" data-help-name="smart_heating-curve">
+    <p>
+        This node calculates the target flow temperature based on the set values. This can be used to control a mixing valve.
+    </p>
+    <p>
+        <b>Note:</b> Smart Nodes use topics in the format <code>name#number</code>, so that different Smart Nodes can be controlled with the same topic.<br />
+        This node only uses the part <code>name</code>. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>room_setpoint</code></td>
+                    <td>Overwrites the room setpoint temperature.</td>
+                </tr>
+                <tr>
+                    <td><code>flow_min</code></td>
+                    <td>Overwrites the minimum flow setpoint temperature.</td>
+                </tr>
+                <tr>
+                    <td><code>flow_max</code></td>
+                    <td>Overwrites the maximum flow setpoint temperature.</td>
+                </tr>
+                <tr>
+                    <td><code>temperature_outside</code></td>
+                    <td>Sets the current outside temperature.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

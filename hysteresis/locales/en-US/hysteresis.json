@@ -1,0 +1,27 @@
+{
+    "hysteresis": {
+        "ui": {
+            "name": "Name",
+            "setpoint": "Setpoint",
+            "hysteresis": "Hysteresis",
+            "output_messages": "Output messages",
+            "over": "Over",
+            "under": "Under",
+            "send": "Send",
+            "outputs": "Outputs",
+
+            "note": "Note:",
+            "note_text": "<code>msg.payload</code> is automatically set to the hysteresis result,<br/>if it has not already been set here in the configuration.<br/><code>true</code> if higher, <code>false</code> if lower",
+            "system_start": "System start",
+            "save_state": "Save state",
+            "send_after_start": "Send last message 10 seconds after start",
+
+            "send_nothing": "Send nothing",
+            "original_message": "Original message",
+            "send_only_change": "Only when changed",
+            "always": "Always",
+            "common_output": "Common output",
+            "separate_output": "Separate outputs"
+        }
+    }
+}

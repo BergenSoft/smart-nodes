@@ -1,0 +1,36 @@
+<script type="text/html" data-help-name="smart_hysteresis">
+    <p>
+        Diese Node sendet die einkommende Nachricht an den Ausgang <code>Über</code>, wenn der einkommende Wert größer gleich dem Sollwert plus Hysterese ist und
+        die einkommende Nachricht an den Ausgang <code>Unter</code>, wenn der einkommende Wert kleiner gleich dem Sollwert minus Hysterese ist.<br/>
+        Die Nachricht wird dabei nur einmalig bei über- bzw. unterschreiten des Grenzwertes weitergeleitet.<br/>
+        Die Node behält den aktuellen Zustand auch nach dem Deploy bei.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>setpoint</code></td>
+                    <td>Überschreibt den Sollwert mit <code>msg.payload</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>hysteresis</code></td>
+                    <td>Überschreibt die Hysterese mit <code>msg.payload</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Die einkommende Nachricht wird mit den angegebenen Ausgangsnachrichten ergänzt, sofern nicht Originalnachricht ausgewählt wurde.
+    </p>
+</script>

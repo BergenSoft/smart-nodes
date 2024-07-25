@@ -1,0 +1,38 @@
+<script type="text/html" data-help-name="smart_heating-curve">
+    <p>
+        Diese Node berechnet anhand den eingestellten Werten, die Vorlaufsolltemperatur. Diese kann verwendet werden um ein Mischventil anzusteuern.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>room_setpoint</code></td>
+                    <td>Überschreibt die Raum-Solltemperatur.</td>
+                </tr>
+                <tr>
+                    <td><code>flow_min</code></td>
+                    <td>Überschreibt die minimale Vorlaufsolltemperatur.</td>
+                </tr>
+                <tr>
+                    <td><code>flow_max</code></td>
+                    <td>Überschreibt die maximale Vorlaufsolltemperatur.</td>
+                </tr>
+                <tr>
+                    <td><code>temperature_outside</code></td>
+                    <td>Setzt die aktuelle Außentemperatur.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

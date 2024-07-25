@@ -1,6 +1,6 @@
 {
     "name": "smart-nodes",
-    "version": "0.3.37",
+    "version": "0.4.0",
     "description": "Smart Nodes",
     "keywords": [
         "node-red",
@@ -34,12 +34,12 @@
     "node-red": {
         "version": ">=1.0.0",
         "nodes": {
-            "light-control": "light-control/light-control.js",
-            "scene-control": "scene-control/scene-control.js",
-            "shutter-control": "shutter-control/shutter-control.js",
-            "shutter-complex-control": "shutter-complex-control/shutter-complex-control.js",
-            "long-press-control": "long-press-control/long-press-control.js",
-            "multi-press-control": "multi-press-control/multi-press-control.js",
+            "light": "light/light.js",
+            "scene": "scene/scene.js",
+            "shutter": "shutter/shutter.js",
+            "shutter-complex": "shutter-complex/shutter-complex.js",
+            "long-press": "long-press/long-press.js",
+            "multi-press": "multi-press/multi-press.js",
             "logic": "logic/logic.js",
             "forwarder": "forwarder/forwarder.js",
             "compare": "compare/compare.js",

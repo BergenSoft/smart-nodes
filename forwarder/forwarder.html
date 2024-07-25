@@ -21,6 +21,8 @@
         },
         oneditprepare: function ()
         {
+            let node = this;
+
             $("#node-input-save_state").on("change", ev =>
             {
                 if (ev.target.checked)
@@ -35,66 +37,33 @@
 
 <script type="text/html" data-template-name="smart_forwarder">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="forwarder.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]forwarder.ui.name" />
     </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-enabled" style="width: 20px;" />
-        <span for="node-input-enabled" style="width: 200px;"> Aktiviert</span>
+        <label for="node-input-enabled" style="width: 200px;"> <span data-i18n="forwarder.ui.enabled"></span>
     </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-forward_last_on_enable" style="width: 20px;" />
-        <span for="node-input-forward_last_on_enable">Letzte nicht gesendete Nachricht senden, wenn die Node aktiviert wird.</span>
+        <label for="node-input-forward_last_on_enable" data-i18n="forwarder.ui.forward_last_on_enable"></label>
     </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-always_forward_true" style="width: 20px;" />
-        <span for="node-input-always_forward_true"><code>msg.payload = true</code> immer weiterleiten</span>
+        <label for="node-input-always_forward_true" data-i18n="[html]forwarder.ui.always_forward_true"></label>
     </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-always_forward_false" style="width: 20px;" />
-        <span for="node-input-always_forward_false"><code>msg.payload = false</code> immer weiterleiten</span>
+        <label for="node-input-always_forward_false" data-i18n="[html]forwarder.ui.always_forward_false"></label>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="forwarder.ui.system_start"></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
-        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+        <label for="node-input-save_state" style="width: calc(100% - 30px);" data-i18n="forwarder.ui.save_state"></label>
     </div>
     <div class="form-row" id="resend_on_start_row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);" data-i18n="forwarder.ui.send_after_start"></label>
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_forwarder">
-    <p>Diese Node leitet eine Nachricht weiter, wenn er enabled wurde oder das dauerhafte Weiterleiten für die Nachricht aktiviert ist.</p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
-    </p>
-    <p>
-        Folgende topics werden akzeptiert:
-        <table>
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Beschreibung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>enable</code></td>
-                    <td>Aktiviert das Weiterleiten.</td>
-                </tr>
-                <tr>
-                    <td><code>disable</code></td>
-                    <td>Deaktiviert das Weiterleiten.</td>
-                </tr>
-                <tr>
-                    <td><code>set_state</code></td>
-                    <td>Aktiviert das Weiterleiten, wenn <code>msg.payload = true</code> oder deaktiviert das Weiterleiten, wenn <code>msg.payload = false</code>.</td>
-                </tr>
-            </tbody>
-        </table>
-    </p>
 </script>

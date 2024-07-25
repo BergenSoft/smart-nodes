@@ -1,0 +1,15 @@
+{
+    "forwarder": {
+        "ui": {
+            "name": "Name",
+            "enabled": "Enabled",
+            "forward_last_on_enable": "Send last unsent message when node is activated.",
+            "always_forward_true": "Always forward <code>msg.payload = true</code> .",
+            "always_forward_false": "Always forward <code>msg.payload = false</code> .",
+
+            "system_start": "System start",
+            "save_state": "Save state",
+            "send_after_start": "Send last message 10 seconds after the start"
+        }
+    }
+}

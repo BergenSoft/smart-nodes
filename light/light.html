@@ -1,0 +1,250 @@
+<script type="text/javascript">
+    (function ()
+    {
+        let treeList;
+        let candidateNodesCount = 0;
+        let flows = [];
+        let flowMap = {};
+
+        function onEditPrepare(node, targetTypes)
+        {
+            if (!node.links)
+                node.links = [];
+
+            const activeSubflow = RED.nodes.subflow(node.z);
+
+            treeList = $("<div>")
+                .css({ width: "100%", height: "100%" })
+                .appendTo(".node-input-link-row")
+                .treeList({ autoSelect: false })
+                .on("treelistitemmouseover", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = true;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                })
+                .on("treelistitemmouseout", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = false;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                });
+
+            flows = [];
+            flowMap = {};
+
+            if (activeSubflow)
+            {
+                flowMap[activeSubflow.id] = {
+                    id: activeSubflow.id,
+                    class: "red-ui-palette-header",
+                    label: "Subflow : " + (activeSubflow.name || activeSubflow.id),
+                    expanded: true,
+                    children: []
+                };
+                flows.push(flowMap[activeSubflow.id]);
+            }
+            else
+            {
+                RED.nodes.eachWorkspace(function (ws)
+                {
+                    if (!ws.disabled)
+                    {
+                        flowMap[ws.id] = {
+                            id: ws.id,
+                            class: "red-ui-palette-header",
+                            label: (ws.label || ws.id) + (node.z === ws.id ? " *" : ""),
+                            expanded: true,
+                            children: []
+                        };
+                        flows.push(flowMap[ws.id]);
+                    }
+                });
+            }
+
+            setTimeout(function ()
+            {
+                treeList.treeList("show", node.z);
+            }, 100);
+        }
+
+        function initTreeList(node, targetTypes)
+        {
+            candidateNodesCount = 0;
+            for (const key in flowMap)
+            {
+                flowMap[key].children = [];
+            }
+
+            let candidateNodes = [];
+
+            targetTypes.forEach(function (targetType)
+            {
+                candidateNodes = candidateNodes.concat(RED.nodes.filterNodes({ type: targetType }));
+            });
+
+            candidateNodes.forEach(function (n)
+            {
+                if (flowMap[n.z])
+                {
+                    const isChecked = (node.links.indexOf(n.id) !== -1) || (n.links || []).indexOf(node.id) !== -1;
+                    if (isChecked)
+                    {
+                        flowMap[n.z].children.push({
+                            id: n.id,
+                            node: n,
+                            label: n.name || n.id,
+                            selected: false,
+                            checkbox: false,
+                            radio: false
+                        });
+                        candidateNodesCount++;
+                    }
+                }
+            });
+
+            for (const key in flowMap)
+            {
+                flowMap[key].children.sort((a, b) => a.label.localeCompare(b.label));
+            }
+
+            const flowsFiltered = flows.filter(function (f) { return f.children.length > 0 });
+            treeList.treeList("empty");
+            treeList.treeList("data", flowsFiltered);
+        }
+
+        function resizeNodeList()
+        {
+            var rows = $("#dialog-form>div:not(.node-input-link-row)");
+            var height = $("#dialog-form").height();
+            for (var i = 0; i < rows.length; i++)
+            {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var editorRow = $("#dialog-form>div.node-input-link-row");
+            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            $(".node-input-link-row").css("height", height + "px");
+        }
+
+        RED.nodes.registerType("smart_light-control", {
+            category: "Smart Nodes",
+            paletteLabel: "Light control",
+            color: "#C882FF",
+            defaults: {
+                name: { value: "" },
+                exec_text_names: { value: "" },
+                max_time_on: { value: "0" },
+                max_time_on_unit: { value: "s" },
+                alarm_action: { value: 'NOTHING' }, // NOTHING | ON | OFF
+                alarm_off_action: { value: 'NOTHING' }, // NOTHING | ON | OFF | LAST | LAST_SENDED
+                links: { value: [], type: "smart_central-control[]" }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "font-awesome/fa-lightbulb-o",
+            label: function ()
+            {
+                return this.name || "Light control";
+            },
+            oneditprepare: function ()
+            {
+                let node = this;
+
+                onEditPrepare(this, ["smart_central-control"]);
+                initTreeList(node, ["smart_central-control"]);
+
+                $("#node-input-max_time_on")
+                    .spinner({
+                        min: 0,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    }).css("max-width", "4rem");
+
+                $("#node-input-max_time_on_unit")
+                    .css("max-width", "10rem")
+                    .typedInput({
+                        types: [{
+                            value: "max_time_on_unit",
+                            default: "s",
+                            options: [
+                                { value: "ms", label: node._("light.ui.milliseconds") },
+                                { value: "s", label: node._("light.ui.seconds") },
+                                { value: "min", label: node._("light.ui.minutes") },
+                                { value: "h", label: node._("light.ui.hours") },
+                            ],
+                        }],
+                    });
+
+                $("#node-input-alarm_action").typedInput({
+                    types: [{
+                        value: "alarm_action",
+                        default: "NOTHING",
+                        options: [
+                            { value: "NOTHING", label: node._("light.ui.no_action") },
+                            { value: "ON", label: node._("light.ui.turn_on") },
+                            { value: "OFF", label: node._("light.ui.turn_off") }
+                        ],
+                    }],
+                });
+
+                $("#node-input-alarm_off_action").typedInput({
+                    types: [{
+                        value: "alarm_off_action",
+                        default: "NOTHING",
+                        options: [
+                            { value: "NOTHING", label: node._("light.ui.no_action") },
+                            { value: "ON", label: node._("light.ui.turn_on") },
+                            { value: "OFF", label: node._("light.ui.turn_off") },
+                            { value: "LAST", label: node._("light.ui.last_state") },
+                            { value: "LAST_SENDED", label: node._("light.ui.last_sended_state") }
+                        ],
+                    }],
+                });
+            },
+            onadd: function ()
+            {
+                this.links = [];
+            },
+            oneditresize: resizeNodeList
+        });
+    })();
+</script>
+
+<script type="text/html" data-template-name="smart_light-control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="light.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]light.ui.name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-exec_text_names"><i class="fa fa-comments-o"></i> <span data-i18n="light.ui.text"></span></label>
+        <input id="node-input-exec_text_names" type="text" />
+        <div style="max-width: 450px;" data-i18n="light.ui.controlled_by_words"></div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> <span data-i18n="light.ui.time_on"></span></label>
+        <input id="node-input-max_time_on" value="0" />
+        <input id="node-input-max_time_on_unit" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-alarm_action"><i class="fa fa-exclamation-triangle"></i> <span data-i18n="light.ui.alarm_on"></span></label>
+        <input id="node-input-alarm_action"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-alarm_off_action"><i class="fa fa-exclamation-triangle"></i> <span data-i18n="light.ui.alarm_off"></span></label>
+        <input id="node-input-alarm_off_action"/>
+    </div>
+    <span><i class="fa fa-link"></i> <span data-i18n="light.ui.controlled_by_central"></span></span>
+    <div class="form-row node-input-link-row node-input-link-rows"></div>
+</script>

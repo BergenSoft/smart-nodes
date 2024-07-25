@@ -1,0 +1,12 @@
+{
+    "heating": {
+        "ui": {
+            "name": "Name",
+            "room_setpoint": "Room setpoint",
+            "slope": "Slope",
+            "offset": "Offset",
+            "min_setpoint": "Min setpoint",
+            "max_setpoint": "Max setpoint"
+        }
+    }
+}

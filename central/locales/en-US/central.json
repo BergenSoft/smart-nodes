@@ -1,8 +1,5 @@
 {
     "central": {
-        "errors": {
-            "unknown_message": "Unknown message received in smart_node central."
-        },
         "status": {
             "all_off": "All off",
             "Something_is_on": "Something is on"

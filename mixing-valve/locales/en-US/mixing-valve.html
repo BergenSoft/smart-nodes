@@ -1,0 +1,66 @@
+<script type="text/html" data-help-name="smart_mixing-valve">
+    <p>
+        This node controls a heating mixer. This can be used for both heating and cooling.
+        After the set sampling time, a check is made to see whether the position of the mixer needs to be corrected.
+    </p>
+    <p>
+        When used for the first time, a calibration run is started. This means that the mixer closes for the set running time and is then at 0%.
+        The mixing process can then start. The last position reached is saved persistently, which means that further calibration runs are generally no longer necessary.
+    </p>
+    <p>
+        <b>Note:</b> Smart Nodes use topics in the format <code>name#number</code>, so that different Smart Nodes can be controlled with the same topic.<br />
+        This node only uses the <code>name</code> part. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>enable</code></td>
+                    <td>Activates the mixer control.</td>
+                </tr>
+                <tr>
+                    <td><code>disable</code></td>
+                    <td>Deactivates the mixer control and moves to the position that is set as the off mode.</td>
+                </tr>
+                <tr>
+                    <td><code>set_state</code></td>
+                    <td>Activates forwarding if <code>msg.payload = true</code> or deactivates forwarding if
+                        <code>msg.payload = false</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>setpoint</code></td>
+                    <td>Overrides the setpoint with <code>msg.payload</code> °C.</td>
+                </tr>
+                <tr>
+                    <td><code>off_mode</code></td>
+                    <td>
+                        Overrides the off mode with <code>msg.payload</code>.
+                        Valid values for <code>msg.payload</code> are <code>"NOTHING"</code>, <code>"OPEN"</code> and <code>"CLOSE"</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>valve_mode</code></td>
+                    <td>
+                        Overrides the mode with <code>msg.payload</code>.
+                        Valid values for <code>msg.payload</code> are <code>"HEATING"</code> and <code>"COOLING"</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>current_temperature</code></td>
+                    <td>Sets the current temperature to <code>msg.payload</code> °C.</td>
+                </tr>
+                <tr>
+                    <td><code>calibrate</code></td>
+                    <td>Forces a calibration run.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

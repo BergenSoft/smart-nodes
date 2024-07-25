@@ -1,0 +1,19 @@
+{
+    "delay": {
+        "ui": {
+            "name": "Name",
+
+            "on_delay": "Einschalt- verzögerung",
+            "off_delay": "Ausschalt- verzögerung",
+            "delay_only_on_change": "Nur verzögern, wenn sich <code>msg.payload</code> verändert hat.",
+            "system_start": "Systemstart",
+            "save_state": "Zustand speichern",
+            "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden",
+
+            "milliseconds": "Millisekunden",
+            "seconds": "Sekunden",
+            "minutes": "Minuten",
+            "hours": "Stunden"
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "delay": {
+        "ui": {
+            "name": "Name",
+
+            "on_delay": "Switch-on delay",
+            "off_delay": "Switch-off- delay",
+            "delay_only_on_change": "Only delay if <code>msg.payload</code> has changed.",
+            "system_start": "System start",
+            "save_state": "Save state",
+            "send_after_start": "Send last message 10 seconds after the start",
+
+            "milliseconds": "Milliseconds",
+            "seconds": "Seconds",
+            "minutes": "Minutes",
+            "hours": "Hours"
+        }
+    }
+}

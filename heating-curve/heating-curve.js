@@ -7,11 +7,22 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        // persistent values
-        var node_settings = Object.assign({}, {
+
+        // #####################
+        // # persistent values #
+        // #####################
+        var node_settings = helper.cloneObject({
             room_setpoint: config.room_setpoint,
             flow_min: config.flow_min,
             flow_max: config.flow_max,
@@ -19,17 +30,30 @@ module.exports = function (RED)
             last_flow_temperature: null
         }, smart_context.get(node.id));
 
-        // dynamic config
+
+        // ##################
+        // # Dynamic config #
+        // ##################
         let slope = config.slope;
         let offset = config.offset;
 
-        // runtime values
 
+        // ##################
+        // # Runtime values #
+        // ##################
+
+
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
             handleTopic(msg);
+
             sendResult();
             setStatus();
+
+            smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -37,6 +61,11 @@ module.exports = function (RED)
         });
 
 
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
         let handleTopic = msg =>
         {
             let real_topic = helper.getTopicName(msg.topic);
@@ -46,48 +75,44 @@ module.exports = function (RED)
                     let new_setpoint = parseFloat(msg.payload);
                     if (isNaN(new_setpoint) && !isFinite(new_setpoint))
                     {
-                        // node.error("Invalid payload: " + msg.payload);
+                        console.warn("Invalid payload: " + msg.payload);
                         return;
                     }
 
                     node_settings.room_setpoint = msg.payload;
-                    smart_context.set(node.id, node_settings);
                     break;
 
                 case "temperature_outside":
                     let new_temp = parseFloat(msg.payload);
                     if (isNaN(new_temp) && !isFinite(new_temp))
                     {
-                        // node.error("Invalid payload: " + msg.payload);
+                        console.warn("Invalid payload: " + msg.payload);
                         return;
                     }
 
                     node_settings.temperature_outside = msg.payload;
-                    smart_context.set(node.id, node_settings);
                     break;
 
                 case "flow_min":
                     let new_flow_min = parseFloat(msg.payload);
                     if (isNaN(new_flow_min) && !isFinite(new_flow_min))
                     {
-                        // node.error("Invalid payload: " + msg.payload);
+                        console.warn("Invalid payload: " + msg.payload);
                         return;
                     }
 
                     node_settings.flow_min = msg.payload;
-                    smart_context.set(node.id, node_settings);
                     break;
 
                 case "flow_max":
                     let new_flow_max = parseFloat(msg.payload);
                     if (isNaN(new_flow_max) && !isFinite(new_flow_max))
                     {
-                        // node.error("Invalid payload: " + msg.payload);
+                        console.warn("Invalid payload: " + msg.payload);
                         return;
                     }
 
                     node_settings.flow_max = msg.payload;
-                    smart_context.set(node.id, node_settings);
                     break;
 
                 default:
@@ -125,7 +150,7 @@ module.exports = function (RED)
         }
 
         if (node_settings.last_flow_temperature !== null)
-            setTimeout(sendResult, 10 * 1000);
+            setTimeout(sendResult, 10000);
 
         setStatus();
     }

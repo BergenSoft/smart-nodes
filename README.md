@@ -4,17 +4,29 @@ The smart nodes was created to control smart home devices like lights, power out
 This nodes are designed to work with the [node-red-contrib-knx-ultimate](https://github.com/Supergiovane/node-red-contrib-knx-ultimate) but it could also work with other smart technologies.
 
 The knx binary input and output/switching modules should be configured very stupid. Closing a binary input should output 1 and releasing 0.
-Same for the output/switching modules, 1 should turn on and 0 turn out. That makes it easy to count the presses or check for short and long presses.
-Some node has to filter out the binary inputs if they goes to 0 or in other words, if `msg.payload == false`. Please see the internal node documentation then this signals are ignored. As an example sending a toggle topic for closing an input and also for releasing would toggle a light twice.
+Same for the output/switching modules, 1 should turn on and 0 turn off. That makes it easy to count the presses or check for short and long presses.
+Some node has to filter out the binary inputs if they goes to 0 or in other words, if `msg.payload == false`. Please see the internal node documentation then this signals are ignored. As an example sending `msg.topic = "toggle"` for pressing and releasing an button would toggle the output twice.
 
 Sometimes one source node should be connected to multiple smart nodes which requires different topics.
-To avoid requiring many change nodes, the smart node are using a special `msg.topic` notation. You can always send topics in the format `name#number`, e.g. `toggle#1`.
-Smart nodes that requires a name are using only the name part. the # and the number are optional. Smart nodes that requries a number will only use the number, the name and # is also optional.
+To avoid requiring many change nodes, the smart nodes are using a special `msg.topic` notation. You can always send topics in the format `name#number`, e.g. `toggle#1`.
+Smart nodes that requires a name are using only the name part. the # and the number are ignored and optional. Smart nodes that requries a number will only use the number, the name and # is also ignored and optional.
 
-This is usefull when one node provide information to e.g. a light control node, as well as to a logic node.
+This is usefull when one node provides information for example to a light control node and also to a logic node.
 
 This file only describes the general function of the node. See the documentation shown in NodeRed to find out how to use them, or see the included example flows.
-As I'm german, the internal documentation is only available in german. If you need another language, feel free to add localizations and adding more languages via a pull request.
+
+# Important info
+
+This smart nodes are still in development and can have breaking changes. So please always take a look in the [Changelog](CHANGELOG.md) file.
+
+# Support
+
+I spent a lots of hours in this project. If you like it, you can support my work in different ways:
+
+-   Report bugs.
+-   Create pull requests.
+-   Name tipps and tricks if you see any improvement.
+-   Donate via [Paypal](https://paypal.me/BergenSoft).
 
 # Nodes
 
@@ -27,8 +39,9 @@ This node is able to control a light or a power outlet.
 -   Auto turn off the light after a fixed time.
 -   Auto turn off the light with a custom time which is part of the message object.
 -   Toggle light between on and off.
--   Can be triggered by motion sensors.
--   Has an alarm function to go to a specific state (on or off) when the alarm is activated.
+-   Can be activated by motion sensors.
+-   Has an alarm on function to go to a specific state (on or off) when the alarm is activated.
+-   Has an alarm off function to go to a specific (on, off, the last or the last sended) when the alarm is deactivated.
 
 ## 2. Shutter control
 
@@ -38,10 +51,11 @@ There is no support for slats and it is also not planned as I don't need them, b
 ### **Features:**
 
 -   One button control which switch between `up`, `stop`, `down`, `stop`.
--   One button control for each direction `up and stop` or `down and stop`.
--   Send direct position the shutter should be.
+-   Two button control for each direction `up and stop` and `down and stop`.
+-   Send direct position the shutter should go to.
 -   Stop shutter immediately.
--   Has an alarm function to go to a specific state (Open or close) when the alarm is activated.
+-   Has an alarm on function to go to a specific state (Open or close) when the alarm is activated.
+-   Has an alarm off function to restore a specific state when the alarm gets deaktivated.
 
 ## 3. Scene control
 
@@ -165,13 +179,17 @@ This node parses a text and performs actions to the selected and matching smart 
 
 ### Examples
 
-[ text ] is optional
+Text in [ Braces ] is optional<br/>
+Room names that has to be entered in the nodes are in `code` style.
 
--   Turn on [the light in] the living room and the kitchen off.
--   Open [the shutter in] the kitchen and turn studio off.
--   Close [the shutter in the] sleeping room.
--   Living room to 10 %.
--   Turn on living room except the couch light.
+-   Turn on [the light in] the `living room` and the `kitchen` off.
+-   Open [the shutter in] the `kitchen` and turn `studio` off.
+-   Close [the shutter in the] `sleeping` room.
+-   `Living room` to 10 %.
+-   Turn on `living room` except the `couch` light.
+
+### **Features:**
+
 -   Sends debug message to output.
 
 ## 15. Mixing valve

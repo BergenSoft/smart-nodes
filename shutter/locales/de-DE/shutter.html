@@ -1,0 +1,127 @@
+
+<script type="text/html" data-help-name="smart_shutter-control">
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Diese Node steuert Rollladen oder Jalousien.
+        Es gibt 3 Ausgänge die angesteuert werden können:
+        <ol>
+            <li><b>Auf/Ab:</b> <code>msg.payload = false</code> lässt den Rollladen nach oben fahren und <code>msg.payload = true</code> lässt den Rollladen nach unten fahren.</li>
+            <li><b>Stop:</b> <code>msg.payload = true</code> lässt den Rollladen stoppen.</li>
+            <li><b>Position:</b> <code>msg.payload = 42</code> Lässt den Rollladen auf 42% fahren.</li>
+        </ol>
+        Die Ausgänge sind den jeweiligen KNX Gruppenadressen zuzuordnen.
+    </p>
+    <p>
+        Diese Node erwartet folgende Topics als Eingang:<br/>
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                    <th>msg.payload == false wird ignoriert</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>status</code> oder <code>status_position</code></td>
+                    <td>
+                        Meldet der Node die aktuelle Position.
+                        Dadurch kann die Node feststellen in welche Richtung ein Rollladen als letztes gefahren ist.
+                        Dies wird für das topic <b>toggle</b> benötigt um die nächste Laufrichtung bei einer 1-Tasten Bedienung zu ermitteln.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>up_down</code></td>
+                    <td>
+                        Nimmt einen Befehl von Home Assistant entgegen um informiert zu werden ob der Rollladen läuft und in welche Richtung.<br/>
+                        <strong>Wichtig:</strong> Dieses Topic startet den Rollladen <u>nicht</u>, da die Gruppenadresse direkt mit dem Jalousiemodul verbunden sein muss.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>short_up_down</code></td>
+                    <td>
+                        Sendet bei <code>msg.payload = false</code> einen kurzen Hochfahrbefehl und bei <code>msg.payload = true</code> einen kurzen Runterfahrbefehl.<br/>
+                        Es wird dabei die im Baustein hinterlegte Zeit verwendet. Diese kann aber durch setzen von <code>msg.time_on = 1500</code> oder <code>msg.time_on = "1.5s"</code> einmalig überschrieben werden.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>up</code></td>
+                    <td>Sendet einen Hochfahrbefehl, falls der Rollladen nicht bereits nach oben fährt. Ggf. wird vorher noch ein Stop-Befehl gesendet.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>up_stop</code></td>
+                    <td>Sendet abwechselnd einen Stop- und einen Hochfahrbefehl.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>down</code></td>
+                    <td>Sendet einen Runterfahrbefehl, falls der Rollladen nicht bereits nach unten fährt. Ggf. wird vorher noch ein Stop-Befehl gesendet.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>down_stop</code></td>
+                    <td>Sendet abwechselnd einen Stop- und einen Runterfahrbefehl.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>stop</code></td>
+                    <td>Sendet einen Stopbefehl.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>position</code></td>
+                    <td>Sendet einen Positionsbefehl. <code>msg.payload</code> sollte ein Wert zwischen 0 (offen) und 100 (geschlossen) haben.</td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>Schaltet den Rollladen abwechselnd auf hoch, stop, runter, stop.</td>
+                    <td>Ja</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Diese Node verwaltet keine Laufzeit für den Rollladen selbst. Diese muss über ETS für den Ausgang konfiguriert werden.
+        Es ist jedoch möglich, den Rollladen nach einer definierten Zeit automatisch abzuschalten.
+        Es ist jedoch möglich, den Rollladen nach einer definierten Zeit automatisch abzuschalten.
+        Beispiel: <code>msg = { "topic": "up", "time_on": 5000 }</code> oder <code>msg = { "topic": "up", "time_on": "5s" }</code><br/>
+        Diese Nachricht lässt den Rollladen für 5000 Millisekunden / 5 Sekunden nach oben fahren. Sollte es sich um eine Jalousie halten, werden die Lamellen entsprechend gedreht.
+        Als Einheit für die Zeit können folgende Werte verwendet werden:
+        <table>
+            <thead>
+                <tr>
+                    <th>Einheit</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Millisekunden</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> oder <code>sec</code></td>
+                    <td>Sekunden</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> oder <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Stunden</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Die Angabe einer Zeit funktioniert nicht mit dem topic <b>position</b>.
+    </p>
+</script>

@@ -1,0 +1,26 @@
+{
+    "logic": {
+        "ui": {
+            "name": "Name",
+            "logic": "Logik",
+            "inputs": "Eingänge",
+            "invert": "Invertieren",
+            "output": "Ausgang",
+            "output_messages": "Ausgangsnachrichten",
+            "true": "Wahr",
+            "false": "Falsch",
+            "send": "Senden",
+            "outputs": "Ausgänge",
+            "note": "Hinweis:",
+            "note_text": "<code>msg.payload</code> wird automatisch auf das Logik-Ergebnis gesetzt,<br/>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.",
+            "system_start": "Systemstart",
+            "save_state": "Zustand speichern",
+            "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden",
+
+            "send_only_change": "Nur bei Änderung",
+            "always": "Immer",
+            "common_output": "Gemeinsamer Ausgang",
+            "separate_output": "Separate Ausgänge"
+        }
+    }
+}

@@ -264,11 +264,14 @@
             },
             oneditprepare: function ()
             {
-                // console.log("Here");
+                let node = this;
+
                 onEditPrepare(this, ["smart_light-control", "smart_scene-control", "smart_shutter-complex-control", "smart_shutter-control"]);
             },
             oneditsave: function ()
             {
+                let node = this;
+
                 onEditSave(this);
             },
             onadd: onAdd,
@@ -279,30 +282,11 @@
 
 <script type="text/html" data-template-name="smart_text-exec">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="text-exec.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]text-exec.ui.name" />
     </div>
-    <div class="node-input-link-rows" style="position:relative; height: 30px; text-align: right;"
-        ><div style="display:inline-block"><input type="text" id="node-input-link-target-filter" /></div
-    ></div>
+    <div class="node-input-link-rows" style="position:relative; height: 30px; text-align: right;">
+        <div style="display:inline-block"><input type="text" id="node-input-link-target-filter" /></div>
+    </div>
     <div class="form-row node-input-link-row node-input-link-rows"></div>
-</script>
-
-<script type="text/html" data-help-name="smart_text-exec">
-    <p>
-        Diese Node nimmt einen Text entgegen, zerlegt ihn und führt die Kommandos auf den ausgewählten und passenden Nodes aus.
-    </p>
-    <p>
-        <strong>Beispiele:</strong><br/><br/>
-        <strong>Schalte das Licht im Wohnzimmer ein.</strong><br/>
-        Alle Light-controls und Scene-controls die das Wort <strong>Wohnzimmer</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code>.<br/><br/>
-        
-        <strong>Schalte das Büro ein und die Küche aus.</strong><br/>
-        Alle Light-controls und Scene-controls die das Wort <strong>Büro</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code> und
-        alle Light-controls und Scene-controls die das Wort <strong>Küche</strong> enthalten bekommen eine Nachricht mit dem topic <code>off</code>.<br/><br/>
-        
-        <strong>Schließe die Rollladen im Wohnzimmer und schalte das Licht in der Küche an.</strong><br/>
-        Alle Schutter-controls und Shutter-complex-controls die das Wort <strong>Wohnzimmer</strong> enthalten bekommen eine Nachricht mit dem topic <code>down</code> und
-        alle Light-controls und Scene-controls die das Wort <strong>Küche</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code>.<br/><br/>
-    </p>
 </script>

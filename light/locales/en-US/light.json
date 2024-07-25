@@ -1,0 +1,24 @@
+{
+    "light": {
+        "ui": {
+            "name": "Name",
+            "text": "Text",
+            "controlled_by_words": "This node can be controlled using the words entered. Multiple words are separated by a comma.",
+            "time_on": "Time On",
+            "alarm_on": "Alarm On",
+            "alarm_off": "Alarm Off",
+            "controlled_by_central": "This block is controlled by the following central blocks:",
+
+            "milliseconds": "Milliseconds",
+            "seconds": "Seconds",
+            "minutes": "Minutes",
+            "hours": "Hours",
+
+            "no_action": "No action",
+            "turn_on": "Turn on",
+            "turn_off": "Turn off",
+            "last_state": "Last state",
+            "last_sended_state": "Last sent state"
+        }
+    }
+}

@@ -7,10 +7,21 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        // persistant values
+
+        // #####################
+        // # persistent values #
+        // #####################
         var node_settings = {
             values: [
                 helper.evaluateNodeProperty(RED, config.value1, config.value1_type),
@@ -20,33 +31,61 @@ module.exports = function (RED)
             last_message: null,
         };
 
+        // load or delete saved values
         if (config.save_state)
-        {
-            // load old saved values
             node_settings = Object.assign(node_settings, smart_context.get(node.id));
-        }
         else
-        {
-            // delete old saved values
             smart_context.del(node.id);
-        }
 
-        // dynamic config
+
+        // ##################
+        // # Dynamic config #
+        // ##################
         let comparator = config.comparator;
         let out_true = helper.evaluateNodeProperty(RED, config.out_true, config.out_true_type);
         let out_false = helper.evaluateNodeProperty(RED, config.out_false, config.out_false_type);
         let send_only_change = helper.evaluateNodeProperty(RED, config.send_only_change, "bool");
         let outputs = helper.evaluateNodeProperty(RED, config.outputs, "num");
 
-        // runtime values
 
+        // ##################
+        // # Runtime values #
+        // ##################
+
+
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
+            handleTopic(msg);
+
+            setStatus();
+
+            if (config.save_state)
+                smart_context.set(node.id, node_settings);
+        });
+
+        node.on("close", function ()
+        {
+        });
+
+
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
+        let handleTopic = msg =>
+        {
+            helper.log("handle topic:");
+            helper.log(msg);
+
             // Check if topic has a valid value
-            let input = helper.getTopicNumber(msg.topic);
-            if (input == null || input < 1 || input > 2)    
+            let real_topic_number = helper.getTopicNumber(msg.topic);
+            if (real_topic_number == null || real_topic_number < 1 || real_topic_number > 2)    
             {
-                node.error(RED._("compare.errors.wrong_topic") + msg.topic);
+                console.warn("Topic has to be 1 or 2, sended: " + msg.topic);
                 return;
             }
 
@@ -54,17 +93,20 @@ module.exports = function (RED)
             let num = parseFloat(msg.payload);
             if (Number.isNaN(num))
             {
-                // node.error("Payload has to be numeric");
+                console.warn("Payload has to be numeric: " + msg.payload);
                 return;
             }
 
             // Save new value
-            node_settings.values[input - 1] = num;
+            node_settings.values[real_topic_number - 1] = num;
 
             let result = getResult();
-            let out_msg = null;
 
-            setStatus(result);
+            helper.log("getResult:");
+            helper.log(result);
+            helper.log(node_settings);
+
+            let out_msg = null;
 
             if (result != null)
             {
@@ -72,12 +114,12 @@ module.exports = function (RED)
                 if (result)
                 {
                     if (out_true !== null)
-                        out_msg = Object.assign({}, out_true);
+                        out_msg = helper.cloneObject(out_true);
                 }
                 else
                 {
                     if (out_false !== null)
-                        out_msg = Object.assign({}, out_false);
+                        out_msg = helper.cloneObject(out_false);
                 }
 
                 if (out_msg !== null)
@@ -105,12 +147,13 @@ module.exports = function (RED)
 
                 node_settings.last_result = result;
                 node_settings.last_message = out_msg;
-
-                if (config.save_state)
-                    smart_context.set(node.id, node_settings);
             }
-        });
+        }
 
+        /**
+         * Do the configured comparison and return the result
+         * @returns The comparison result
+         */
         let getResult = () =>
         {
             // Wait until both values are set
@@ -168,23 +211,20 @@ module.exports = function (RED)
         }
 
         // updates the status
-        let setStatus = (result) =>
+        let setStatus = () =>
         {
-            if (result == null)
+            if (node_settings.last_result === null)
                 node.status({});
             else
-                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + node_settings.values.join(" " + getComparatorSign() + " ") + " => " + result });
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + node_settings.values.join(" " + getComparatorSign() + " ") + " => " + node_settings.last_result });
         }
 
-        node.on("close", function ()
-        {
-        });
 
         if (config.save_state && config.resend_on_start && node_settings.last_message != null)
         {
             setTimeout(() =>
             {
-                node.send(node_settings.last_message);
+                node.send(helper.cloneObject(node_settings.last_message));
             }, 10000);
         }
 

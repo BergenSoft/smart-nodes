@@ -1,0 +1,10 @@
+<script type="text/html" data-help-name="smart_statistic">
+    <p>This node calculates the minimum, maximum, sum, difference, absolute value, absolute difference, average and moving average of different values.</p>
+    <p>Each value must be sent with its own topic. If a second value comes with the same topic, the corresponding value is overwritten.</p>
+    <p>In the case of MIN, MAX and ABS, the corresponding topic that came with the values is also output. SUM, DIFF, AVG and MOV_AVG are combined results, which is why Topic is always not set here.</p>
+    <p>The topic is not important for the absolute value and the moving average; every value that is received is used for the calculation.</p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so that different smart nodes can be controlled with the same topic.<br/>
+        This node only uses the <code>number</code> part. <code>name</code> and <code>#</code> are optional.
+    </p>
+</script>

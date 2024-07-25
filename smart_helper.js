@@ -5,16 +5,16 @@ module.exports = {
      * If a type is unknown the NodeRed function is used for conversation.
      * 
      * Known types are:
-     * - "null", which will return always null
+     * - "NOTHING", which will return always null
      */
     evaluateNodeProperty(RED, value, type)
     {
         try
         {
-            switch (type)
+            switch (type?.toUpperCase())
             {
                 case null:
-                case "null":
+                case "NOTHING":
                     return null;
 
                 default:
@@ -23,10 +23,7 @@ module.exports = {
         }
         catch (error)
         {
-            console.error(value);
-            console.error(type);
-            console.error(error);
-            console.error(msg);
+            console.error({ value, type, error });
             return null;
         }
     },
@@ -70,6 +67,23 @@ module.exports = {
             return null;
 
         return result;
+    },
+
+    /**
+     * This functions extracts the topic name out of the given topic and checks if it is a valid topic.
+     * If not, the default topic is returned.
+     * @param {string} topic 
+     * @param {string} defaultTopic 
+     * @param {string[]} possibleTopics 
+     * @returns The real topic that needs to be processes
+     */
+    getRealTopic(topic, defaultTopic, possibleTopics)
+    {
+        let realTopic = this.getTopicName(topic);
+        if (possibleTopics.includes(realTopic))
+            return realTopic;
+
+        return defaultTopic;
     },
 
     /**
@@ -164,6 +178,26 @@ module.exports = {
             return 0;
 
         return this.getTimeInMs(values[1].replace(",", "."), values[2] || "ms");
+    },
+
+    /**
+     * Formats a string by replacing {n} with the n-th argument.
+     * Example: format("Hello {0}. {1} {0}.", "world", "Bye") => "Hello world. Bye world."
+     * @param {string} str The string to format
+     * @param  {...string} args The arguments used for the replacement
+     * @returns The formatted string
+     */
+    format(str, ...args)
+    {
+        if (!args.length)
+            return str;
+
+        for (var a in args)
+        {
+            str = str.replace(new RegExp("\\{" + a + "\\}", "gi"), args[a]);
+        }
+
+        return str
     },
 
     /**
@@ -302,8 +336,17 @@ module.exports = {
      * @param {*} obj The Object to copy
      * @returns A new Object
      */
-    cloneObject(obj)
+    cloneObject(...obj)
     {
-        return Object.assign({}, obj);
+        return Object.assign({}, ...obj);
+    },
+
+    /**
+     * Forward all arguments to the console if it is enabled
+     */
+    log()
+    {
+        // uncomment to see all log values
+        // console.log(...arguments);
     }
 };

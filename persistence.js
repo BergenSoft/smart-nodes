@@ -66,6 +66,7 @@ module.exports = function (_RED)
 
     function del(id)
     {
+        hasChanges = true;
         delete globalData["id" + id];
     }
 

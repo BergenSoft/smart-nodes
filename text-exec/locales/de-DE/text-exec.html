@@ -1,0 +1,18 @@
+<script type="text/html" data-help-name="smart_text-exec">
+    <p>
+        Diese Node nimmt einen Text entgegen, zerlegt ihn und führt die Kommandos auf den ausgewählten und passenden Nodes aus.
+    </p>
+    <p>
+        <strong>Beispiele:</strong><br/><br/>
+        <strong>Schalte das Licht im Wohnzimmer ein.</strong><br/>
+        Alle Light-controls und Scene-controls die das Wort <strong>Wohnzimmer</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code>.<br/><br/>
+        
+        <strong>Schalte das Büro ein und die Küche aus.</strong><br/>
+        Alle Light-controls und Scene-controls die das Wort <strong>Büro</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code> und
+        alle Light-controls und Scene-controls die das Wort <strong>Küche</strong> enthalten bekommen eine Nachricht mit dem topic <code>off</code>.<br/><br/>
+        
+        <strong>Schließe die Rollladen im Wohnzimmer und schalte das Licht in der Küche an.</strong><br/>
+        Alle Schutter-controls und Shutter-complex-controls die das Wort <strong>Wohnzimmer</strong> enthalten bekommen eine Nachricht mit dem topic <code>down</code> und
+        alle Light-controls und Scene-controls die das Wort <strong>Küche</strong> enthalten bekommen eine Nachricht mit dem topic <code>on</code>.<br/><br/>
+    </p>
+</script>

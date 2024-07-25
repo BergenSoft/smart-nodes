@@ -1,0 +1,12 @@
+{
+    "multi-press": {
+        "ui": {
+            "name": "Name",
+            "count_presses": "Number of keypresses",
+            "count_presses_placeholder": "Max number of keypresses",
+            "time_interval": "Time interval",
+            "time_interval_placeholder": "Max time in ms between keypresses",
+            "output_messages": "Output messages"
+        }
+    }
+}

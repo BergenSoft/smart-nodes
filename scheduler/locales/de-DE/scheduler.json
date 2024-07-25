@@ -1,0 +1,21 @@
+{
+    "scheduler": {
+        "ui": {
+            "name": "Name",
+            "scheduler_enabled": "Scheduler aktiviert",
+            "schedules": "Schedules",
+
+            "system_start": "Systemstart",
+            "save_state": "Zustand speichern",
+            "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden",
+
+            "monday": "Montag",
+            "tuesday": "Dienstag",
+            "wednesday": "Mittwoch",
+            "thursday": "Donnerstag",
+            "friday": "Freitag",
+            "saturday": "Samstag",
+            "sunday": "Sonntag"
+        }
+    }
+}

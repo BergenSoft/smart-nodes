@@ -7,40 +7,84 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
+
+        // #####################
+        // # persistent values #
+        // #####################
         var node_settings = {
             enabled: config.enabled,
             last_message: null,
             last_msg_was_sended: true
         };
 
+        // load or delete saved values
         if (config.save_state)
-        {
-            // load old saved values
             node_settings = Object.assign(node_settings, smart_context.get(node.id));
-        }
         else
-        {
-            // delete old saved values
             smart_context.del(node.id);
-        }
 
-        // dynamic config
+
+        // ##################
+        // # Dynamic config #
+        // ##################
         let forward_true = config.always_forward_true;
         let forward_false = config.always_forward_false;
         let forward_last_on_enable = config.forward_last_on_enable;
 
-        // runtime values
+
+        // ##################
+        // # Runtime values #
+        // ##################
 
 
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
+            handleTopic(msg);
+
+            setStatus();
+
+            if (config.save_state)
+                smart_context.set(node.id, node_settings);
+        });
+
+        node.on("close", function ()
+        {
+            if (timeout != null)
+            {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+        });
+
+
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
+        let handleTopic = msg =>
+        {
+            let real_topic = helper.getTopicName(msg.topic);
+
             let new_state = null;
-            if (msg.topic == "enable" || (msg.topic == "set_state" && msg.payload))
+            if (real_topic == "enable" || (real_topic == "set_state" && msg.payload))
                 new_state = true;
-            else if (msg.topic == "disable" || (msg.topic == "set_state" && !msg.payload))
+            else if (real_topic == "disable" || (real_topic == "set_state" && !msg.payload))
                 new_state = false;
 
             // Already the correct state
@@ -53,12 +97,9 @@ module.exports = function (RED)
                 case false:
                     node_settings.enabled = new_state;
 
-                    if (config.save_state)
-                        smart_context.set(node.id, node_settings);
-
                     if (node_settings.enabled && forward_last_on_enable && node_settings.last_message != null && !node_settings.last_msg_was_sended)
                     {
-                        node.send(node_settings.last_message);
+                        node.send(helper.cloneObject(node_settings.last_message));
                         node_settings.last_msg_was_sended = true;
                     }
 
@@ -69,7 +110,7 @@ module.exports = function (RED)
                     // Forward if enabled or forced
                     if (node_settings.enabled || (forward_true && msg.payload) || (forward_false && !msg.payload))
                     {
-                        node.send(msg);
+                        node.send(helper.cloneObject(msg));
                         node_settings.last_msg_was_sended = true;
                     }
                     else
@@ -77,10 +118,10 @@ module.exports = function (RED)
                         node_settings.last_msg_was_sended = false;
                     }
 
-                    node_settings.last_message = helper.cloneObject(msg);;
+                    node_settings.last_message = helper.cloneObject(msg);
                     break;
             }
-        });
+        }
 
         let setStatus = () =>
         {
@@ -94,7 +135,7 @@ module.exports = function (RED)
         {
             setTimeout(() =>
             {
-                node.send(node_settings.last_message);
+                node.send(helper.cloneObject(node_settings.last_message));
             }, 10000);
         }
 

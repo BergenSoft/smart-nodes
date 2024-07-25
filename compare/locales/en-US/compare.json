@@ -1,12 +1,9 @@
 {
     "compare": {
-        "errors": {
-            "wrong_topic": "Topic has to be 1 or 2, sended: "
-        },
         "ui": {
             "name": "Name",
             "compare": "Compare",
-            "note_default_values": "Default values ​​are set here and can be overwritten by incoming messages.",
+            "note_default_values": "Default values are set here and can be overwritten by incoming messages.",
             "value_1": "Value 1",
             "value_2": "Value 2",
             "output_messages": "Output message",
@@ -14,12 +11,25 @@
             "false": "False",
             "send": "Send",
             "outputs": "Outputs",
-            "note": "Note",
-            "note_payload": "is automatically set to the comparison result, unless it has already been set here in the configuration.",
-            "note_comperator": "is automatically set to the comparison operator if it has not already been set here in the configuration.",
+            "note": "Note:",
+            "note_text": "<code>msg.payload</code> is automatically set to the comparison result,<br/>if it has not already been set here in the configuration.<br/><code>msg.comperator</code> is automatically set to the comparison operator,<br/>if it has not already been set here in the configuration.",
+
             "system_start": "System start",
             "save_state": "Save state",
-            "send_after_start": "Send last message 10 seconds after the start"
+            "send_after_start": "Send last message 10 seconds after the start",
+
+            "smaller": "< Smaller",
+            "smaller_equal": "<= Smaller or equal",
+            "equal": "== Equal",
+            "unequal": "!= Not equal",
+            "greater_equal": ">= Greater or equal",
+            "greater": "> Greater",
+            "no_value": "No value",
+            "send_nothing": "Send nothing",
+            "send_only_change": "Only on change",
+            "always": "Always",
+            "common_output": "Common output",
+            "separate_output": "Separate outputs"
         }
     }
 }

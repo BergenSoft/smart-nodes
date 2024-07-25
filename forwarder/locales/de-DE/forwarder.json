@@ -1,0 +1,15 @@
+{
+    "forwarder": {
+        "ui": {
+            "name": "Name",
+            "enabled": "Aktiviert",
+            "forward_last_on_enable": "Letzte nicht gesendete Nachricht senden, wenn die Node aktiviert wird.",
+            "always_forward_true": "Leite <code>msg.payload = true</code> immer weiter.",
+            "always_forward_false": "Leite <code>msg.payload = false</code> immer weiter.",
+
+            "system_start": "Systemstart",
+            "save_state": "Zustand speichern",
+            "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden"
+        }
+    }
+}

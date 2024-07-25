@@ -1,0 +1,32 @@
+<script type="text/html" data-help-name="smart_forwarder">
+    <p>This node forwards a message if it has been enabled or if permanent forwarding is activated for the message.</p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so that different smart nodes can be controlled with the same topic.<br />
+        This node only uses the part <code>name</code>. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>enable</code></td>
+                    <td>Enables forwarding.</td>
+                </tr>
+                <tr>
+                    <td><code>disable</code></td>
+                    <td>Disables forwarding.</td>
+                </tr>
+                <tr>
+                    <td><code>set_state</code></td>
+                    <td>Enables forwarding if <code>msg.payload = true</code> or disables forwarding if <code>msg.payload = false</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

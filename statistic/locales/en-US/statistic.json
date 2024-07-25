@@ -1,0 +1,29 @@
+{
+    "statistic": {
+        "ui": {
+            "name": "Name",
+            "operation": "Operation",
+            "count": "Count",
+            "message": "Message",
+
+            "note": "Note:",
+            "note_text": "<code>msg.payload</code> is always automatically set to the result value.",
+
+            "output_messages": "Output messages",
+            "system_start": "System start",
+            "save_state": "Save state",
+            "send_after_start": "Send last message 10 seconds after start",
+
+            "minimum": "Minimum",
+            "maximum": "Maximum",
+            "sum": "Sum",
+            "difference": "Difference",
+            "absolute_value": "Absolute value",
+            "absolute_difference": "Absolute difference",
+            "average": "Average",
+            "moving_average": "Moving average",
+
+            "default": "Default"
+        }
+    }
+}

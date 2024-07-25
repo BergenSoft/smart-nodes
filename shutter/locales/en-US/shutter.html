@@ -1,0 +1,133 @@
+<script type="text/html" data-help-name="smart_shutter-control">
+    <p>
+        <b>Note:</b> Smart Nodes use topics in the format <code>name#number</code>, so that different Smart Nodes can be controlled with the same topic.<br />
+        This node only uses the part <code>name</code>. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        This node controls roller shutters or blinds. There are 3 outputs that can be controlled:
+    <ol>
+        <li><b>Up/Down:</b> <code>msg.payload = false</code> moves the roller shutter up and <code>msg.payload = true</code> moves the roller shutter down.</li>
+        <li><b>Stop:</b> <code>msg.payload = true</code> stops the roller shutter.</li>
+        <li><b>Position:</b> <code>msg.payload = 42</code> Moves the roller shutter to 42%.</li>
+    </ol>
+    The outputs are assigned to the respective KNX group addresses.
+    </p>
+    <p>
+        This node expects the following topics as input:<br />
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                    <th>msg.payload == false is ignored</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>status</code> or <code>status_position</code></td>
+                    <td>
+                        The node reports the current position.
+                        This allows the node to determine in which direction a roller shutter last moved.
+                        This is required for the topic <b>toggle</b> to determine the next direction of travel for a 1-button
+                        operation.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>up_down</code></td>
+                    <td>
+                        Receives a command from Home Assistant to be informed whether the roller shutter is running and in which
+                        direction.<br />
+                        <strong>Important:</strong> This topic <u>does not</u> start the roller shutter, as the group address
+                        must be directly connected to the blind module.
+                    </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>short_up_down</code></td>
+                    <td>
+                        Sends a short up command if <code>msg.payload = false</code> and a short down command if
+                        <code>msg.payload = true</code>.<br />
+                        The time stored in the module is used. However, this can be overwritten once by setting
+                        <code>msg.time_on = 1500</code> or <code>msg.time_on = "1.5s"</code>.
+                    </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>up</code></td>
+                    <td>Sends a command to raise the roller shutter if it is not already moving up. If necessary, a stop command
+                        is sent beforehand.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>up_stop</code></td>
+                    <td>Sends a stop and an up command alternately.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>down</code></td>
+                    <td>Sends a down command if the roller shutter is not already moving down. If necessary, a stop command is
+                        sent beforehand.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>down_stop</code></td>
+                    <td>Sends a stop and a down command alternately.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>stop</code></td>
+                    <td>Sends a stop command.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>position</code></td>
+                    <td>Sends a position command. <code>msg.payload</code> should have a value between 0 (open) and 100
+                        (closed).</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>Switches the roller shutter alternately to up, stop, down, stop.</td>
+                    <td>Yes</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        This node does not manage a running time for the roller shutter itself. This must be configured for the output via ETS.
+        However, it is possible to switch the roller shutter off automatically after a defined time.
+        However, it is possible to switch the roller shutter off automatically after a defined time.
+        Example: <code>msg = { "topic": "up", "time_on": 5000 }</code> or <code>msg = { "topic": "up", "time_on": "5s" }</code><br />
+        This message causes the roller shutter to move up for 5000 milliseconds / 5 seconds. If it is a Venetian blind, the slats are rotated accordingly.
+        The following values can be used as a unit for time:
+        <table>
+            <thead>
+                <tr>
+                    <th>Unit</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Milliseconds</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> or <code>sec</code></td>
+                    <td>Seconds</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> or <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Hours</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Specifying a time does not work with the topic <b>position</b>.
+    </p>
+</script>

@@ -256,14 +256,14 @@
             color: "#6EE2D9",
             defaults: {
                 name: { value: "" },
-                mode: { value: "shutter" }, // shutter | light
+                mode: { value: "LIGHT" }, // LIGHT | SHUTTER
                 links: { value: [], type: "smart_shutter-complex-control[]" },
             },
             inputs: 1,
             outputs: 0,
             icon: function ()
             {
-                if (this.mode === "shutter")
+                if (this.mode === "SHUTTER")
                     return "font-awesome/fa-align-justify";
 
                 return "font-awesome/fa-lightbulb-o";
@@ -279,19 +279,36 @@
                 onEditPrepare(this, ["smart_shutter-complex-control", "smart_shutter-control"]);
                 $("#node-input-mode").on("change", function ()
                 {
-                    if (this.value == "shutter")
+                    if (this.value == "SHUTTER")
                         initTreeList(node, ["smart_shutter-complex-control", "smart_shutter-control"]);
                     else
                         initTreeList(node, ["smart_light-control", "smart_scene-control"]);
                 });
 
-                if (!this.mode)
-                {
-                    $("#node-input-mode").val("shutter").trigger("change");
-                }
+                $("#node-input-mode").typedInput({
+                    types: [{
+                        default: "LIGHT",
+                        value: "mode",
+                        options: [
+                            { value: "LIGHT", label: node._("central.ui.light_outlet") },
+                            { value: "SHUTTER", label: node._("central.ui.cover") }
+                        ],
+                    }],
+                });
+
+                // Backward compatibility
+                this.mode = this.mode?.toUpperCase();
+
+                if (this.mode)
+                    $("#node-input-mode").val(this.mode).trigger("change");
+                else
+                    $("#node-input-mode").val("SHUTTER").trigger("change");
+
             },
             oneditsave: function ()
             {
+                let node = this;
+                
                 onEditSave(this);
             },
             onadd: onAdd,
@@ -306,11 +323,8 @@
         <input type="text" id="node-input-name" />
     </div>
     <div class="form-row">
-        <label for="node-input-mode"><span data-i18n="central.ui.type"></span></label>
-        <select id="node-input-mode" style="width: 70%">
-            <option value="shutter" selected><span data-i18n="central.ui.cover"></span></option>
-            <option value="light"><span data-i18n="central.ui.light_outlet"></span></option>
-        </select>
+        <label for="node-input-mode"><i class="fa fa-arrow-right"></i> <span data-i18n="central.ui.type"></span></label>
+        <input id="node-input-mode"/>
     </div>
     <div class="node-input-link-rows" style="position:relative; height: 30px; text-align: right;"
         ><div style="display:inline-block"><input type="text" id="node-input-link-target-filter" /></div

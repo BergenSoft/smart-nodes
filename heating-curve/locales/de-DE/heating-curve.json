@@ -1,0 +1,12 @@
+{
+    "heating": {
+        "ui": {
+            "name": "Name",
+            "room_setpoint": "Raum Soll",
+            "slope": "Steilheit",
+            "offset": "Verschiebung",
+            "min_setpoint": "Min Soll",
+            "max_setpoint": "Max Soll"
+        }
+    }
+}

@@ -7,41 +7,67 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
+        // #####################
+        // # persistent values #
+        // #####################
         var node_settings = {
             value: null,
             last_message: null,
         };
 
+        // load or delete saved values
         if (config.save_state)
-        {
-            // load old saved values
             node_settings = Object.assign(node_settings, smart_context.get(node.id));
-        }
         else
-        {
-            // delete old saved values
             smart_context.del(node.id);
-        }
 
-        // dynamic config
-        let start = config.start;
-        let step = config.step;
-        let min = config.min;
-        let max = config.max;
+
+        // ##################
+        // # Dynamic config #
+        // ##################
+        let start = parseInt(config.start, 10);
+        let step = parseInt(config.step, 10);
+        let min = parseInt(config.min, 10);
+        let max = parseInt(config.max, 10);
         let out_message = helper.evaluateNodeProperty(RED, config.out_message, config.out_message_type);
 
-        // runtime values
+
+        // ##################
+        // # Runtime values #
+        // ##################
+        // Not used by this node
 
         node.on("input", function (msg)
         {
             handleTopic(msg);
+
             sendResult();
+
             setStatus();
+            smart_context.set(node.id, node_settings);
         });
 
+        node.on("close", function ()
+        {
+        });
+
+
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
         let handleTopic = msg =>
         {
             let real_topic = helper.getTopicName(msg.topic);
@@ -93,6 +119,9 @@ module.exports = function (RED)
             node_settings.value = Math.min(max, Math.max(min, node_settings.value));
         }
 
+        /**
+         * Send the result to the output
+         */
         let sendResult = () =>
         {
             // Nothing changed, nothing to do
@@ -101,18 +130,12 @@ module.exports = function (RED)
 
             // if out_message is set, use this instead of the default message
             if (out_message)
-                node_settings.last_message = Object.assign({}, out_message, { payload: node_settings.value });
+                node_settings.last_message = helper.cloneObject(out_message, { payload: node_settings.value });
             else
                 node_settings.last_message = { payload: node_settings.value };
 
-            smart_context.set(node.id, node_settings);
-
             node.send(node_settings.last_message);
         }
-
-        node.on("close", function ()
-        {
-        });
 
         // updates the status
         let setStatus = () =>
@@ -127,7 +150,7 @@ module.exports = function (RED)
         {
             setTimeout(() =>
             {
-                node.send(node_settings.last_message);
+                node.send(helper.cloneObject(node_settings.last_message));
             }, 10000);
         }
 

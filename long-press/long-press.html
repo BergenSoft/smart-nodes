@@ -1,0 +1,70 @@
+<script type="text/javascript">
+    RED.nodes.registerType("smart_long-press-control", {
+        category: "Smart Nodes",
+        paletteLabel: "Long press control",
+        color: "#FF8080",
+        defaults: {
+            name: { value: "" },
+            long_press_ms: { value: 1000 },
+            short: { value: '{"topic": ""}' },
+            long: { value: '{"topic": ""}' },
+        },
+        inputs: 1,
+        outputs: 2,
+        outputLabels: ["Short", "Long"],
+        icon: "font-awesome/fa-hand-o-up",
+        label: function ()
+        {
+            return this.name || "Long press control";
+        },
+        oneditprepare: function ()
+        {
+            let node = this;
+
+            $("#node-input-long_press_ms").spinner({
+                min: 1,
+                change: function (event, ui)
+                {
+                    var value = parseInt(this.value);
+                    value = isNaN(value) ? 0 : value;
+                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                    if (value !== this.value)
+                        $(this).spinner("value", value);
+                }
+            });
+
+            $("#node-input-short").typedInput({
+                type: "json",
+                types: ["json"]
+            });
+
+            $("#node-input-long").typedInput({
+                type: "json",
+                types: ["json"]
+            });
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="smart_long-press-control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="long-press.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]long-press.ui.name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-long_press_ms"><i class="fa fa-clock-o"></i><span data-i18n="long-press.ui.time_for_long"></span></label>
+        <input id="node-input-long_press_ms" data-i18n="[placeholder]long-press.ui.time_for_long_placeholder" />
+        <span data-i18n="long-press.ui.milliseconds"></span>
+    </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;" data-i18n="long-press.ui.output_messages"></h4>
+    <div class="form-row">
+        <label for="node-input-short"><i class="fa fa-hand-o-up"></i> <span data-i18n="long-press.ui.short"></span></label>
+        <input type="text" id="node-input-short" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-long"><i class="fa fa-hand-o-up"></i> <span data-i18n="long-press.ui.long"></span></label>
+        <input type="text" id="node-input-long" />
+    </div>
+</script>

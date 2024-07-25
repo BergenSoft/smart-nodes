@@ -1,0 +1,120 @@
+<script type="text/html" data-help-name="smart_shutter-complex-control">
+    <p>
+        <b>Note:</b> This node was developed if the KNX roller shutter control cannot be used and you are forced to use 2 separate outputs for up and down.
+        It is highly recommended that the outputs lock each other to prevent simultaneous control. Everyone is responsible for any damage to the roller shutter.
+    </p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so that different smart nodes can be controlled with the same topic.<br />
+        This node only uses the <code>name</code> part. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        This node controls roller shutters or blinds.
+        There are 3 outputs that can be controlled:
+        <ol>
+            <li><b>Up:</b> <code>msg.payload = true;</code> starts the roller shutter to move up and <code>msg.payload = false;</code> stops it again. </li>
+            <li><b>Down:</b> <code>msg.payload = true;</code> starts the roller shutter to move down and <code>msg.payload = false;</code> stops it again. </li>
+            <li><b>Status Position:</b> <code>msg.payload = 42;</code>Shows the current status of the roller shutter. 0 = open, 100 = closed.</li>
+        </ol>
+        The outputs are assigned to the respective KNX group addresses.
+    </p>
+    <p>
+        This node expects the following topics as input:<br />
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                    <th>msg.payload == false is ignored</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>up_stop</code></td>
+                    <td>Sends a stop and a raise command alternately.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>up</code></td>
+                    <td>Sends a raise command if the roller shutter is not already moving up. If necessary, a stop command is sent beforehand and the set time is waited for.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>down_stop</code></td>
+                    <td>Sends a stop and a down command alternately.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>down</code></td>
+                    <td>Sends a down command if the roller shutter is not already moving down. If necessary, a stop command is sent beforehand and the set time is waited for.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>up_down</code></td>
+                    <td>Receives a command from Home Assistant and initiates the corresponding action.</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>stop</code></td>
+                    <td>Sends a stop command.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>position</code></td>
+                    <td>Sends a position command. <code>msg.payload</code> should have a value between 0 (open) and 100 (closed).</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>alarm</code></td>
+                    <td>Sets the current alarm state.</td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>Switches the roller shutter alternately to up, stop, down, stop.</td>
+                    <td>Yes</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        This node manages the running time for the roller shutter itself.
+        It is also possible to have the roller shutter switch off automatically after a defined time.
+        Example: <code>msg = { "topic": "up", "time_on": 5000 }</code> or <code>msg = { "topic": "up", "time_on": "5s" }</code><br />
+        This message causes the roller shutter to move up for 5000 milliseconds / 5 seconds. If it is a blind, the slats are rotated accordingly.
+        The following values can be used as a unit for time:
+        <table>
+            <thead>
+                <tr>
+                    <th>Unit</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Milliseconds</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> or <code>sec</code></td>
+                    <td>Seconds</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> or <code>min</code></td>
+                    <td>Minutes.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Hours</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        To correct possible position deviations, the roller shutter always runs for at least 5 seconds if nothing else has been set in <code>msg.on_time</code>.
+        This means that the roller shutter can be raised even further if it is recognized as open in the system, but in reality it is not yet completely up.<br>
+        Sometimes it may also be desirable for a roller shutter not to start again at 0 or 100%. For this, <code>msg.exact = true</code> must be set.
+    </p>
+    <p>
+        Specifying a time does not work with the topic <b>position</b>.
+    </p>
+</script>

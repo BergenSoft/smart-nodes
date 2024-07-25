@@ -1,0 +1,26 @@
+{
+    "logic": {
+        "ui": {
+            "name": "Name",
+            "logic": "Logic",
+            "inputs": "Inputs",
+            "invert": "Invert",
+            "output": "Output",
+            "output_messages": "Output messages",
+            "true": "True",
+            "false": "False",
+            "send": "Send",
+            "outputs": "Outputs",
+            "note": "Note:",
+            "note_text": "<code>msg.payload</code> is automatically set to the logic result<br/>if it has not already been set here in the configuration.",
+            "system_start": "System start",
+            "save_state": "Save state",
+            "send_after_start": "Send last message 10 seconds after start",
+
+            "send_only_change": "Only on change",
+            "always": "Always",
+            "common_output": "Common output",
+            "separate_output": "Separate outputs"
+        }
+    }
+}

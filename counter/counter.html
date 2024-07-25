@@ -23,11 +23,54 @@
         },
         oneditprepare: function ()
         {
+            let node = this;
+
+            $("#node-input-start")
+                .spinner({
+                    change: function (event, ui)
+                    {
+                        var value = parseFloat(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                }).css("max-width", "4rem");
+
+            $("#node-input-step")
+                .spinner({
+                    change: function (event, ui)
+                    {
+                        var value = parseFloat(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                }).css("max-width", "4rem");
+
+            $("#node-input-min")
+                .spinner({
+                    change: function (event, ui)
+                    {
+                        var value = parseFloat(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                }).css("max-width", "4rem");
+
+            $("#node-input-max")
+                .spinner({
+                    change: function (event, ui)
+                    {
+                        var value = parseFloat(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                }).css("max-width", "4rem");
+
+
             $("#node-input-out_message").typedInput({
                 type: "json",
                 types: ["json", {
-                    value: "null",
-                    label: this._("default"),
+                    value: "NOTHING",
+                    label: node._("default"),
                     icon: "fa fa-times",
                     hasValue: false,
                 }],
@@ -42,6 +85,14 @@
                     $("#resend_on_start_row").hide();
             });
             $("#node-input-save_state").trigger("change");
+
+            // Backward compatibility
+            if (this.out_message_type == "null")
+            {
+                this.out_message_type = "NOTHING";
+                $("#node-input-out_message_type").val("NOTHING");
+            }
+
         }
     });
 </script>
@@ -53,43 +104,39 @@
     </div>
     <div class="form-row">
         <label for="node-input-start"><i class="fa fa-cog"></i> <span data-i18n="counter.ui.start"></label>
-        <input type="number" id="node-input-start"  data-i18n="[placeholder]counter.ui.start">
+        <input id="node-input-start"  data-i18n="[placeholder]counter.ui.start">
     </div>
     <div class="form-row">
         <label for="node-input-step"><i class="fa fa-forward"></i> <span data-i18n="counter.ui.step"></label>
-        <input type="number" id="node-input-step"  data-i18n="[placeholder]counter.ui.step">
+        <input id="node-input-step"  data-i18n="[placeholder]counter.ui.step">
     </div>
     <div class="form-row">
         <label for="node-input-min"><i class="fa fa-arrow-down"></i> <span data-i18n="counter.ui.min"></label>
-        <input type="number" id="node-input-min"  data-i18n="[placeholder]counter.ui.min">
+        <input id="node-input-min"  data-i18n="[placeholder]counter.ui.min">
     </div>
     <div class="form-row">
         <label for="node-input-max"><i class="fa fa-arrow-up"></i> <span data-i18n="counter.ui.max"></label>
-        <input type="number" id="node-input-max"  data-i18n="[placeholder]counter.ui.max">
+        <input id="node-input-max"  data-i18n="[placeholder]counter.ui.max">
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Ausgangsnachricht</h4>
+    <h4 style="margin: 0.5rem 0;"><span data-i18n="compare.ui.output_messages"></span></h4>
     <div class="form-row">
-        <label for="node-input-out_message"><i class="fa fa-check-circle"></i> Nachricht</label>
+        <label for="node-input-out_message"><i class="fa fa-check-circle"></i> <span data-i18n="counter.ui.message"></span></label>
         <input type="text" id="node-input-out_message"/>
         <input type="hidden" id="node-input-out_message_type">
     </div>
     <div class="form-row">
-        <span><strong>Hinweis:</strong></span>
-    </div>
-    <div class="form-row">
-        <span>
-            <code>msg.payload</code> wird immer automatisch auf den Ergebnis-Wert gesetzt.
-        </span>
+        <div><strong data-i18n="counter.ui.note"></strong></div>
+        <div data-i18n="[html]counter.ui.note_text"></div>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;">Systemstart</h4>
+    <h4 style="margin: 0.5rem 0;"><span data-i18n="compare.ui.system_start"></span></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
-        <label for="node-input-save_state" style="width: calc(100% - 30px);">Zustand speichern</label>
+        <label for="node-input-save_state" style="width: calc(100% - 30px);"><span data-i18n="compare.ui.save_state"></span></label>
     </div>
     <div class="form-row" id="resend_on_start_row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);">Letze Nachricht 10 Sekunden nach dem Start senden</label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);"><span data-i18n="compare.ui.send_after_start"></span></label>
     </div>
 </script>

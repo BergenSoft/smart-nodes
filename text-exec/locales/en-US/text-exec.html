@@ -1,0 +1,18 @@
+<script type="text/html" data-help-name="smart_text-exec">
+    <p>
+        This node accepts a text, breaks it down and executes the commands on the selected and appropriate nodes.
+    </p>
+    <p>
+        <strong>Examples:</strong><br/><br/>
+        <strong>Turn on the light in the living room.</strong><br/>
+        All light controls and scene controls that contain the word <strong>living room</strong> receive a message with the topic <code>on</code>.<br/><br/>
+        
+        <strong>Turn on the office and turn off the kitchen.</strong><br/>
+        All light controls and scene controls that contain the word <strong>office</strong> receive a message with the topic <code>on</code> and
+        all light controls and scene controls that contain the word <strong>kitchen</strong> receive a message with the topic <code>off</code>.<br/><br/>
+        
+        <strong>Close the shutters in the living room and turn on the light in the kitchen.</strong><br/>
+        All shutter controls and shutter complex controls that contain the word <strong>living room</strong> receive a message with the topic <code>down</code> and
+        all light controls and scene controls that contain the word <strong>kitchen</strong> receive a message with the topic <code>on</code>.<br/><br/>
+    </p>
+</script>

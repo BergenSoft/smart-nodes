@@ -7,10 +7,22 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        // persistant values
+
+        // #####################
+        // # persistent values #
+        // #####################
         var node_settings = {
             last_value: null,
             last_result: null,
@@ -46,22 +58,52 @@ module.exports = function (RED)
             smart_context.del(node.id);
         }
 
-        // dynamic config
+
+        // ##################
+        // # Dynamic config #
+        // ##################
         let out_higher = helper.evaluateNodeProperty(RED, config.out_higher, config.out_higher_type);
         let out_lower = helper.evaluateNodeProperty(RED, config.out_lower, config.out_lower_type);
         let send_only_change = helper.evaluateNodeProperty(RED, config.send_only_change, "bool");
         let outputs = helper.evaluateNodeProperty(RED, config.outputs, "num");
 
-        // runtime values
 
+        // ##################
+        // # Runtime values #
+        // ##################
+
+
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
-            let value = parseFloat(msg.payload);
+            handleTopic(msg);
+
+            setStatus();
+
+            if (config.save_state)
+                smart_context.set(node.id, node_settings);
+        });
+
+        node.on("close", function ()
+        {
+        });
+
+
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
+        let handleTopic = msg =>
+        {
             let real_topic = helper.getTopicName(msg.topic);
+            let value = parseFloat(msg.payload);
 
             if (isNaN(value))
             {
-                // node.error("Invalid payload: " + msg.payload);
+                console.warn("Invalid payload: " + msg.payload);
                 return;
             }
 
@@ -69,67 +111,51 @@ module.exports = function (RED)
             {
                 case "setpoint":
                     node_settings.setpoint = value;
-                    node.status({ fill: node_settings.last_result ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": New setpoint: " + value + "" });
-
-                    if (config.save_state)
-                        smart_context.set(node.id, node_settings);
                     break;
 
                 case "hysteresis":
                     node_settings.hysteresis = value;
-                    node.status({ fill: node_settings.last_result ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": New hysteresis: " + value + "" });
-
-                    if (config.save_state)
-                        smart_context.set(node.id, node_settings);
                     break;
 
                 default:
-                    let result = getResult(value);
-                    let out_msg = null;
-
-                    // No change, nothing to send
-                    if (result !== null)
-                    {
-                        // Get custom output message
-                        if (result)
-                            out_msg = createMessage(out_higher, config.out_higher_type, msg, value);
-                        else
-                            out_msg = createMessage(out_lower, config.out_lower_type, msg, value);
-
-                        // Overwrite automatic values, if not already defined
-                        if (typeof out_msg.payload === "undefined")
-                            out_msg.payload = result ?? node_settings.last_result;
-
-                        // Separate outputs if needed
-                        if (outputs == 2)
-                        {
-                            if (result)
-                                out_msg = [out_msg, null];
-                            else
-                                out_msg = [null, out_msg];
-                        }
-
-                        // Send only if needed
-                        if (send_only_change == false || node_settings.last_result != result)
-                            node.send(out_msg);
-
-                        node_settings.last_result = result;
-                        node_settings.last_message = out_msg;
-                    }
-
-                    node_settings.last_value = value;
-
-                    setStatus(result === null);
-
-                    if (config.save_state)
-                        smart_context.set(node.id, node_settings);
+                    node_settings.last_value = value
                     break;
             }
-        });
 
-        node.on("close", function ()
-        {
-        });
+            // Always calculate new result
+            let result = getResult(node_settings.last_value);
+            let out_msg = null;
+
+            // No change, nothing to send
+            if (result === null)
+                return;
+
+            // Get custom output message
+            if (result)
+                out_msg = createMessage(out_higher, config.out_higher_type, msg, node_settings.last_value);
+            else
+                out_msg = createMessage(out_lower, config.out_lower_type, msg, node_settings.last_value);
+
+            // Overwrite automatic values, if not already defined
+            if (typeof out_msg.payload === "undefined")
+                out_msg.payload = result ?? node_settings.last_result;
+
+            // Separate outputs if needed
+            if (outputs == 2)
+            {
+                if (result)
+                    out_msg = [out_msg, null];
+                else
+                    out_msg = [null, out_msg];
+            }
+
+            // Send only if needed
+            if (send_only_change == false || node_settings.last_result != result)
+                node.send(out_msg);
+
+            node_settings.last_result = result;
+            node_settings.last_message = out_msg;
+        }
 
         let getResult = value =>
         {
@@ -145,19 +171,17 @@ module.exports = function (RED)
             return node_settings.last_result;
         }
 
-        let setStatus = noChange =>
+        let setStatus = () =>
         {
-            if (noChange)
-                node.status({ fill: node_settings.last_result ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": No change by value " + node_settings.last_value + "" });
-            else if (node_settings.last_result === true)
-                node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Turned higher by value " + node_settings.last_value + "" });
-            else if (node_settings.last_result === false)
-                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Turned lower by value " + node_settings.last_value + "" });
+            if (node_settings.last_result == null)
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": ❓ S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: null" });
+            else
+                node.status({ fill: node_settings.last_result ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.last_result ? "⬆️" : "⬇️") + " S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + node_settings.last_value.toFixed(2) });
         }
 
         let createMessage = (out_msg, out_type, msg, value) =>
         {
-            return Object.assign({}, out_type == "original" ? msg : out_msg, {
+            return helper.cloneObject(out_type == "ORIGINAL" ? msg : out_msg, {
                 smart_info: {
                     last_result: node_settings.last_result,
                     hysteresis: node_settings.hysteresis,
@@ -165,7 +189,7 @@ module.exports = function (RED)
                     last_value: node_settings.last_value,
                     value: value
                 }
-            })
+            });
         };
 
         if (config.save_state && config.resend_on_start && node_settings.last_result !== null && node_settings.last_message !== null)
@@ -175,16 +199,18 @@ module.exports = function (RED)
                 if (outputs == 2)
                 {
                     if (node_settings.last_result)
-                        node.send([node_settings.last_message, null]);
+                        node.send([helper.cloneObject(node_settings.last_message), null]);
                     else
-                        node.send([null, node_settings.last_message]);
+                        node.send([null, helper.cloneObject(node_settings.last_message)]);
                 }
                 else
                 {
-                    node.send(node_settings.last_message);
+                    node.send(helper.cloneObject(node_settings.last_message));
                 }
             }, 10000);
         }
+
+        setStatus();
     }
 
     RED.nodes.registerType("smart_hysteresis", HysteresisNode);

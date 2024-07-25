@@ -1,11 +1,8 @@
 {
     "central": {
-        "errors": {
-            "unknown_message": "Unbekannte Nachricht in smart_node central empfangen."
-        },
         "status": {
             "all_off": "Alles aus",
-            "Something_is_on": "Something is on"
+            "Something_is_on": "Etwas ist an"
         },
         "ui": {
             "name": "Name",

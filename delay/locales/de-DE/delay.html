@@ -1,0 +1,71 @@
+<script type="text/html" data-help-name="smart_delay">
+    <p>Diese Node kann dazu verwendet werden ein Ein- oder Ausschaltsignal zu verzögern.</p>
+    <p>Die Zeit 0 bedeutet keine Verögerung.</p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>set_delay_on</code></td>
+                    <td>Setzt die Einschaltverzögerung auf die in <code>msg.payload</code> angegebene Zeit.</td>
+                </tr>
+                <tr>
+                    <td><code>set_delay_off</code></td>
+                    <td>Setzt die Ausschaltverzögerung auf die in <code>msg.payload</code> angegebene Zeit.</td>
+                </tr>
+                <tr>
+                    <td><code>set_delays</code></td>
+                    <td>Setzt die Ein- und Ausschaltverzögerung auf die in <code>msg.payload</code> angegebene Zeit.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Beispiel: <code>msg = { "topic": "set_delay_on", "payload": 5000 }</code> oder <code>msg = { "topic": "set_delay_on", "payload": "5s" }</code><br/>
+        Diese Nachricht setzt die Einschaltverzögerung auf 5000 Millisekunden / 5 Sekunden.
+        Ist die Zeit auf 0 eingestellt, wird die Nachricht sofort weitergeleitet.<br/>
+        Als Einheit für die Zeit können folgende Werte verwendet werden:
+        <table>
+            <thead>
+                <tr>
+                    <th>Einheit</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Millisekunden</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> oder <code>sec</code></td>
+                    <td>Sekunden</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> oder <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Stunden</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Wenn die Checkbox <b>Nur verzögern, wenn sich <code>msg.payload</code> verändert hat.</b> aktiviert ist
+        und während dem Warten um ein Einschaltsignal weiterzuleiten ein Ausschaltsignal empfangen wird,
+        so wird das Senden des Einschaltsignals abgebrochen. Dies gilt auch für den umgekehrten Fall.<br/>
+        Ist die Checkbox nicht aktiviert, wird jede Nachricht verzögert, sofern nicht bereits eine Verzögerung für den gleichen <code>payload</code> aktiv ist.
+    </p>
+</script>

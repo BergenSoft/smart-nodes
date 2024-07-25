@@ -1,0 +1,149 @@
+<script type="text/html" data-help-name="smart_light-control">
+    <p>
+        Diese Node steuert einen Ausgang. Dies kann ein Licht, eine Steckdose oder ähnliches sein.
+        Als Ausgang wird immer <code>msg.payload = true</code> oder <code>msg.payload = false</code> gesendet um den Ausgang ein-, bzw. auszuschalten.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                    <th>msg.payload == false wird ignoriert</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>status</code></td>
+                    <td>
+                        Gibt über <code>msg.payload = true</code> oder <code>msg.payload = false</code> den aktuellen Status des Ausgangs an.<br/>
+                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>on</code></td>
+                    <td>Schaltet den Ausgang ein und startet die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>off</code></td>
+                    <td>Schaltet den Ausgang aus.</td>
+                    <td>Ja</td>
+                </tr>
+                <tr>
+                    <td><code>set</code></td>
+                    <td>
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus.<br/>
+                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>set_permanent</code></td>
+                    <td>
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> dauerhaft ein und bei <code>msg.payload = false</code> aus.<br/>
+                        Es wird dabei keine Zeitmessung gestartet.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>motion</code></td>
+                    <td>
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein ohne eine Zeitmessung.<br/>
+                        Bei <code>msg.payload = false</code> wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.<br/>
+                        Ist keine Zeit angegeben oder hinterlegt, schaltet sich der Ausgang sofort aus.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>alarm</code></td>
+                    <td>
+                        Setzt den aktuellen Alarmzustand auf den Wert von <code>msg.payload</code> und löst die entsprechende Aktion aus.<br/>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Einstellung</th>
+                                    <th>Beschreibung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Keine Aktion</td>
+                                    <td>Es passiert nichts</td>
+                                </tr>
+                                <tr>
+                                    <td>Einschalten</td>
+                                    <td>Der Ausgang wird eingeschalten.</td>
+                                </tr>
+                                <tr>
+                                    <td>Ausschalten</td>
+                                    <td>Der Ausgang wird ausgeschalten.</td>
+                                </tr>
+                                <tr>
+                                    <td>Letzen Zustand</td>
+                                    <td>Der Zustand bevor der Alarm gesetzt wurde wird wiederhergestellt.</td>
+                                </tr>
+                                <tr>
+                                    <td>Zuletzt gesendeten Zustand</td>
+                                    <td>Der Zustand der zuletzt empfangen wurde, auch während der Alarm aktiv war, wird wiederhergestellt.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>
+                        Schaltet den Ausgang abwechselnd ein und aus.<br/>
+                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                    <td>Ja</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Diese Node hat eine einstellbare Maximallaufzeit, bevor der Ausgang automatisch wieder ausgeschalten wird.
+        Diese Zeitmessung wird wie in der Tabelle oben verwendet.
+        Die eingestellte Zeit kann gezielt überschrieben werden.
+        Beispiel: <code>msg = { "topic": "on", "time_on": 5000 }</code> oder <code>msg = { "topic": "on", "time_on": "5s" }</code><br/>
+        Diese Nachricht schaltet das Licht für 5000 Millisekunden / 5 Sekunden an und anschließend wieder aus.
+        Die nächste Nachricht ohne <code>time_on</code> Angabe verwendet wieder die voreingestellte Zeit.
+        Ist die Zeit auf 0 eingestellt, wird das Licht <b>nicht</b> automatisch ausgeschalten.<br/>
+        Als Einheit für die Zeit können folgende Werte verwendet werden:
+        <table>
+            <thead>
+                <tr>
+                    <th>Einheit</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Millisekunden</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> oder <code>sec</code></td>
+                    <td>Sekunden</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> oder <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Stunden</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

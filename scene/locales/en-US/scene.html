@@ -1,0 +1,107 @@
+<script type="text/html" data-help-name="smart_scene-control">
+    <p>
+        This node controls several outputs that are switched on or off based on a defined scene.
+
+        <code>msg.payload = true</code> or <code>msg.payload = false</code> is always sent to each output to switch it on or off.
+
+    </p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so different smart nodes can be controlled with the same topic.<br />
+        This node uses both the <code>name</code> and <code>number</code> parts. Depending on the message, both values may need to be set.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>status#2</code></td>
+                    <td>
+                        Indicates the current status of output <code>2</code> via <code>msg.payload = true</code> or <code>msg.payload = false</code>.<br />
+                        When an output changes, the time measurement is started for the stored or sent time, if available.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>on</code></td>
+                    <td>Switches all outputs on and starts the time measurement for the stored or sent time, if available.</td>
+                </tr>
+                <tr>
+                    <td><code>off</code></td>
+                    <td>Switches all outputs off.</td>
+                </tr>
+                <tr>
+                    <td><code>set</code></td>
+                    <td>
+                        Switches all outputs on when <code>msg.payload = true</code> and off when <code>msg.payload = false</code>.<br />
+                        When changing from switched off to switched on, the time measurement is started for the stored or sent time, if available.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>set_permanent</code></td>
+                    <td>
+                        Switches all outputs permanently on when <code>msg.payload = true</code> and off when <code>msg.payload = false</code>.<br />
+                        No time measurement is started.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>scene_x,y,z</code></td>
+                    <td>
+                        Switches the outputs on or off according to the specified scene numbers (x, y and z).<br />
+                        When the message arrives, it is checked which scene is currently active. If the number appears in the list, the next specified scene is activated.<br />
+                        If the scene does not appear in the list, the first scene listed is activated.<br />
+                        If only one scene is specified, the block switches between the specified scene and off.<br />
+                        If at least one output is switched on, the time measurement starts again.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>
+                        Switches all outputs off if at least one is already switched on.<br />
+                        If all outputs are already switched off, all are switched on.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        This node has an adjustable maximum runtime before all outputs are automatically switched off again.
+        This time measurement is used as in the table above.
+        The set time can be overwritten specifically.
+        Example: <code>msg = { "topic": "on", "time_on": 5000 }</code> or <code>msg = { "topic": "on", "time_on": "5s" }</code><br />
+        This message switches the light on for 5000 milliseconds / 5 seconds and then off again.
+        The next message without <code>time_on</code> specification uses the preset time again.
+        If the time is set to 0, the light will <b>not</b> be switched off automatically.<br />
+        The following values can be used as the unit for the time:
+        <table>
+            <thead>
+                <tr>
+                    <th>Unit</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Milliseconds</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> or <code>sec</code></td>
+                    <td>Seconds</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> or <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Hours</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

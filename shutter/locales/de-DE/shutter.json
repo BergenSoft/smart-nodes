@@ -1,0 +1,11 @@
+{
+    "shutter": {
+        "ui": {
+            "name": "Name",
+            "text": "Text",
+            "controlled_by_words": "Diese Node kann über die eingegebenen Wörter gesteuert werden. Mehrere Wörter werden durch ein Komma getrennt.",
+            "time_short": "Zeit kurz",
+            "controlled_by_central": "Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:"
+        }
+    }
+}

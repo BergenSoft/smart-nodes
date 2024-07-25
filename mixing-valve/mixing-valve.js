@@ -7,11 +7,25 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+
+        // ###################
+        // # Class constants #
+        // ###################
+        const ADJUST_OPEN = 0;
+        const ADJUST_CLOSE = 1;
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
-        // persistent values
-        var node_settings = Object.assign({}, {
+
+        // #####################
+        // # persistent values #
+        // #####################
+        var node_settings = helper.cloneObject({
             enabled: config.enabled,
             setpoint: config.setpoint,
             off_mode: config.off_mode,
@@ -19,21 +33,46 @@ module.exports = function (RED)
             last_position: null
         }, smart_context.get(node.id));
 
-        // dynamic config
+
+        // ##################
+        // # Dynamic config #
+        // ##################
         let time_total = config.time_total;
         let time_sampling = config.time_sampling;
 
-        // runtime values
-        let sampling_interval = null;
-        let calibration_timeout = null;
-        let changing_timeout = null;
-        let changing_open = null;
-        let current_temperature = null;
-        let changing_start_time = null;
 
+        // ##################
+        // # Runtime values #
+        // ##################
+
+        // Here the setInterval return value is stored which is used to recheck the valve position
+        let sampling_interval = null;
+
+        // Here the setTimeout return value is stored to stop the calibration time.
+        let calibration_timeout = null;
+
+        // Here the setTimeout return value is stored to stop the valve adjustment.
+        let changing_timeout = null;
+
+        // Store the direction of the adjustment
+        let adjusting = null;
+
+        // Stores the current temperature which is used to determine the adjusting direction
+        let current_temperature = null;
+
+        // The start time of the adjustment to count the change
+        let adjusting_start_time = null;
+
+
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
             handleTopic(msg);
+
+            setStatus();
+            smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -53,14 +92,22 @@ module.exports = function (RED)
         });
 
 
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
         let handleTopic = msg =>
         {
             let real_topic = helper.getTopicName(msg.topic);
+
+            if (real_topic == "set_state")
+                real_topic = (!!msg.payload) ? "enable" : "disable";
+
             switch (real_topic)
             {
                 case "enable":
                     node_settings.enabled = true;
-                    smart_context.set(node.id, node_settings);
 
                     stopChanging();
                     startSampling();
@@ -68,37 +115,20 @@ module.exports = function (RED)
 
                 case "disable":
                     node_settings.enabled = false;
-                    smart_context.set(node.id, node_settings);
 
                     stopSampling();
                     doOffMode();
-                    break;
-
-                case "set_state":
-                    node_settings.enabled = !!msg.payload; // force boolean
-                    smart_context.set(node.id, node_settings);
-
-                    if (node_settings.enabled)
-                    {
-                        startSampling();
-                    }
-                    else
-                    {
-                        stopSampling();
-                        doOffMode();
-                    }
                     break;
 
                 case "setpoint":
                     let new_setpoint = parseFloat(msg.payload);
                     if (isNaN(new_setpoint) && !isFinite(new_setpoint))
                     {
-                        // node.error("Invalid payload: " + msg.payload);
+                        console.warn("Invalid payload: " + msg.payload);
                         return;
                     }
+
                     node_settings.setpoint = new_setpoint;
-                    smart_context.set(node.id, node_settings);
-                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": New setpoint " + new_setpoint });
                     break;
 
                 case "off_mode":
@@ -108,11 +138,14 @@ module.exports = function (RED)
                         case "OPEN":
                         case "CLOSE":
                             node_settings.off_mode = msg.payload;
-                            smart_context.set(node.id, node_settings);
 
                             if (!node_settings.enabled)
                                 doOffMode();
                             break;
+
+                        default:
+                            console.warn("Invalid off_mode: " + msg.payload);
+                            return;
                     }
                     break;
 
@@ -122,12 +155,13 @@ module.exports = function (RED)
                         case "HEATING":
                         case "COOLING":
                             node_settings.valve_mode = msg.payload;
-                            smart_context.set(node.id, node_settings);
                             setStatus();
                             break;
+
+                        default:
+                            console.warn("Invalid valve_mode: " + msg.payload);
+                            return;
                     }
-                    node_settings.enabled = true;
-                    smart_context.set(node.id, node_settings);
 
                     startSampling();
                     break;
@@ -136,11 +170,10 @@ module.exports = function (RED)
                     let new_temp = parseFloat(msg.payload);
                     if (isNaN(new_temp) && !isFinite(new_temp))
                     {
-                        // node.error("Invalid payload: " + msg.payload);
+                        console.warn("Invalid payload for current_temperature: " + msg.payload);
                         return;
                     }
                     current_temperature = new_temp;
-                    setStatus();
                     break;
 
                 case "calibrate":
@@ -148,7 +181,7 @@ module.exports = function (RED)
                     break;
 
                 default:
-                    node.error("Invalid topic: " + real_topic);
+                    console.warn("Invalid topic: " + real_topic);
                     return;
             }
         }
@@ -208,55 +241,50 @@ module.exports = function (RED)
             }
 
             // calculate direction
-            let do_open = false;
+            let adjustAction = ADJUST_CLOSE;
             if (current_temperature < node_settings.setpoint)
             {
                 if (node_settings.valve_mode == "HEATING")
-                    do_open = true;
+                    adjustAction = ADJUST_OPEN;
             }
             else
             {
                 if (node_settings.valve_mode == "COOLING")
-                    do_open = true;
+                    adjustAction = ADJUST_OPEN;
             }
 
             // start moving
-            startChanging(do_open, moving_time);
-
-            setStatus();
+            startChanging(adjustAction, moving_time);
         }
 
-        let startChanging = (do_open, time_ms) =>
+        let startChanging = (adjustAction, time_ms) =>
         {
             stopChanging();
 
             // Already oppened/closed
-            if (do_open && node_settings.last_position == 100)
+            if (adjustAction == ADJUST_OPEN && node_settings.last_position == 100)
                 return;
-            if (!do_open && node_settings.last_position == 0)
+            if (adjustAction == ADJUST_CLOSE && node_settings.last_position == 0)
                 return;
 
-            changing_start_time = Date.now();
-            if (do_open)
+            adjusting_start_time = Date.now();
+            if (adjustAction == ADJUST_OPEN)
                 node.send([{ payload: true }, { payload: false }, null]);
             else
                 node.send([{ payload: false }, { payload: true }, null]);
 
-            node.status({
-                fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Start " + (do_open ? "opening" : "closing") + " for " + helper.formatMsToStatus(time_ms)
-            });
-
-            changing_open = do_open;
+            adjusting = adjustAction;
             changing_timeout = setTimeout(() =>
             {
                 changing_timeout = null;
                 stopChanging();
+                setStatus();
             }, time_ms);
-
         }
 
         let stopChanging = () =>
         {
+            // Stop any runnting timeout
             if (changing_timeout !== null)
             {
                 clearTimeout(changing_timeout);
@@ -264,24 +292,21 @@ module.exports = function (RED)
             }
 
             // No changing in progress
-            if (changing_start_time == null)
+            if (adjusting_start_time == null)
                 return;
 
             // Calculate moved percentage
-            let time_passed = (Date.now() - changing_start_time) / 1000;
-            changing_start_time = null;
+            let time_passed = (Date.now() - adjusting_start_time) / 1000;
+            adjusting_start_time = null;
 
             let changed_value = (time_passed / time_total) * 100; // calculate in % value (0-100)
-            if (changing_open)
+            if (adjusting == ADJUST_OPEN)
                 node_settings.last_position += changed_value;
             else
                 node_settings.last_position -= changed_value;
 
             // Only values from 0 to 100 are allowed
             node_settings.last_position = Math.min(Math.max(node_settings.last_position, 0), 100);
-
-            // Save state
-            smart_context.set(node.id, node_settings);
 
             node.send([{ payload: false }, { payload: false }, { payload: node_settings.last_position.toFixed(1) }]);
 
@@ -302,6 +327,7 @@ module.exports = function (RED)
 
                 // Calibration finished, start sampling if enabled
                 calibration_timeout = null;
+
                 if (node_settings.enabled)
                     startSampling();
                 else
@@ -309,8 +335,6 @@ module.exports = function (RED)
 
                 setStatus();
             }, time_total * 1000);
-
-            setStatus();
         }
 
         let doOffMode = () =>
@@ -318,11 +342,11 @@ module.exports = function (RED)
             switch (node_settings.off_mode)
             {
                 case "OPEN":
-                    startChanging(true, time_total * 1000);
+                    startChanging(ADJUST_OPEN, time_total * 1000);
                     break;
 
                 case "CLOSE":
-                    startChanging(false, time_total * 1000);
+                    startChanging(ADJUST_CLOSE, time_total * 1000);
                     break;
 
                 case "NOTHING":
@@ -335,6 +359,8 @@ module.exports = function (RED)
         {
             if (calibration_timeout !== null)
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": In calibration" });
+            else if (changing_timeout != null)
+                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + "  " + (adjusting == ADJUST_OPEN ? "Opening" : "Closing") + ", Set: " + node_settings.setpoint?.toFixed(1) + "°C, Cur: " + current_temperature?.toFixed(1) + "°C, Pos: " + node_settings.last_position?.toFixed(1) + "%" });
             else
                 node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + node_settings.setpoint?.toFixed(1) + "°C, Cur: " + current_temperature?.toFixed(1) + "°C, Pos: " + node_settings.last_position?.toFixed(1) + "%" });
         }

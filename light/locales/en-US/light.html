@@ -1,0 +1,148 @@
+<script type="text/html" data-help-name="smart_light-control">
+    <p>
+        This node controls an output. This can be a light, a socket or something similar.
+        The output is always <code>msg.payload = true</code> or <code>msg.payload = false</code> to switch the output on or off.
+    </p>
+    <p>
+        <b>Note:</b> Smart nodes use topics in the format <code>name#number</code>, so different smart nodes can be controlled with the same topic.<br />
+        This node only uses the <code>name</code> part. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                    <th>msg.payload == false is ignored</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>status</code></td>
+                    <td>
+                        Specifies the current status of the output via <code>msg.payload = true</code> or <code>msg.payload = false</code>.<br />
+                        When changing from switched off to switched on, the time measurement is started for the stored or  time, if available. </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>on</code></td>
+                    <td>Switches the output on and starts the time measurement for the stored or sent time, if available.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>off</code></td>
+                    <td>Switches the output off.</td>
+                    <td>Yes</td>
+                </tr>
+                <tr>
+                    <td><code>set</code></td>
+                    <td>
+                        Switches the output on when <code>msg.payload = true</code> and off when <code>msg.payload = false</code>.<br />
+                        When changing from switched off to switched on, the time measurement is started for the stored or sent time, if available.
+                    </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>set_permanent</code></td>
+                    <td>
+                        Switches the output on permanently when <code>msg.payload = true</code> and off when <code>msg.payload = false</code>.<br />
+                        No time measurement is started.
+                    </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>motion</code></td>
+                    <td>
+                        Switches the output on when <code>msg.payload = true</code> without a time measurement.<br />
+                        When <code>msg.payload = false</code> the time measurement is started for the stored or sent time, if available.<br />
+                        If no time is specified or stored, the output switches off immediately.
+                    </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>alarm</code></td>
+                    <td>
+                        Sets the current alarm state to the value of <code>msg.payload</code> and triggers the corresponding action.<br />
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Setting</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>No action</td>
+                                    <td>Nothing happens</td>
+                                </tr>
+                                <tr>
+                                    <td>Switch on</td>
+                                    <td>The output is switched on.</td>
+                                </tr>
+                                <tr>
+                                    <td>Switch off</td>
+                                    <td>The output is switched off.</td>
+                                </tr>
+                                <tr>
+                                    <td>Last state</td>
+                                    <td>The state before the alarm was set is restored.</td>
+                                </tr>
+                                <tr>
+                                    <td>Last sent state</td>
+                                    <td>The state that was last received, even while the alarm was active, is restored.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>toggle</code> (default)</td>
+                    <td>
+                        Switches the output on and off alternately.<br />
+                        When switching from off to on, the time measurement is started for the stored or sent time, if available.
+                    </td>
+                    <td>Yes</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        This node has an adjustable maximum runtime before the output is automatically switched off again.
+        This time measurement is used as in the table above.
+        The set time can be overwritten specifically.
+        Example: <code>msg = { "topic": "on", "time_on": 5000 }</code> or <code>msg = { "topic": "on", "time_on": "5s" }</code><br />
+        This message switches the light on for 5000 milliseconds / 5 seconds and then off again.
+        The next message without <code>time_on</code> specification uses the preset time again.
+        If the time is set to 0, the light will <b>not</b> be switched off automatically.<br />
+        The following values can be used as the unit for the time:
+        <table>
+            <thead>
+                <tr>
+                    <th>Unit</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ms</code> (default)</td>
+                    <td>Milliseconds</td>
+                </tr>
+                <tr>
+                    <td><code>s</code> or <code>sec</code></td>
+                    <td>Seconds</td>
+                </tr>
+                <tr>
+                    <td><code>m</code> or <code>min</code></td>
+                    <td>Mintun.</td>
+                </tr>
+                <tr>
+                    <td><code>h</code></td>
+                    <td>Hours</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

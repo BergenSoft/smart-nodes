@@ -7,29 +7,52 @@ module.exports = function (RED)
         const node = this;
         RED.nodes.createNode(node, config);
 
+
+        // ###################
+        // # Class constants #
+        // ###################
+
+
+        // #######################
+        // # Global help objects #
+        // #######################
         const smart_context = require("../persistence.js")(RED);
         const helper = require("../smart_helper.js");
 
+
+        // #####################
+        // # persistent values #
+        // #####################
         var node_settings = {
             enabled: config.enabled,
-            lastMessage: null,
+            last_message: null,
         };
 
-        if (config.save_state)
-        {
-            // load old saved values
-            node_settings = Object.assign(node_settings, smart_context.get(node.id));
-        }
-        else
-        {
-            // delete old saved values
-            smart_context.del(node.id);
-        }
 
+        // load or delete saved values
+        if (config.save_state)
+            node_settings = Object.assign(node_settings, smart_context.get(node.id));
+        else
+            smart_context.del(node.id);
+
+
+        // ##################
+        // # Dynamic config #
+        // ##################
+
+
+        // ##################
+        // # Runtime values #
+        // ##################
+
+        // Here the setTimeout return value is stored when the next timeout should happen
         let timeout = null;
+
+        // This is date when the next event schould be raised
         let nextEvent = null;
 
-        // prepare schedules
+
+        // Initially prepare schedules config object
         setTimeout(() =>
         {
             for (let i = 0; i < config.schedules.length; i++)
@@ -47,48 +70,17 @@ module.exports = function (RED)
         }, 1000);
 
 
+        // ###############
+        // # Node events #
+        // ###############
         node.on("input", function (msg)
         {
-            switch (helper.getTopicName(msg.topic))
-            {
-                case "enable":
-                    if (node_settings.enabled)
-                        return;
-
-                    node_settings.enabled = true;
-                    if (config.save_state)
-                        smart_context.set(node.id, node_settings);
-                    break;
-
-                case "disable":
-                    if (!node_settings.enabled)
-                        return;
-
-                    node_settings.enabled = false;
-                    if (config.save_state)
-                        smart_context.set(node.id, node_settings);
-                    break;
-
-                case "set_state":
-                    if (node_settings.enabled == !!msg.payload)
-                        return;
-
-                    node_settings.enabled = !!msg.payload;
-                    if (config.save_state)
-                        smart_context.set(node.id, node_settings);
-                    break;
-
-                default:
-                    return;
-            }
-
-            if (node_settings.enabled)
-                initTimeouts();
-            else
-                clearTimeouts();
+            handleTopic(msg);
 
             setStatus();
-            smart_context.set(node.id, node_settings);
+
+            if (config.save_state)
+                smart_context.set(node.id, node_settings);
         });
 
         node.on("close", function ()
@@ -100,6 +92,33 @@ module.exports = function (RED)
             }
         });
 
+
+        // #####################
+        // # Private functions #
+        // #####################
+
+        // This is the main function which handles all topics that was received.
+        let handleTopic = msg =>
+        {
+            let real_topic = helper.getTopicName(msg.topic);
+
+            if (real_topic == "set_state")
+                real_topic = (!!msg.payload) ? "enable" : "disable";
+
+            switch (real_topic)
+            {
+                case "enable":
+                    node_settings.enabled = true;
+                    initNextTimeout();
+                    break;
+
+                case "disable":
+                    node_settings.enabled = false;
+                    break;
+            }
+        }
+
+        // calculate which event should occur nect
         let initNextTimeout = () =>
         {
             let minIndex = null;
@@ -120,16 +139,28 @@ module.exports = function (RED)
                 return;
             }
 
+            // Stop timeout if any
+            if (timeout != null)
+            {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+
             nextEvent = config.schedules[minIndex].nextEvent;
             let waitTime = nextEvent.getTime() - (new Date()).getTime();
-            timeout = setTimeout(raiseEvent, waitTime, minIndex);
+            timeout = setTimeout(() =>
+            {
+                timeout = null;
+                raiseEvent(minIndex);
+            }, waitTime);
         }
 
+        // calculates the next time when the scheduled i-th entry should run.
         let calcNextEvent = i =>
         {
             const schedule = config.schedules[i];
 
-            // If no day is checked then we cannot it is never raised
+            // If no day is checked it is never raised
             if (!schedule.days || schedule.days.length == 0)
                 return null;
 
@@ -174,7 +205,7 @@ module.exports = function (RED)
                 schedule.second
             );
 
-            // console.log({
+            // helper.log({
             //     i,
             //     findNextDay,
             //     nextEvent
@@ -183,6 +214,7 @@ module.exports = function (RED)
             return nextEvent;
         }
 
+        // Send the i-th entry to the output
         let raiseEvent = i =>
         {
             const schedule = config.schedules[i];
@@ -191,8 +223,8 @@ module.exports = function (RED)
                 return;
 
             timeout = null;
-            node.send(schedule.message);
-            node_settings.lastMessage = schedule.message;
+            node.send(helper.cloneObject(schedule.message));
+            node_settings.last_message = schedule.message;
 
             if (config.save_state)
                 smart_context.set(node.id, node_settings);
@@ -233,11 +265,11 @@ module.exports = function (RED)
             }
         }
 
-        if (config.save_state && config.resend_on_start && node_settings.lastMessage != null)
+        if (config.save_state && config.resend_on_start && node_settings.last_message != null)
         {
             setTimeout(() =>
             {
-                node.send(node_settings.lastMessage);
+                node.send(helper.cloneObject(node_settings.last_message));
             }, 10000);
         }
     }

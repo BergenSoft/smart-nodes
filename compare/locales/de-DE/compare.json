@@ -1,8 +1,5 @@
 {
     "compare": {
-        "errors": {
-            "wrong_topic": "Topic muss 1 oder 2 sein, gesendet: "
-        },
         "ui": {
             "name": "Name",
             "compare": "Vergleich",
@@ -14,12 +11,13 @@
             "false": "Falsch",
             "send": "Senden",
             "outputs": "Ausgänge",
-            "note": "Hinweis",
-            "note_payload": "wird automatisch auf das Vergleichs-Ergebnis gesetzt, sofern es nicht bereits hier in der Konfiguration gesetzt wurde.",
-            "note_comperator": "wird automatisch auf den Vergleichs-Operator gesetzt, sofern es nicht bereits hier in der Konfiguration gesetzt wurde.",
+            "note": "Hinweis:",
+            "note_text": "<code>msg.payload</code> wird automatisch auf das Vergleichs-Ergebnis gesetzt,<br/>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.<br/><code>msg.comperator</code> wird automatisch auf den Vergleichs-Operator gesetzt,<br/>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.",
+
             "system_start": "Systemstart",
             "save_state": "Zustand speichern",
             "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden",
+
             "smaller": "< Kleiner",
             "smaller_equal": "<= Kleiner oder gleich",
             "equal": "== Gleich",
@@ -28,7 +26,7 @@
             "greater": "> Größer",
             "no_value": "Kein Wert",
             "send_nothing": "Nichts senden",
-            "only_on_change": "Nur bei Änderung",
+            "send_only_change": "Nur bei Änderung",
             "always": "Immer",
             "common_output": "Gemeinsamer Ausgang",
             "separate_output": "Separate Ausgänge"

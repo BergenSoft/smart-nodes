@@ -1,0 +1,12 @@
+{
+    "multi-press": {
+        "ui": {
+            "name": "Name",
+            "count_presses": "Anzahl Tastendrücke",
+            "count_presses_placeholder": "Max Anzahl an Tastendrücke",
+            "time_interval": "Zeitabstand",
+            "time_interval_placeholder": "Max Zeit in ms zwischen Tastendruck",
+            "output_messages": "Ausgangsnachrichten"
+        }
+    }
+}

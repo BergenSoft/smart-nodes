@@ -1,0 +1,10 @@
+<script type="text/html" data-help-name="smart_statistic">
+    <p>Dieser Knoten berechnet das Minimum, Maximum, die Summe, die Differenz, den absoluten Wert, die absolute Differenz, den Durchschnitt sowie den gleitenden Mittelwert verschiedener Werte.</p>
+    <p>Jeder Wert muss mit einem eigenen Topic gesendet werden. Kommt ein zweiter Wert mit dem gleichen Topic, wird der entsprechende Wert überschrieben.</p>
+    <p>Im Falle von MIN, MAX und ABS wird das entsprechende Topic, welches mit den Werten kam, mit ausgegeben. Bei SUM, DIFF, AVG und MOV_AVG handelt es sich um kombinierte Ergebnisse, weshalb Topic hier immer nicht gesetzt ist.</p>
+    <p>Für den absoluten Wert sowie den gleitenden Mittelwert spielt das Topic keine Rolle, jeder Wert der empfangen wird, wird für die Berechnung verwendet.</p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>nummer</code>. <code>name</code> und <code>#</code> sind dabei optional.
+    </p>
+</script>

@@ -1,0 +1,65 @@
+<script type="text/html" data-help-name="smart_mixing-valve">
+    <p>
+        Diese Node steuert einen Heizungsmischer. Dieser kann sowohl fürs Heizen als auch fürs Kühlen verwendet werden.
+        Nach der eingestellten Abtastzeit wird geprüft, ob die Position des Mischers korrigiert werden muss.
+    </p>
+    <p>
+        Beim ersten Verwenden wird eine Kalibrierungsfahrt gestartet. D.h. der Mischer schließt für die eingestellte Laufzeit und befindet sich dann auf 0%.
+        Danach kann der Mischvorgang starten. Die zuletzt angefahrene Position wird persistent gespeichert, wodurch weitere Kalibrierungsfahrten in der Regel nicht mehr notwending sind.
+    </p>
+    <p>
+        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
+        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
+    </p>
+    <p>
+        Folgende topics werden akzeptiert:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>enable</code></td>
+                    <td>Aktiviert die Mischeransteuerung.</td>
+                </tr>
+                <tr>
+                    <td><code>disable</code></td>
+                    <td>Deaktiviert die Mischeransteuerung und fährt die Position an, die als Aus-Modus festgelegt ist.</td>
+                </tr>
+                <tr>
+                    <td><code>set_state</code></td>
+                    <td>Aktiviert das Weiterleiten, wenn <code>msg.payload = true</code> oder deaktiviert das Weiterleiten, wenn <code>msg.payload = false</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>setpoint</code></td>
+                    <td>Überschreibt den Sollwert mit <code>msg.payload</code> °C.</td>
+                </tr>
+                <tr>
+                    <td><code>off_mode</code></td>
+                    <td>
+                        Überschreibt den Aus-Modus mit <code>msg.payload</code>.
+                        Gültige Werte für <code>msg.payload</code> sind <code>"NOTHING"</code>, <code>"OPEN"</code> und <code>"CLOSE"</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>valve_mode</code></td>
+                    <td>
+                        Überschreibt den Modus mit <code>msg.payload</code>.
+                        Gültige Werte für <code>msg.payload</code> sind <code>"HEATING"</code> und <code>"COOLING"</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>current_temperature</code></td>
+                    <td>Setzt die aktuelle Temperatur auf <code>msg.payload</code> °C.</td>
+                </tr>
+                <tr>
+                    <td><code>calibrate</code></td>
+                    <td>Erzwingt eine Kalibrierungsfahrt.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

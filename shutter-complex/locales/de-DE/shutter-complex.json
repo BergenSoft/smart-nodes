@@ -1,0 +1,20 @@
+{
+    "shutter": {
+        "ui": {
+            "name": "Name",
+            "text": "Text",
+            "controlled_by_words": "Diese Node kann über die eingegebenen Wörter gesteuert werden. Mehrere Wörter werden durch ein Komma getrennt.",
+            "time_up": "Zeit auf",
+            "time_down": "Zeit ab",
+            "pause_change": "Pause Wechsel",
+            "alarm_on": "Alarm Ein",
+            "alarm_off": "Alarm Aus",
+            "controlled_by_central": "Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:",
+
+            "no_action": "Keine Aktion",
+            "up": "Hoch / Öffnen",
+            "down": "Runter / Schließen",
+            "last_position": "Letze Position"
+        }
+    }
+}

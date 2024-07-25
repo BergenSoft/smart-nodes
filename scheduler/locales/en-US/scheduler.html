@@ -1,0 +1,30 @@
+<script type="text/html" data-help-name="smart_scheduler">
+    <p>
+        This node sends the corresponding messages to the output at the specified times.
+    </p>
+    <p>
+        The following topics are accepted:
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>enable</code></td>
+                    <td>Enables the scheduler.</td>
+                </tr>
+                <tr>
+                    <td><code>disable</code></td>
+                    <td>Disables the scheduler.</td>
+                </tr>
+                <tr>
+                    <td><code>set_state</code></td>
+                    <td>Enables the scheduler if <code>msg.payload = true</code> or disables the scheduler if <code>msg.payload = false</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+</script>

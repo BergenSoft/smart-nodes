@@ -1,0 +1,20 @@
+{
+    "shutter": {
+        "ui": {
+            "name": "Name",
+            "text": "Text",
+            "controlled_by_words": "This node can be controlled using the words entered. Multiple words are separated by a comma.",
+            "time_up": "Time up",
+            "time_down": "Time down",
+            "pause_change": "Pause change",
+            "alarm_on": "Alarm On",
+            "alarm_off": "Alarm Off",
+            "controlled_by_central": "This module is controlled by the following central modules:",
+
+            "no_action": "No action",
+            "up": "Up / Open",
+            "down": "Down / Close",
+            "last_position": "Last position"
+        }
+    }
+}

@@ -1,8 +1,6 @@
 <script type="text/javascript">
     (function ()
     {
-        let node;
-
         RED.nodes.registerType("smart_heating-curve", {
             category: "Smart Nodes",
             paletteLabel: "Heating Curve",
@@ -24,7 +22,7 @@
             },
             oneditprepare: function ()
             {
-                node = this;
+                let node = this;
 
                 $("#node-input-room_setpoint")
                     .spinner({
@@ -278,69 +276,30 @@
 
 <script type="text/html" data-template-name="smart_heating-curve">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="heating.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]heating.ui.name" />
     </div>
     <div class="form-row">
-        <label for="node-input-room_setpoint"><i class="fa fa-thermometer-three-quarters"></i> Raum Soll</label>
+        <label for="node-input-room_setpoint"><i class="fa fa-thermometer-three-quarters"></i> <span data-i18n="heating.ui.room_setpoint"></span></label>
         <input id="node-input-room_setpoint" value="0" /> °C [15 - 25]
     </div>
     <div class="form-row">
-        <label for="node-input-slope"><i class="fa fa-expand"></i> Steilheit</label>
+        <label for="node-input-slope"><i class="fa fa-expand"></i> <span data-i18n="heating.ui.slope"></span></label>
         <input id="node-input-slope" value="0" /> [0,05 - 4]
     </div>
     <div class="form-row">
-        <label for="node-input-offset"><i class="fa fa-arrows-v"></i> Verschiebung</label>
+        <label for="node-input-offset"><i class="fa fa-arrows-v"></i> <span data-i18n="heating.ui.offset"></span></label>
         <input id="node-input-offset" value="0" />
     </div>
     <div class="form-row">
-        <label for="node-input-flow_max"><i class="fa fa-arrow-up"></i> Max Soll</label>
-        <input id="node-input-flow_max" value="0" />
+        <label for="node-input-flow_min"><i class="fa fa-arrow-down"></i> <span data-i18n="heating.ui.min_setpoint"></span></label>
+        <input id="node-input-flow_min" value="0" />
     </div>
     <div class="form-row">
-        <label for="node-input-flow_min"><i class="fa fa-arrow-down"></i> Min Soll</label>
-        <input id="node-input-flow_min" value="0" />
+        <label for="node-input-flow_max"><i class="fa fa-arrow-up"></i> <span data-i18n="heating.ui.max_setpoint"></span></label>
+        <input id="node-input-flow_max" value="0" />
     </div>
     <div class="form-row">
         <canvas id="heating-curve-diagram" width="450" height="300"></canvas>
     </div>
-</script>
-
-<script type="text/html" data-help-name="smart_heating-curve">
-    <p>
-        Diese Node berechnet anhand den eingestellten Werten, die Vorlaufsolltemperatur. Diese kann verwendet werden um ein Mischventil anzusteuern.
-    </p>
-    <p>
-        <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>
-        Diese Node verwendet nur den Teil <code>name</code>. <code>#</code> und <code>nummer</code> sind dabei optional.
-    </p>
-    <p>
-        Folgende topics werden akzeptiert:
-        <table>
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Beschreibung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>room_setpoint</code></td>
-                    <td>Überschreibt die Raum-Solltemperatur.</td>
-                </tr>
-                <tr>
-                    <td><code>flow_min</code></td>
-                    <td>Überschreibt die minimale Vorlaufsolltemperatur.</td>
-                </tr>
-                <tr>
-                    <td><code>flow_max</code></td>
-                    <td>Überschreibt die maximale Vorlaufsolltemperatur.</td>
-                </tr>
-                <tr>
-                    <td><code>temperature_outside</code></td>
-                    <td>Setzt die aktuelle Außentemperatur.</td>
-                </tr>
-            </tbody>
-        </table>
-    </p>
 </script>
