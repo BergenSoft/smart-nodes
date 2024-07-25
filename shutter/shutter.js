@@ -206,7 +206,7 @@ module.exports = function (RED)
             let timeMs = helper.getTimeInMsFromString(msg.time_on);
             if (isNaN(timeMs) || timeMs <= 0)
             {
-                console.warn("Invalid msg.time_on value was sent.", msg);
+                helper.warn(this, "Invalid msg.time_on value was sent.", msg);
                 return;
             }
 

@@ -50,7 +50,7 @@ module.exports = function (RED)
         {
             if (typeof msg.source == "undefined" || typeof msg.state == "undefined")
             {
-                console.warn("Unknown message received in smart_node central.", msg);
+                helper.warn(this, "Unknown message received in smart_node central.", msg);
                 return;
             }
 

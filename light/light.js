@@ -287,7 +287,7 @@ module.exports = function (RED)
 
             if (isNaN(timeMs))
             {
-                console.warn("Invalid time_on value send: " + origTimeMs);
+                helper.warn(this, "Invalid time_on value send: " + origTimeMs);
                 timeMs = max_time_on;
             }
 

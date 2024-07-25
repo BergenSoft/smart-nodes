@@ -73,7 +73,7 @@ module.exports = function (RED)
         {
             if (isNaN(parseFloat(msg.payload)))
             {
-                console.warn("Invalid payload: " + msg.payload);
+                // helper.warn(this, "Invalid payload: " + msg.payload);
                 return;
             }
 
@@ -214,7 +214,7 @@ module.exports = function (RED)
             if (operation === "ABS")
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + " => " + msg.payload });
             else
-                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + "(" + Object.entries(node_settings.values).map(v => v[1]).join(", ") + ") => " + msg.payload });
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + operation + "(" + Object.entries(node_settings.values).map(v => v[1]).join(", ") + ") => " + msg.payload?.toFixed(2) });
         }
 
         if (config.save_state && config.resend_on_start && node_settings.last_message != null)

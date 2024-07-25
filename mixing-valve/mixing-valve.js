@@ -124,7 +124,7 @@ module.exports = function (RED)
                     let new_setpoint = parseFloat(msg.payload);
                     if (isNaN(new_setpoint) && !isFinite(new_setpoint))
                     {
-                        console.warn("Invalid payload: " + msg.payload);
+                        // helper.warn(this, "Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -144,7 +144,7 @@ module.exports = function (RED)
                             break;
 
                         default:
-                            console.warn("Invalid off_mode: " + msg.payload);
+                            helper.warn(this, "Invalid off_mode: " + msg.payload);
                             return;
                     }
                     break;
@@ -159,7 +159,7 @@ module.exports = function (RED)
                             break;
 
                         default:
-                            console.warn("Invalid valve_mode: " + msg.payload);
+                            helper.warn(this, "Invalid valve_mode: " + msg.payload);
                             return;
                     }
 
@@ -170,7 +170,7 @@ module.exports = function (RED)
                     let new_temp = parseFloat(msg.payload);
                     if (isNaN(new_temp) && !isFinite(new_temp))
                     {
-                        console.warn("Invalid payload for current_temperature: " + msg.payload);
+                        // helper.warn(this, "Invalid payload for current_temperature: " + msg.payload);
                         return;
                     }
                     current_temperature = new_temp;
@@ -181,7 +181,7 @@ module.exports = function (RED)
                     break;
 
                 default:
-                    console.warn("Invalid topic: " + real_topic);
+                    helper.warn(this, "Invalid topic: " + real_topic);
                     return;
             }
         }

@@ -80,3 +80,8 @@
 
     After saving the nodes, the values are automatically converted to the new one.
     This conversion will be removed in version 0.5.0.
+
+## Version 0.4.1:
+
+- Show only up to 2 decimal places in node status text.
+- Improved warn messages shown in console.

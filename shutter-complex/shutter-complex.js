@@ -354,7 +354,7 @@ module.exports = function (RED)
                     // data is the position in percent
                     if (data == null)
                     {
-                        console.warn("WARN: Try to set position without giving a new position");
+                        helper.warn(this, "Try to set position without giving a new position");
                         return;
                     }
 

@@ -85,7 +85,7 @@ module.exports = function (RED)
             let real_topic_number = helper.getTopicNumber(msg.topic);
             if (real_topic_number == null || real_topic_number < 1 || real_topic_number > 2)    
             {
-                console.warn("Topic has to be 1 or 2, sended: " + msg.topic);
+                helper.warn(this, "Topic has to be 1 or 2, sended: " + msg.topic);
                 return;
             }
 
@@ -93,7 +93,7 @@ module.exports = function (RED)
             let num = parseFloat(msg.payload);
             if (Number.isNaN(num))
             {
-                console.warn("Payload has to be numeric: " + msg.payload);
+                helper.warn(this, "Payload has to be numeric: " + msg.payload);
                 return;
             }
 

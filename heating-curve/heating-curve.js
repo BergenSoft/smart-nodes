@@ -75,7 +75,7 @@ module.exports = function (RED)
                     let new_setpoint = parseFloat(msg.payload);
                     if (isNaN(new_setpoint) && !isFinite(new_setpoint))
                     {
-                        console.warn("Invalid payload: " + msg.payload);
+                        // helper.warn(this, "Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -86,7 +86,7 @@ module.exports = function (RED)
                     let new_temp = parseFloat(msg.payload);
                     if (isNaN(new_temp) && !isFinite(new_temp))
                     {
-                        console.warn("Invalid payload: " + msg.payload);
+                        // helper.warn(this, "Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -97,7 +97,7 @@ module.exports = function (RED)
                     let new_flow_min = parseFloat(msg.payload);
                     if (isNaN(new_flow_min) && !isFinite(new_flow_min))
                     {
-                        console.warn("Invalid payload: " + msg.payload);
+                        // helper.warn(this, "Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -108,7 +108,7 @@ module.exports = function (RED)
                     let new_flow_max = parseFloat(msg.payload);
                     if (isNaN(new_flow_max) && !isFinite(new_flow_max))
                     {
-                        console.warn("Invalid payload: " + msg.payload);
+                        // helper.warn(this, "Invalid payload: " + msg.payload);
                         return;
                     }
 
@@ -146,7 +146,7 @@ module.exports = function (RED)
 
         let setStatus = () =>
         {
-            node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Out: " + node_settings.temperature_outside.toFixed(1) + "°C, Flow: " + node_settings.last_flow_temperature?.toFixed(1) + "°C" });
+            node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Out: " + node_settings.temperature_outside?.toFixed(1) + "°C, Flow: " + node_settings.last_flow_temperature?.toFixed(1) + "°C" });
         }
 
         if (node_settings.last_flow_temperature !== null)

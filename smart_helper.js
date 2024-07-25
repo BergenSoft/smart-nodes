@@ -348,5 +348,14 @@ module.exports = {
     {
         // uncomment to see all log values
         // console.log(...arguments);
+    },
+
+    /**
+     * Forward all arguments to the console if it is enabled
+     */
+    warn(node, ...args)
+    {
+        // uncomment to see all warn values
+        console.warn(typeof node + " (" + node.id + "):", ...args);
     }
 };

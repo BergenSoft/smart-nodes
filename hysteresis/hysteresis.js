@@ -54,7 +54,6 @@ module.exports = function (RED)
         else
         {
             // delete old saved values
-            node.status({});
             smart_context.del(node.id);
         }
 
@@ -103,7 +102,7 @@ module.exports = function (RED)
 
             if (isNaN(value))
             {
-                console.warn("Invalid payload: " + msg.payload);
+                // helper.warn(this, "Invalid payload: " + msg.payload);
                 return;
             }
 
@@ -176,7 +175,7 @@ module.exports = function (RED)
             if (node_settings.last_result == null)
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": ❓ S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: null" });
             else
-                node.status({ fill: node_settings.last_result ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.last_result ? "⬆️" : "⬇️") + " S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + node_settings.last_value.toFixed(2) });
+                node.status({ fill: node_settings.last_result ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.last_result ? "⬆️" : "⬇️") + " S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + node_settings.last_value?.toFixed(2) });
         }
 
         let createMessage = (out_msg, out_type, msg, value) =>
