@@ -83,5 +83,10 @@
 
 ## Version 0.4.1:
 
-- Show only up to 2 decimal places in node status text.
-- Improved warn messages shown in console.
+-   Show only up to 2 decimal places in node status text.
+-   Improved warn messages shown in console.
+
+## Version 0.4.2:
+
+-   Fixed design of property page of forwarder node.
+-   Corrected hysteresis to send original message.
