@@ -180,7 +180,7 @@ module.exports = function (RED)
 
         let createMessage = (out_msg, out_type, msg, value) =>
         {
-            return helper.cloneObject(out_type == "ORIGINAL" ? msg : out_msg, {
+            return helper.cloneObject(out_type == "NOTHING" ? msg : out_msg, {
                 smart_info: {
                     last_result: node_settings.last_result,
                     hysteresis: node_settings.hysteresis,
