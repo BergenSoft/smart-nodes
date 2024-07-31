@@ -156,16 +156,16 @@ module.exports = function (RED)
                 if (timeout != null)
                 {
                     // current delay runs already for the same payload, so don't start a new one.
-                    if (next_payload == msg.payload)
+                    if ((next_payload ?? node_settings.last_message?.payload) == msg.payload)
                         return;
 
                     // payload changed back to last value => stop current delay
                     if (node_settings.last_message?.payload == msg.payload)
                     {
+                        next_payload = null;
                         node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Stopped delayed message" });
                         clearTimeout(timeout);
                         timeout = null;
-
                         return;
                     }
                 }
@@ -187,6 +187,7 @@ module.exports = function (RED)
             // No delay if 0 or smaller
             if (delay_ms <= 0)
             {
+                next_payload = null;
                 node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
                 node_settings.last_message = helper.cloneObject(msg);
 
@@ -196,9 +197,12 @@ module.exports = function (RED)
 
             // start new timeout
             node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "Forward " + getMessageStatusText(msg) + " in " + helper.formatMsToStatus(delay_ms, "at") });
+            next_payload = msg.payload;
             timeout = setTimeout(() =>
             {
                 timeout = null;
+                next_payload = null;
+
                 node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + "Sended " + getMessageStatusText(msg) });
                 node_settings.last_message = helper.cloneObject(msg);
 
@@ -206,6 +210,7 @@ module.exports = function (RED)
 
                 if (config.save_state)
                     smart_context.set(node.id, node_settings);
+
             }, delay_ms);
         }
 

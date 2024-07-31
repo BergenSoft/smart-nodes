@@ -90,3 +90,11 @@
 
 -   Fixed design of property page of forwarder node.
 -   Corrected hysteresis to send original message.
+
+## Version 0.4.3:
+
+-   Corrected hysteresis (again) to send original message.
+
+## Version 0.4.4:
+
+-   Fixed the delay node to not restart the time if "only on change" option is enabled.
