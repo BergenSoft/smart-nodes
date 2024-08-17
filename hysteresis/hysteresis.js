@@ -173,7 +173,7 @@ module.exports = function (RED)
         let setStatus = () =>
         {
             if (node_settings.last_result == null)
-                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": ❓ S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: null" });
+                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": ❓ S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + (node_settings.last_value?.toFixed(2) ?? "null") });
             else
                 node.status({ fill: node_settings.last_result ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.last_result ? "⬆️" : "⬇️") + " S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + node_settings.last_value?.toFixed(2) });
         }

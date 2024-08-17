@@ -98,3 +98,7 @@
 ## Version 0.4.4:
 
 -   Fixed the delay node to not restart the time if "only on change" option is enabled.
+
+## Version 0.4.5:
+
+-   Fixed the status of hysteresis node.
