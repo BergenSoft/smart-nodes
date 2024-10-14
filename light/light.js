@@ -62,6 +62,9 @@ module.exports = function (RED)
         // The timeout starts only if the motion sensor goes off.
         let isMotion = false;
 
+        // If this is on, ignore all state changes and don't restart any time measurement.
+        let isBlinking = false;
+
         // Here the date is stored, when the light should go off.
         // This is used to calculate the node status.
         let timeout_end_date = null;
@@ -109,6 +112,10 @@ module.exports = function (RED)
             switch (real_topic)
             {
                 case "status":
+                    // Ignore if is in blinking mode
+                    if (isBlinking)
+                        return;
+
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
 
@@ -230,6 +237,24 @@ module.exports = function (RED)
 
                     break;
 
+                case "blink":
+                    if (!node_settings.alarm_active)
+                    {
+                        isBlinking = true;
+                        node.send({ payload: !node_settings.last_value });
+                        setStatus();
+                        setTimeout(
+                            () =>
+                            {
+                                isBlinking = false;
+                                node.send({ payload: node_settings.last_value });
+                                setStatus();
+                            },
+                            helper.getTimeInMsFromString(msg.time_on, 500)
+                        );
+                    }
+                    return;
+
                 default:
                     node_settings.last_value_sended = !node_settings.last_value;
 
@@ -334,6 +359,10 @@ module.exports = function (RED)
             if (node_settings.alarm_active)
             {
                 node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": ALARM is active" });
+            }
+            else if (isBlinking)
+            {
+                node.status({ fill: "yellow", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Blink" });
             }
             else if (node_settings.last_value)
             {

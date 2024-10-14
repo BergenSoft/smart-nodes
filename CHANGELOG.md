@@ -102,3 +102,11 @@
 ## Version 0.4.5:
 
 -   Fixed the status of hysteresis node.
+
+## Version 0.4.6:
+
+-   Fixed the status of hysteresis node.
+
+## Version 0.4.7:
+
+- Added blink topic to light node

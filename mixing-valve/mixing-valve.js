@@ -233,12 +233,9 @@ module.exports = function (RED)
             // Calculate change time
             // Change time in ms for 1%
             let moving_time = time_total * 1000 / 100;
-            if (temp_diff > 5)
-            {
-                // 0 °C diff => 0% change
-                // 20 °C diff => 5% change
-                moving_time *= helper.scale(Math.min(temp_diff, 20), 0, 20, 0, 5);
-            }
+            // 0 °C diff => 0% change
+            // 20 °C diff => 2% change
+            moving_time *= helper.scale(Math.min(temp_diff, 20), 0, 20, 0, 2);
 
             // calculate direction
             let adjustAction = ADJUST_CLOSE;
@@ -263,9 +260,9 @@ module.exports = function (RED)
 
             // Already oppened/closed
             if (adjustAction == ADJUST_OPEN && node_settings.last_position == 100)
-                return;
-            if (adjustAction == ADJUST_CLOSE && node_settings.last_position == 0)
-                return;
+                time_ms = time_total * 1000 / 200; // Change at least 1/200 => 0.5 %
+            else if (adjustAction == ADJUST_CLOSE && node_settings.last_position == 0)
+                time_ms = time_total * 1000 / 200; // Change at least 1/200 => 0.5 %
 
             adjusting_start_time = Date.now();
             if (adjustAction == ADJUST_OPEN)
