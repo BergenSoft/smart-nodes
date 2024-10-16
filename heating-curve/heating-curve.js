@@ -79,7 +79,7 @@ module.exports = function (RED)
                         return;
                     }
 
-                    node_settings.room_setpoint = msg.payload;
+                    node_settings.room_setpoint = new_setpoint;
                     break;
 
                 case "temperature_outside":
@@ -90,7 +90,7 @@ module.exports = function (RED)
                         return;
                     }
 
-                    node_settings.temperature_outside = msg.payload;
+                    node_settings.temperature_outside = new_temp;
                     break;
 
                 case "flow_min":
@@ -101,7 +101,7 @@ module.exports = function (RED)
                         return;
                     }
 
-                    node_settings.flow_min = msg.payload;
+                    node_settings.flow_min = new_flow_min;
                     break;
 
                 case "flow_max":
@@ -112,7 +112,7 @@ module.exports = function (RED)
                         return;
                     }
 
-                    node_settings.flow_max = msg.payload;
+                    node_settings.flow_max = new_flow_max;
                     break;
 
                 default:

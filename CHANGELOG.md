@@ -109,4 +109,8 @@
 
 ## Version 0.4.7:
 
-- Added blink topic to light node
+-   Added blink topic to light node.
+
+## Version 0.4.8:
+
+-   Fixed reading values in heating-curve node.

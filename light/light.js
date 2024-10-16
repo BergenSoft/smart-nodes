@@ -247,8 +247,11 @@ module.exports = function (RED)
                             () =>
                             {
                                 isBlinking = false;
-                                node.send({ payload: node_settings.last_value });
-                                setStatus();
+                                if (!node_settings.alarm_active)
+                                {
+                                    node.send({ payload: node_settings.last_value });
+                                    setStatus();
+                                }
                             },
                             helper.getTimeInMsFromString(msg.time_on, 500)
                         );
