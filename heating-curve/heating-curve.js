@@ -34,8 +34,8 @@ module.exports = function (RED)
         // ##################
         // # Dynamic config #
         // ##################
-        let slope = config.slope;
-        let offset = config.offset;
+        let slope = parseFloat(config.slope);
+        let offset = parseFloat(config.offset);
 
 
         // ##################

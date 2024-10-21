@@ -17,6 +17,7 @@
             "save_state": "Zustand speichern",
             "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden",
 
+            "send_nothing": "Nichts senden",
             "send_only_change": "Nur bei Änderung",
             "always": "Immer",
             "common_output": "Gemeinsamer Ausgang",

@@ -17,6 +17,7 @@
             "save_state": "Save state",
             "send_after_start": "Send last message 10 seconds after start",
 
+            "send_nothing": "Send nothing",
             "send_only_change": "Only on change",
             "always": "Always",
             "common_output": "Common output",

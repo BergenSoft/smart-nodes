@@ -1,20 +1,12 @@
 [
     {
-        "id": "e83d01afd93457a2",
-        "type": "tab",
-        "label": "Heating Curve",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
         "id": "4240b41f17726057",
         "type": "smart_heating-curve",
         "z": "e83d01afd93457a2",
         "name": "",
         "room_setpoint": 20,
         "slope": "1.5",
-        "offset": 0,
+        "offset": "1.5",
         "flow_max": 75,
         "flow_min": 20,
         "x": 540,
@@ -217,7 +209,7 @@
         "crontab": "",
         "once": false,
         "onceDelay": 0.1,
-        "topic": "flow_min",
+        "topic": "flow_max",
         "payload": "80",
         "payloadType": "num",
         "x": 190,

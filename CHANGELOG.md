@@ -114,3 +114,7 @@
 ## Version 0.4.8:
 
 -   Fixed reading values in heating-curve node.
+
+## Version 0.4.9:
+
+-   Fixed reading config values for offset and slope in heating-curve node.
