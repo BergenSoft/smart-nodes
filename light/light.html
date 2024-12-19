@@ -160,6 +160,7 @@
                 initTreeList(node, ["smart_central-control"]);
 
                 $("#node-input-max_time_on")
+                    .css("max-width", "4rem")
                     .spinner({
                         min: 0,
                         change: function (event, ui)
@@ -170,7 +171,7 @@
                             // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
                             if (value !== this.value) $(this).spinner("value", value);
                         },
-                    }).css("max-width", "4rem");
+                    });
 
                 $("#node-input-max_time_on_unit")
                     .css("max-width", "10rem")
@@ -187,31 +188,35 @@
                         }],
                     });
 
-                $("#node-input-alarm_action").typedInput({
-                    types: [{
-                        value: "alarm_action",
-                        default: "NOTHING",
-                        options: [
-                            { value: "NOTHING", label: node._("light.ui.no_action") },
-                            { value: "ON", label: node._("light.ui.turn_on") },
-                            { value: "OFF", label: node._("light.ui.turn_off") }
-                        ],
-                    }],
-                });
+                $("#node-input-alarm_action")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            value: "alarm_action",
+                            default: "NOTHING",
+                            options: [
+                                { value: "NOTHING", label: node._("light.ui.no_action") },
+                                { value: "ON", label: node._("light.ui.turn_on") },
+                                { value: "OFF", label: node._("light.ui.turn_off") }
+                            ],
+                        }],
+                    });
 
-                $("#node-input-alarm_off_action").typedInput({
-                    types: [{
-                        value: "alarm_off_action",
-                        default: "NOTHING",
-                        options: [
-                            { value: "NOTHING", label: node._("light.ui.no_action") },
-                            { value: "ON", label: node._("light.ui.turn_on") },
-                            { value: "OFF", label: node._("light.ui.turn_off") },
-                            { value: "LAST", label: node._("light.ui.last_state") },
-                            { value: "LAST_SENDED", label: node._("light.ui.last_sended_state") }
-                        ],
-                    }],
-                });
+                $("#node-input-alarm_off_action")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            value: "alarm_off_action",
+                            default: "NOTHING",
+                            options: [
+                                { value: "NOTHING", label: node._("light.ui.no_action") },
+                                { value: "ON", label: node._("light.ui.turn_on") },
+                                { value: "OFF", label: node._("light.ui.turn_off") },
+                                { value: "LAST", label: node._("light.ui.last_state") },
+                                { value: "LAST_SENDED", label: node._("light.ui.last_sended_state") }
+                            ],
+                        }],
+                    });
             },
             onadd: function ()
             {
@@ -233,7 +238,7 @@
         <div style="max-width: 450px;" data-i18n="light.ui.controlled_by_words"></div>
     </div>
     <div class="form-row">
-        <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> <span data-i18n="light.ui.time_on"></span></label>
+        <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> <span data-i18n="light.ui.max_time_on"></span></label>
         <input id="node-input-max_time_on" value="0" />
         <input id="node-input-max_time_on_unit" />
     </div>

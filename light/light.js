@@ -112,7 +112,7 @@ module.exports = function (RED)
             switch (real_topic)
             {
                 case "status":
-                    // Ignore if is in blinking mode
+                    // Ignore if it is in blinking mode
                     if (isBlinking)
                         return;
 
@@ -184,17 +184,6 @@ module.exports = function (RED)
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 
-                case "toggle":
-                    // If button is released, don't handle this message
-                    if (msg.payload === false)
-                        return;
-
-                    node_settings.last_value_sended = !node_settings.last_value;
-
-                    if (!node_settings.alarm_active)
-                        node_settings.last_value = !node_settings.last_value;
-                    break;
-
                 case "alarm":
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
@@ -258,11 +247,14 @@ module.exports = function (RED)
                     }
                     return;
 
+                case "toggle":
                 default:
-                    node_settings.last_value_sended = !node_settings.last_value;
+                    // If button is released, don't handle this message
+                    if (msg.payload === false)
+                        return;
 
-                    if (!node_settings.alarm_active)
-                        node_settings.last_value = !node_settings.last_value;
+                    node_settings.last_value = !node_settings.last_value;
+                    node_settings.last_value_sended = node_settings.last_value;
                     break;
             }
 

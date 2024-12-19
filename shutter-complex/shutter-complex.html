@@ -162,30 +162,35 @@
                 onEditPrepare(this, ["smart_central-control"]);
                 initTreeList(node, ["smart_central-control"]);
 
-                $("#node-input-max_time_up").spinner({
-                    min: 1,
-                    change: function (event, ui)
-                    {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value)
-                            $(this).spinner("value", value);
-                    }
-                });
-                $("#node-input-max_time_down").spinner({
-                    min: 1,
-                    change: function (event, ui)
-                    {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value)
-                            $(this).spinner("value", value);
-                    }
-                });
+                $("#node-input-max_time_up")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 1,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value)
+                                $(this).spinner("value", value);
+                        }
+                    });
+
+                $("#node-input-max_time_down")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 1,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value)
+                                $(this).spinner("value", value);
+                        }
+                    });
 
                 // Backward compatibility
                 if (typeof node.max_time !== "undefined")
@@ -197,43 +202,49 @@
                     delete node.max_time;
                 }
 
-                $("#node-input-revert_time_ms").spinner({
-                    min: 1,
-                    change: function (event, ui)
-                    {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value)
-                            $(this).spinner("value", value);
-                    }
-                });
+                $("#node-input-revert_time_ms")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 1,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value)
+                                $(this).spinner("value", value);
+                        }
+                    });
 
-                $("#node-input-alarm_action").typedInput({
-                    types: [{
-                        default: "NOTHING",
-                        value: "alarm_action",
-                        options: [
-                            { value: "NOTHING", label: node._("shutter.ui.no_action") },
-                            { value: "UP", label: node._("shutter.ui.up") },
-                            { value: "DOWN", label: node._("shutter.ui.down") }
-                        ],
-                    }],
-                });
+                $("#node-input-alarm_action")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            default: "NOTHING",
+                            value: "alarm_action",
+                            options: [
+                                { value: "NOTHING", label: node._("shutter.ui.no_action") },
+                                { value: "UP", label: node._("shutter.ui.up") },
+                                { value: "DOWN", label: node._("shutter.ui.down") }
+                            ],
+                        }],
+                    });
 
-                $("#node-input-alarm_off_action").typedInput({
-                    types: [{
-                        value: "alarm_off_action",
-                        default: "NOTHING",
-                        options: [
-                            { value: "NOTHING", label: node._("shutter.ui.no_action") },
-                            { value: "UP", label: node._("shutter.ui.up") },
-                            { value: "DOWN", label: node._("shutter.ui.down") },
-                            { value: "LAST", label: node._("shutter.ui.last_position") }
-                        ],
-                    }],
-                });
+                $("#node-input-alarm_off_action")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            value: "alarm_off_action",
+                            default: "NOTHING",
+                            options: [
+                                { value: "NOTHING", label: node._("shutter.ui.no_action") },
+                                { value: "UP", label: node._("shutter.ui.up") },
+                                { value: "DOWN", label: node._("shutter.ui.down") },
+                                { value: "LAST", label: node._("shutter.ui.last_position") }
+                            ],
+                        }],
+                    });
             },
             onadd: function ()
             {

@@ -6,7 +6,11 @@
             "count_presses_placeholder": "Max number of keypresses",
             "time_interval": "Time interval",
             "time_interval_placeholder": "Max time in ms between keypresses",
-            "output_messages": "Output messages"
+            "output_messages": "Output messages",
+            "outputs": "Outputs",
+
+            "common_output": "Common output",
+            "separate_output": "Separate outputs"
         }
     }
 }

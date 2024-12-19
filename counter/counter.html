@@ -26,6 +26,7 @@
             let node = this;
 
             $("#node-input-start")
+                .css("max-width", "4rem")
                 .spinner({
                     change: function (event, ui)
                     {
@@ -33,9 +34,10 @@
                         value = isNaN(value) ? 0 : value;
                         if (value !== this.value) $(this).spinner("value", value);
                     },
-                }).css("max-width", "4rem");
+                });
 
             $("#node-input-step")
+                .css("max-width", "4rem")
                 .spinner({
                     change: function (event, ui)
                     {
@@ -43,9 +45,10 @@
                         value = isNaN(value) ? 0 : value;
                         if (value !== this.value) $(this).spinner("value", value);
                     },
-                }).css("max-width", "4rem");
+                });
 
             $("#node-input-min")
+                .css("max-width", "4rem")
                 .spinner({
                     change: function (event, ui)
                     {
@@ -53,9 +56,10 @@
                         value = isNaN(value) ? 0 : value;
                         if (value !== this.value) $(this).spinner("value", value);
                     },
-                }).css("max-width", "4rem");
+                });
 
             $("#node-input-max")
+                .css("max-width", "4rem")
                 .spinner({
                     change: function (event, ui)
                     {
@@ -63,19 +67,21 @@
                         value = isNaN(value) ? 0 : value;
                         if (value !== this.value) $(this).spinner("value", value);
                     },
-                }).css("max-width", "4rem");
+                });
 
 
-            $("#node-input-out_message").typedInput({
-                type: "json",
-                types: ["json", {
-                    value: "NOTHING",
-                    label: node._("default"),
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
-                typeField: "#node-input-out_message_type"
-            });
+            $("#node-input-out_message")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json", {
+                        value: "NOTHING",
+                        label: node._("counter.ui.default"),
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }],
+                    typeField: "#node-input-out_message_type"
+                });
 
             $("#node-input-save_state").on("change", ev =>
             {
@@ -92,7 +98,6 @@
                 this.out_message_type = "NOTHING";
                 $("#node-input-out_message_type").val("NOTHING");
             }
-
         }
     });
 </script>
@@ -119,7 +124,7 @@
         <input id="node-input-max"  data-i18n="[placeholder]counter.ui.max">
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;"><span data-i18n="compare.ui.output_messages"></span></h4>
+    <h4 style="margin: 0.5rem 0;"><span data-i18n="counter.ui.output_messages"></span></h4>
     <div class="form-row">
         <label for="node-input-out_message"><i class="fa fa-check-circle"></i> <span data-i18n="counter.ui.message"></span></label>
         <input type="text" id="node-input-out_message"/>
@@ -130,13 +135,13 @@
         <div data-i18n="[html]counter.ui.note_text"></div>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;"><span data-i18n="compare.ui.system_start"></span></h4>
+    <h4 style="margin: 0.5rem 0;"><span data-i18n="counter.ui.system_start"></span></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-save_state" style="width: 20px;" />
-        <label for="node-input-save_state" style="width: calc(100% - 30px);"><span data-i18n="compare.ui.save_state"></span></label>
+        <label for="node-input-save_state" style="width: calc(100% - 30px);"><span data-i18n="counter.ui.save_state"></span></label>
     </div>
     <div class="form-row" id="resend_on_start_row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);"><span data-i18n="compare.ui.send_after_start"></span></label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);"><span data-i18n="counter.ui.send_after_start"></span></label>
     </div>
 </script>

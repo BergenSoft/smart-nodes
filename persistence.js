@@ -27,13 +27,13 @@ module.exports = function (_RED)
         }
     }
 
-    // Autosave each 10 seconds if changes exists.
+    // Autosave each 30 seconds if changes exists.
     let interval = setInterval(() =>
     {
         if (hasChanges)
             save();
 
-    }, 10 * 1000);
+    }, 30 * 1000);
 
     function save()
     {

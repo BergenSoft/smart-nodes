@@ -34,90 +34,103 @@
         {
             let node = this;
 
-            $("#node-input-comparator").typedInput({
-                types: [{
-                    default: "EQUAL",
-                    value: "comperator",
-                    options: [
-                        { value: "SMALLER", label: node._("compare.ui.smaller") },
-                        { value: "SMALLER_EQUAL", label: node._("compare.ui.smaller_equal") },
-                        { value: "EQUAL", label: node._("compare.ui.equal") },
-                        { value: "UNEQUAL", label: node._("compare.ui.unequal") },
-                        { value: "GREATER_EQUAL", label: node._("compare.ui.greater_equal") },
-                        { value: "GREATER", label: node._("compare.ui.greater") },
-                    ],
-                }],
-            });
+            $("#node-input-comparator")
+                .css("max-width", "70%")
+                .typedInput({
+                    types: [{
+                        default: "EQUAL",
+                        value: "comperator",
+                        options: [
+                            { value: "SMALLER", label: node._("compare.ui.smaller") },
+                            { value: "SMALLER_EQUAL", label: node._("compare.ui.smaller_equal") },
+                            { value: "EQUAL", label: node._("compare.ui.equal") },
+                            { value: "UNEQUAL", label: node._("compare.ui.unequal") },
+                            { value: "GREATER_EQUAL", label: node._("compare.ui.greater_equal") },
+                            { value: "GREATER", label: node._("compare.ui.greater") },
+                        ],
+                    }],
+                });
 
-            $("#node-input-value1").typedInput({
-                type: "num",
-                types: ["str", "num", "bool", {
-                    value: "NOTHING",
-                    label: node._("compare.ui.no_value"),
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
-                typeField: "#node-input-value1_type"
-            });
+            $("#node-input-value1")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "num",
+                    types: ["str", "num", "bool", {
+                        value: "NOTHING",
+                        label: node._("compare.ui.no_value"),
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }],
+                    typeField: "#node-input-value1_type"
+                });
 
-            $("#node-input-value2").typedInput({
-                type: "num",
-                types: ["str", "num", "bool", {
-                    value: "NOTHING",
-                    label: node._("compare.ui.no_value"),
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
-                typeField: "#node-input-value2_type"
-            });
+            $("#node-input-value2")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "num",
+                    types: ["str", "num", "bool", {
+                        value: "NOTHING",
+                        label: node._("compare.ui.no_value"),
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }],
+                    typeField: "#node-input-value2_type"
+                });
 
 
+            $("#node-input-out_true")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json", {
+                        value: "NOTHING",
+                        label: node._("compare.ui.send_nothing"),
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }],
+                    typeField: "#node-input-out_true_type"
+                });
 
-            $("#node-input-out_true").typedInput({
-                type: "json",
-                types: ["json", {
-                    value: "NOTHING",
-                    label: node._("compare.ui.send_nothing"),
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
-                typeField: "#node-input-out_true_type"
-            });
+            $("#node-input-out_false")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json", {
+                        value: "NOTHING",
+                        label: node._("compare.ui.send_nothing"),
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }],
+                    typeField: "#node-input-out_false_type"
+                });
 
-            $("#node-input-out_false").typedInput({
-                type: "json",
-                types: ["json", {
-                    value: "NOTHING",
-                    label: node._("compare.ui.send_nothing"),
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
-                typeField: "#node-input-out_false_type"
-            });
+            $("#node-input-send_only_change")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "bool",
+                    types: [{
+                        value: "1",
+                        value: "send_only_change",
+                        options: [
+                            { value: "true", label: node._("compare.ui.send_only_change") },
+                            { value: "false", label: node._("compare.ui.always") },
+                        ]
+                    }]
+                });
 
-            $("#node-input-send_only_change").typedInput({
-                type: "bool",
-                types: [{
-                    value: "1",
-                    value: "send_only_change",
-                    options: [
-                        { value: "true", label: node._("compare.ui.send_only_change") },
-                        { value: "false", label: node._("compare.ui.always") },
-                    ]
-                }]
-            });
-
-            $("#node-input-outputs").typedInput({
-                type: "num",
-                types: [{
-                    value: "1",
-                    value: "outputs",
-                    options: [
-                        { value: "1", label: node._("compare.ui.common_output") },
-                        { value: "2", label: node._("compare.ui.separate_output") },
-                    ]
-                }]
-            });
+            $("#node-input-outputs")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "num",
+                    types: [{
+                        value: "1",
+                        value: "outputs",
+                        options: [
+                            { value: "1", label: node._("compare.ui.common_output") },
+                            { value: "2", label: node._("compare.ui.separate_output") },
+                        ]
+                    }]
+                });
 
 
 
@@ -144,7 +157,6 @@
                 this.value2_type = "NOTHING";
                 $("#node-input-value2_type").val("NOTHING");
             }
-
         },
     });
 </script>

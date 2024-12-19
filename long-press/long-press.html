@@ -8,6 +8,7 @@
             long_press_ms: { value: 1000 },
             short: { value: '{"topic": ""}' },
             long: { value: '{"topic": ""}' },
+            outputs: { value: 1 },
         },
         inputs: 1,
         outputs: 2,
@@ -21,28 +22,47 @@
         {
             let node = this;
 
-            $("#node-input-long_press_ms").spinner({
-                min: 1,
-                change: function (event, ui)
-                {
-                    var value = parseInt(this.value);
-                    value = isNaN(value) ? 0 : value;
-                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                    if (value !== this.value)
-                        $(this).spinner("value", value);
-                }
-            });
+            $("#node-input-long_press_ms")
+                .css("max-width", "4rem")
+                .spinner({
+                    min: 1,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value)
+                            $(this).spinner("value", value);
+                    }
+                });
 
-            $("#node-input-short").typedInput({
-                type: "json",
-                types: ["json"]
-            });
+            $("#node-input-short")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json"]
+                });
 
-            $("#node-input-long").typedInput({
-                type: "json",
-                types: ["json"]
-            });
+            $("#node-input-long")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json"]
+                });
+
+            $("#node-input-outputs")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "num",
+                    types: [{
+                        value: "outputs",
+                        options: [
+                            { value: "1", label: node._("long-press.ui.common_output") },
+                            { value: "2", label: node._("long-press.ui.separate_output") },
+                        ]
+                    }]
+                });
         },
     });
 </script>
@@ -66,5 +86,9 @@
     <div class="form-row">
         <label for="node-input-long"><i class="fa fa-hand-o-up"></i> <span data-i18n="long-press.ui.long"></span></label>
         <input type="text" id="node-input-long" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputs"><i class="fa fa-hashtag"></i> <span data-i18n="long-press.ui.outputs"></span></label>
+        <input id="node-input-outputs" />
     </div>
 </script>

@@ -25,6 +25,7 @@
                 let node = this;
 
                 $("#node-input-room_setpoint")
+                    .css("max-width", "4rem")
                     .spinner({
                         min: 15,
                         max: 25,
@@ -38,9 +39,10 @@
                             if (value !== this.value) $(this).spinner("value", value);
                             drawCanvas();
                         },
-                    }).css("max-width", "4rem");
+                    });
 
                 $("#node-input-slope")
+                    .css("max-width", "4rem")
                     .spinner({
                         min: 0.05,
                         max: 4,
@@ -54,9 +56,9 @@
                             if (value !== this.value) $(this).spinner("value", value);
                             drawCanvas();
                         },
-                    }).css("max-width", "4rem");
+                    });
 
-                $("#node-input-offset")
+                $("#node-input-offset").css("max-width", "4rem")
                     .spinner({
                         min: -20,
                         max: 20,
@@ -70,9 +72,10 @@
                             if (value !== this.value) $(this).spinner("value", value);
                             drawCanvas();
                         },
-                    }).css("max-width", "4rem");
+                    });
 
                 $("#node-input-flow_max")
+                    .css("max-width", "4rem")
                     .spinner({
                         min: 50,
                         max: 85,
@@ -85,9 +88,10 @@
                             if (value !== this.value) $(this).spinner("value", value);
                             drawCanvas();
                         },
-                    }).css("max-width", "4rem");
+                    });
 
                 $("#node-input-flow_min")
+                    .css("max-width", "4rem")
                     .spinner({
                         min: 5,
                         max: 30,
@@ -100,9 +104,10 @@
                             if (value !== this.value) $(this).spinner("value", value);
                             drawCanvas();
                         },
-                    }).css("max-width", "4rem");
+                    });
 
                 drawCanvas();
+
             },
         });
 

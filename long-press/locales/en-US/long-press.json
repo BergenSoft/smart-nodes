@@ -7,7 +7,11 @@
             "milliseconds": "Milliseconds",
             "output_messages": "Output messages",
             "short": "Short",
-            "long": "Long"
+            "long": "Long",
+            "outputs": "Outputs",
+
+            "common_output": "Common output",
+            "separate_output": "Separate outputs"
         }
     }
 }

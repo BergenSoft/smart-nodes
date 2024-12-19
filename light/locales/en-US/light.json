@@ -4,9 +4,9 @@
             "name": "Name",
             "text": "Text",
             "controlled_by_words": "This node can be controlled using the words entered. Multiple words are separated by a comma.",
-            "time_on": "Time On",
-            "alarm_on": "Alarm On",
-            "alarm_off": "Alarm Off",
+            "max_time_on": "Max time on",
+            "alarm_on": "Alarm on",
+            "alarm_off": "Alarm off",
             "controlled_by_central": "This block is controlled by the following central blocks:",
 
             "milliseconds": "Milliseconds",

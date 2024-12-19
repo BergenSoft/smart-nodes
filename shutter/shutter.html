@@ -157,18 +157,20 @@
                 onEditPrepare(this, ["smart_central-control"]);
                 initTreeList(node, ["smart_central-control"]);
 
-                $("#node-input-short_time_on_ms").spinner({
-                    min: 10,
-                    change: function (event, ui)
-                    {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value)
-                            $(this).spinner("value", value);
-                    }
-                });
+                $("#node-input-short_time_on_ms")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 10,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value)
+                                $(this).spinner("value", value);
+                        }
+                    });
             },
             onadd: function ()
             {

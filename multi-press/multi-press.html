@@ -6,7 +6,9 @@
         defaults: {
             name: { value: "" },
             press_delay_ms: { value: 200 },
+            max_presses: { value: 2 },
             outputs: { value: 2 },
+            output_mode: { value: "2" },
             out1: { value: '{"topic": ""}' },
             out2: { value: '{"topic": ""}' },
             out3: { value: '{"topic": ""}' },
@@ -27,57 +29,96 @@
         {
             let node = this;
 
-            $("#node-input-outputs").spinner({
-                min: 2,
-                max: 4,
-                change: function (event, ui)
+            $("#node-input-max_presses")
+                .css("max-width", "4rem")
+                .spinner({
+                    min: 2,
+                    max: 4,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value, 10);
+                        value = isNaN(value) ? 2 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin"), 10));
+                        value = Math.min(value, parseInt($(this).attr("aria-valuemax"), 10));
+                        if (value !== this.value)
+                            $(this).spinner("value", value);
+
+                        node.outputs = node.output_mode == "1" ? 1 : node.max_presses;
+
+                        showNeededMessages(value);
+                    }
+                });
+            $("#node-input-max_presses").trigger("change");
+
+            $("#node-input-press_delay_ms")
+                .css("max-width", "4rem")
+                .spinner({
+                    min: 1,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value, 10);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin"), 10));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value)
+                            $(this).spinner("value", value);
+                    }
+                });
+
+            $("#node-input-out1")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json"]
+                });
+
+            $("#node-input-out2")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json"]
+                });
+
+            $("#node-input-out3")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json"]
+                });
+
+            $("#node-input-out4")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json"]
+                });
+
+            $("#node-input-output_mode")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "num",
+                    types: [{
+                        value: "output_mode",
+                        options: [
+                            { value: "1", label: node._("multi-press.ui.common_output") },
+                            { value: "2", label: node._("multi-press.ui.separate_output") },
+                        ]
+                    }]
+                }).on("change", function (event, type, value)
                 {
-                    var value = parseInt(this.value, 10);
-                    value = isNaN(value) ? 2 : value;
-                    value = Math.max(value, parseInt($(this).attr("aria-valuemin"), 10));
-                    value = Math.min(value, parseInt($(this).attr("aria-valuemax"), 10));
-                    if (value !== this.value)
-                        $(this).spinner("value", value);
+                    node.outputs = value == "1" ? 1 : node.max_presses;
+                });
 
-                    showNeededMessages(value);
-                }
-            });
-            $("#node-input-outputs").trigger("change");
+            // Update node to newest config
+            if (!node.max_presses)
+            {
+                node.max_presses = node.outputs;
+                $("#node-input-output_mode").typedInput("value", "2");
+                $("#node-input-max_presses").val(node.outputs);
+                $("#node-input-output_mode").trigger("change");
+            }
 
-            $("#node-input-press_delay_ms").spinner({
-                min: 1,
-                change: function (event, ui)
-                {
-                    var value = parseInt(this.value, 10);
-                    value = isNaN(value) ? 0 : value;
-                    value = Math.max(value, parseInt($(this).attr("aria-valuemin"), 10));
-                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                    if (value !== this.value)
-                        $(this).spinner("value", value);
-                }
-            });
-
-            $("#node-input-out1").typedInput({
-                type: "json",
-                types: ["json"]
-            });
-
-            $("#node-input-out2").typedInput({
-                type: "json",
-                types: ["json"]
-            });
-
-            $("#node-input-out3").typedInput({
-                type: "json",
-                types: ["json"]
-            });
-
-            $("#node-input-out4").typedInput({
-                type: "json",
-                types: ["json"]
-            });
-
-            showNeededMessages(this.outputs);
+            showNeededMessages(node.max_presses);
         }
     });
 
@@ -102,8 +143,8 @@
         <input type="text" id="node-input-name" data-i18n="[placeholder]multi-press.ui.name" />
     </div>
     <div class="form-row">
-        <label for="node-input-outputs" style="vertical-align: middle"><i class="fa fa-hand-o-up"></i> <span data-i18n="multi-press.ui.count_presses"></span></label>
-        <input id="node-input-outputs" data-i18n="[placeholder]multi-press.ui.count_presses_placeholder" placeholder="" />
+        <label for="node-input-max_presses" style="vertical-align: middle"><i class="fa fa-hand-o-up"></i> <span data-i18n="multi-press.ui.count_presses"></span></label>
+        <input id="node-input-max_presses" data-i18n="[placeholder]multi-press.ui.count_presses_placeholder" placeholder="" />
     </div>
     <div class="form-row">
         <label for="node-input-press_delay_ms"><i class="fa fa-clock-o"></i> <span data-i18n="multi-press.ui.time_interval"></span></label>
@@ -127,5 +168,9 @@
     <div class="form-row" id="form-row-four-click">
         <label for="node-input-out4"><i class="fa fa-hand-o-up"></i> 4x</label>
         <input type="text" id="node-input-out4" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-output_mode"><i class="fa fa-hashtag"></i> <span data-i18n="multi-press.ui.outputs"></span></label>
+        <input id="node-input-output_mode" />
     </div>
 </script>

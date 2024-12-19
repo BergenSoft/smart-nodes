@@ -332,6 +332,21 @@ module.exports = {
     },
 
     /**
+     * This function returns a rounded number or null if it failed.
+     */
+    toFixed(value, fractionDigits)
+    {
+        try
+        {
+            return parseFloat(value).toFixed(fractionDigits);
+        }
+        catch
+        {
+            return null;
+        }
+    },
+
+    /**
      * Creates a new independend object and copies all properties to the new one
      * @param {*} obj The Object to copy
      * @returns A new Object
@@ -347,7 +362,7 @@ module.exports = {
     log()
     {
         // uncomment to see all log values
-        // console.log(...arguments);
+        // console.log(typeof node + " (" + node.id + "):", ...arguments);
     },
 
     /**

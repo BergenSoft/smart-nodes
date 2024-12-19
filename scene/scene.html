@@ -391,18 +391,20 @@
 
                 $("#scene-tabs").trigger("change");
 
-                $("#node-input-max_time_on").spinner({
-                    min: 0,
-                    change: function (event, ui)
-                    {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value)
-                            $(this).spinner("value", value);
-                    }
-                });
+                $("#node-input-max_time_on")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value)
+                                $(this).spinner("value", value);
+                        }
+                    });
 
                 $("#node-input-max_time_on_unit")
                     .css("max-width", "10rem")
@@ -422,7 +424,7 @@
             oneditsave: function ()
             {
                 let node = this;
-                
+
                 // Set scenes
                 var items = $("#node-input-property-scenes").editableList("items");
                 var result = getScenes(items);

@@ -224,10 +224,12 @@
                     minsec.append($("<option></option>").val(i).text(i));
                 }
 
-                row.find(".message").typedInput({
-                    type: "json",
-                    types: ["json"]
-                });
+                row.find(".message")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        type: "json",
+                        types: ["json"]
+                    });
 
                 /**
                  * set the value of the select boxes
@@ -268,7 +270,7 @@
         oneditsave: function ()
         {
             let node = this;
-            
+
             node.schedules = [];
 
             let scheduleList = $("#node-scheduler-schedules");

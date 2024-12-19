@@ -3,7 +3,7 @@
         "ui": {
             "name": "Name",
             "enabled": "Aktiviert",
-            "forward_last_on_enable": "Letzte nicht gesendete Nachricht senden, wenn die Node aktiviert wird.",
+            "forward_last_on_enable": "Letzte nicht gesendete Nachricht senden,<br>wenn die Node aktiviert wird.",
             "always_forward_true": "Leite <code>msg.payload = true</code> immer weiter.",
             "always_forward_false": "Leite <code>msg.payload = false</code> immer weiter.",
 

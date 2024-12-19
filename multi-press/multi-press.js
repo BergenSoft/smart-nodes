@@ -29,6 +29,8 @@ module.exports = function (RED)
         // # Dynamic config #
         // ##################
         let press_delay_ms = parseInt(config.press_delay_ms || 200, 10);
+        let max_presses = config.max_presses || config.outputs;
+        let outputs = config.outputs;
         let outs = [
             helper.evaluateNodeProperty(RED, config.out1, "json"),
             helper.evaluateNodeProperty(RED, config.out2, "json"),
@@ -85,7 +87,7 @@ module.exports = function (RED)
 
             // If maximum presses are detected, send result immediately
             // Otherwise start timeout
-            if (count == config.outputs)
+            if (count == max_presses)
                 sendResult();
             else
                 timeout = setTimeout(() =>
@@ -102,11 +104,20 @@ module.exports = function (RED)
         {
             node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Last was press " + count + " time" + (count == 1 ? "" : "s") });
 
-            // Prepare data
-            let data = Array.from({ length: config.outputs }).fill(null);
-            // Send a copy of the defined json
-            data[count - 1] = helper.cloneObject(outs[count - 1]);
-            node.send(data);
+            if (outputs == 1)
+            {
+                // Common outputs
+                node.send(outs[count - 1]);
+            }
+            else
+            {
+                // Separate outputs
+                // Prepare data
+                let data = Array.from({ length: outputs }).fill(null);
+                // Send a copy of the defined json
+                data[count - 1] = helper.cloneObject(outs[count - 1]);
+                node.send(data);
+            }
 
             // Reset values
             count = 0;

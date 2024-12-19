@@ -6,7 +6,11 @@
             "count_presses_placeholder": "Max Anzahl an Tastendrücke",
             "time_interval": "Zeitabstand",
             "time_interval_placeholder": "Max Zeit in ms zwischen Tastendruck",
-            "output_messages": "Ausgangsnachrichten"
+            "output_messages": "Ausgangsnachrichten",
+            "outputs": "Ausgänge",
+
+            "common_output": "Gemeinsamer Ausgang",
+            "separate_output": "Separate Ausgänge"
         }
     }
 }

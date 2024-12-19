@@ -25,6 +25,7 @@
             let node = this;
 
             $("#node-input-setpoint")
+                .css("max-width", "4rem")
                 .spinner({
                     min: -30,
                     max: 100,
@@ -36,9 +37,10 @@
                         value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
                         if (value !== this.value) $(this).spinner("value", value);
                     },
-                }).css("max-width", "4rem");
+                });
 
             $("#node-input-time_total")
+                .css("max-width", "4rem")
                 .spinner({
                     min: 0,
                     change: function (event, ui)
@@ -49,9 +51,10 @@
                         // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
                         if (value !== this.value) $(this).spinner("value", value);
                     },
-                }).css("max-width", "4rem");
+                });
 
             $("#node-input-time_sampling")
+                .css("max-width", "4rem")
                 .spinner({
                     min: 0,
                     change: function (event, ui)
@@ -62,30 +65,34 @@
                         // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
                         if (value !== this.value) $(this).spinner("value", value);
                     },
-                }).css("max-width", "4rem");
+                });
 
-            $("#node-input-off_mode").typedInput({
-                types: [{
-                    default: "NOTHING",
-                    value: "off_mode",
-                    options: [
-                        { value: "NOTHING", label: node._("mixing-valve.ui.nothing") },
-                        { value: "OPEN", label: node._("mixing-valve.ui.open") },
-                        { value: "CLOSE", label: node._("mixing-valve.ui.close") }
-                    ],
-                }],
-            });
+            $("#node-input-off_mode")
+                .css("max-width", "70%")
+                .typedInput({
+                    types: [{
+                        default: "NOTHING",
+                        value: "off_mode",
+                        options: [
+                            { value: "NOTHING", label: node._("mixing-valve.ui.nothing") },
+                            { value: "OPEN", label: node._("mixing-valve.ui.open") },
+                            { value: "CLOSE", label: node._("mixing-valve.ui.close") }
+                        ],
+                    }],
+                });
 
-            $("#node-input-valve_mode").typedInput({
-                types: [{
-                    default: "HEATING",
-                    value: "valve_mode",
-                    options: [
-                        { value: "HEATING", label: node._("mixing-valve.ui.heating") },
-                        { value: "COOLING", label: node._("mixing-valve.ui.cooling") }
-                    ],
-                }],
-            });
+            $("#node-input-valve_mode")
+                .css("max-width", "70%")
+                .typedInput({
+                    types: [{
+                        default: "HEATING",
+                        value: "valve_mode",
+                        options: [
+                            { value: "HEATING", label: node._("mixing-valve.ui.heating") },
+                            { value: "COOLING", label: node._("mixing-valve.ui.cooling") }
+                        ],
+                    }],
+                });
         },
     });
 </script>

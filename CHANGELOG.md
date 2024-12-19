@@ -118,3 +118,9 @@
 ## Version 0.4.9:
 
 -   Fixed reading config values for offset and slope in heating-curve node.
+
+## Version 0.4.10:
+
+-   **breaking change** (soon): Added common and separate outputs to multi press node.
+    Please open node config and save it to make sure it will work in later versions.
+-   Added common and separate outputs to long press node.

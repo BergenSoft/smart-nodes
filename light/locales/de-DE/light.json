@@ -4,7 +4,7 @@
             "name": "Name",
             "text": "Text",
             "controlled_by_words": "Diese Node kann über die eingegebenen Wörter gesteuert werden. Mehrere Wörter werden durch ein Komma getrennt.",
-            "time_on": "Zeit Ein",
+            "max_time_on": "Max Zeit Ein",
             "alarm_on": "Alarm Ein",
             "alarm_off": "Alarm Aus",
             "controlled_by_central": "Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:",

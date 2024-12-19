@@ -120,6 +120,16 @@
                 if (flowMap[n.z])
                 {
                     const isChecked = node.links.indexOf(n.id) !== -1 || (n.links || []).indexOf(node.id) !== -1;
+                    if (!node.exec_text_names)
+                    {
+                        // No exec name defined but checked, so remove it from the linked list.
+                        if (isChecked)
+                        {
+                            node.links.splice(node.links.indexOf(n.id), 1);
+                            console.log("Unchecked " + node.name);
+                        }
+                        return;
+                    }
                     if (isChecked) node.oldLinks.push(n.id);
 
                     flowMap[n.z].children.push({

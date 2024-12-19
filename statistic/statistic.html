@@ -24,6 +24,7 @@
             let node = this;
 
             $("#node-input-operation")
+                .css("max-width", "70%")
                 .typedInput({
                     types: [{
                         default: "MIN",
@@ -41,17 +42,19 @@
                     }],
                 });
 
-            $("#node-input-count").css("max-width", "4rem").spinner({
-                min: 2,
-                change: function (event, ui)
-                {
-                    var value = parseInt(this.value);
-                    value = isNaN(value) ? 0 : value;
-                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                    if (value !== this.value) $(this).spinner("value", value);
-                },
-            });
+            $("#node-input-count").css("max-width", "4rem")
+                .css("max-width", "4rem")
+                .spinner({
+                    min: 2,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value) $(this).spinner("value", value);
+                    },
+                });
 
             $("#node-input-operation").on("change", function (event, type, value)
             {
@@ -61,16 +64,18 @@
                     $(".statistic-moving-average-row").hide();
             });
 
-            $("#node-input-out_message").typedInput({
-                type: "json",
-                types: ["json", {
-                    value: "NOTHING",
-                    label: node._("statistic.ui.default"),
-                    icon: "fa fa-times",
-                    hasValue: false,
-                }],
-                typeField: "#node-input-out_message_type"
-            });
+            $("#node-input-out_message")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "json",
+                    types: ["json", {
+                        value: "NOTHING",
+                        label: node._("statistic.ui.default"),
+                        icon: "fa fa-times",
+                        hasValue: false,
+                    }],
+                    typeField: "#node-input-out_message_type"
+                });
 
             $("#node-input-save_state").on("change", ev =>
             {
@@ -88,7 +93,6 @@
                 this.out_message_type = "NOTHING";
                 $("#node-input-out_message_type").val("NOTHING");
             }
-
         }
     });
 </script>

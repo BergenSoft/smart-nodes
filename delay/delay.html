@@ -24,57 +24,65 @@
         {
             let node = this;
 
-            $("#node-input-on_delay").spinner({
-                min: 0,
-                change: function (event, ui)
-                {
-                    var value = parseInt(this.value);
-                    value = isNaN(value) ? 0 : value;
-                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                    if (value !== this.value)
-                        $(this).spinner("value", value);
-                }
-            });
+            $("#node-input-on_delay")
+                .css("max-width", "4rem")
+                .spinner({
+                    min: 0,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value)
+                            $(this).spinner("value", value);
+                    }
+                });
 
-            $("#node-input-on_delay_unit").css("max-width", "10rem").typedInput({
-                types: [{
-                    default: "s",
-                    value: "on_delay_unit",
-                    options: [
-                        { value: "ms", label: node._("delay.ui.milliseconds") },
-                        { value: "s", label: node._("delay.ui.seconds") },
-                        { value: "min", label: node._("delay.ui.minutes") },
-                        { value: "h", label: node._("delay.ui.hours") },
-                    ]
-                }]
-            });
+            $("#node-input-on_delay_unit")
+                .css("max-width", "10rem")
+                .typedInput({
+                    types: [{
+                        default: "s",
+                        value: "on_delay_unit",
+                        options: [
+                            { value: "ms", label: node._("delay.ui.milliseconds") },
+                            { value: "s", label: node._("delay.ui.seconds") },
+                            { value: "min", label: node._("delay.ui.minutes") },
+                            { value: "h", label: node._("delay.ui.hours") },
+                        ]
+                    }]
+                });
 
-            $("#node-input-off_delay").spinner({
-                min: 0,
-                change: function (event, ui)
-                {
-                    var value = parseInt(this.value);
-                    value = isNaN(value) ? 0 : value;
-                    value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                    // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                    if (value !== this.value)
-                        $(this).spinner("value", value);
-                }
-            });
+            $("#node-input-off_delay")
+                .css("max-width", "4rem")
+                .spinner({
+                    min: 0,
+                    change: function (event, ui)
+                    {
+                        var value = parseInt(this.value);
+                        value = isNaN(value) ? 0 : value;
+                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                        if (value !== this.value)
+                            $(this).spinner("value", value);
+                    }
+                });
 
-            $("#node-input-off_delay_unit").css("max-width", "10rem").typedInput({
-                types: [{
-                    default: "s",
-                    value: "on_delay_unit",
-                    options: [
-                        { value: "ms", label: node._("delay.ui.milliseconds") },
-                        { value: "s", label: node._("delay.ui.seconds") },
-                        { value: "min", label: node._("delay.ui.minutes") },
-                        { value: "h", label: node._("delay.ui.hours") },
-                    ]
-                }]
-            });
+            $("#node-input-off_delay_unit")
+                .css("max-width", "10rem")
+                .typedInput({
+                    types: [{
+                        default: "s",
+                        value: "on_delay_unit",
+                        options: [
+                            { value: "ms", label: node._("delay.ui.milliseconds") },
+                            { value: "s", label: node._("delay.ui.seconds") },
+                            { value: "min", label: node._("delay.ui.minutes") },
+                            { value: "h", label: node._("delay.ui.hours") },
+                        ]
+                    }]
+                });
 
             $("#node-input-save_state").on("change", ev =>
             {

@@ -123,12 +123,13 @@
                 if (flowMap[n.z])
                 {
                     const isChecked = node.links.indexOf(n.id) !== -1 || (n.links || []).indexOf(node.id) !== -1;
-                    if (isChecked) node.oldLinks.push(n.id);
+                    if (isChecked)
+                        node.oldLinks.push(n.id);
 
                     flowMap[n.z].children.push({
                         id: n.id,
                         node: n,
-                        label: n.name || n.id,
+                        label: n.name || n._def.paletteLabel + "(" + n.id + ")",
                         selected: isChecked,
                         checkbox: true,
                         radio: false,
@@ -285,16 +286,18 @@
                         initTreeList(node, ["smart_light-control", "smart_scene-control"]);
                 });
 
-                $("#node-input-mode").typedInput({
-                    types: [{
-                        default: "LIGHT",
-                        value: "mode",
-                        options: [
-                            { value: "LIGHT", label: node._("central.ui.light_outlet") },
-                            { value: "SHUTTER", label: node._("central.ui.cover") }
-                        ],
-                    }],
-                });
+                $("#node-input-mode")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            default: "LIGHT",
+                            value: "mode",
+                            options: [
+                                { value: "LIGHT", label: node._("central.ui.light_outlet") },
+                                { value: "SHUTTER", label: node._("central.ui.cover") }
+                            ],
+                        }],
+                    });
 
                 // Backward compatibility
                 this.mode = this.mode?.toUpperCase();
@@ -303,12 +306,10 @@
                     $("#node-input-mode").val(this.mode).trigger("change");
                 else
                     $("#node-input-mode").val("SHUTTER").trigger("change");
-
             },
             oneditsave: function ()
             {
                 let node = this;
-                
                 onEditSave(this);
             },
             onadd: onAdd,
@@ -326,8 +327,8 @@
         <label for="node-input-mode"><i class="fa fa-arrow-right"></i> <span data-i18n="central.ui.type"></span></label>
         <input id="node-input-mode"/>
     </div>
-    <div class="node-input-link-rows" style="position:relative; height: 30px; text-align: right;"
-        ><div style="display:inline-block"><input type="text" id="node-input-link-target-filter" /></div
-    ></div>
+    <div class="node-input-link-rows" style="position:relative; height: 30px; text-align: right;">
+        <div style="display:inline-block"><input type="text" id="node-input-link-target-filter" /></div>
+    </div>
     <div class="form-row node-input-link-row node-input-link-rows"></div>
 </script>

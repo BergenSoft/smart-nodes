@@ -36,7 +36,7 @@ module.exports = function (RED)
 
         // Here the ouput message for logging purposes is saved.
         // It will be cleared with every new node input
-        let log;
+        let log = null;
 
         // Holds a list with all room names, sorted from the longest to the shortest
         // Format: Index => RoomName
@@ -80,6 +80,7 @@ module.exports = function (RED)
 
             node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + message });
             log = {
+                rooms: rooms,
                 lookup: lookup,
                 actions: []
             };

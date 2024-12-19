@@ -25,9 +25,10 @@ module.exports = function (RED)
         // ##################
         // # Dynamic config #
         // ##################
-        let long_press_ms = parseInt(config.long_press_ms || 1000, 10);
+        let long_press_ms = helper.evaluateNodeProperty(RED, config.long_press_ms || 1000, "num");
         let short = helper.evaluateNodeProperty(RED, config.short, "json");
         let long = helper.evaluateNodeProperty(RED, config.long, "json");
+        let outputs = helper.evaluateNodeProperty(RED, config.outputs, "num");
 
 
         // ##################
@@ -86,13 +87,24 @@ module.exports = function (RED)
                 {
                     last_action = ACTION_SHORT;
                     if (short != null)
-                        node.send([helper.cloneObject(short), null]);
+                    {
+                        if (outputs == 2)
+                            node.send([helper.cloneObject(short), null]);
+                        else
+                            node.send(helper.cloneObject(short));
+                    }
                 }
                 else
                 {
                     last_action = ACTION_LONG;
                     if (long != null)
-                        node.send([null, helper.cloneObject(long)]);
+                    {
+                        if (outputs == 2)
+                            node.send([null, helper.cloneObject(long)]);
+                        else
+                            node.send(helper.cloneObject(long));
+
+                    }
                 }
             }
         }
@@ -109,7 +121,10 @@ module.exports = function (RED)
                 on_time = null;
                 timeout = null;
 
-                node.send([null, helper.cloneObject(long)]);
+                if (outputs == 2)
+                    node.send([null, helper.cloneObject(long)]);
+                else
+                    node.send(helper.cloneObject(long));
 
                 setStatus();
             }, long_press_ms);
