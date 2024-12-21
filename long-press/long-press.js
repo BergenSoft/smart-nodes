@@ -28,7 +28,7 @@ module.exports = function (RED)
         let long_press_ms = helper.evaluateNodeProperty(RED, config.long_press_ms || 1000, "num");
         let short = helper.evaluateNodeProperty(RED, config.short, "json");
         let long = helper.evaluateNodeProperty(RED, config.long, "json");
-        let outputs = helper.evaluateNodeProperty(RED, config.outputs, "num");
+        let outputs = helper.evaluateNodeProperty(RED, config.outputs || 2, "num");
 
 
         // ##################
