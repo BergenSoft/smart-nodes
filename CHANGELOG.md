@@ -124,3 +124,11 @@
 -   **breaking change** (soon): Added common and separate outputs to multi press node.
     Please open node config and save it to make sure it will work in later versions.
 -   Added common and separate outputs to long press node.
+
+## Version 0.4.11:
+
+-   Fixed long press default outputs.
+
+## Version 0.4.12:
+
+-   Fixed text exec node.
