@@ -265,7 +265,7 @@ module.exports = function (RED)
         {
             for (const link of config.links)
             {
-                node.log("Check node = " + link);
+                // node.log("Check node = " + link);
                 let linkedNode = RED.nodes.getNode(link);
 
                 if (linkedNode == null || linkedNode.exec_text_names == null || linkedNode.exec_text_names.length == 0)
@@ -280,7 +280,7 @@ module.exports = function (RED)
                         case "smart_scene-control":
                         case "smart_shutter-control":
                         case "smart_shutter-complex-control":
-                            node.log("Add room: " + name);
+                            // node.log("Add room: " + name);
                             if (!lookup.has(name))
                                 lookup.set(name, []);
 
@@ -289,7 +289,7 @@ module.exports = function (RED)
 
                             if (!rooms.includes(name))
                             {
-                                node.log("Add room to room list: " + name);
+                                // node.log("Add room to room list: " + name);
                                 rooms.push(name);
                             }
                             break;

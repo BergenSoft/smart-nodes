@@ -136,3 +136,7 @@
 ## Version 0.4.13:
 
 -   Fixed text exec node again.
+
+## Version 0.4.14:
+
+-   Removed log outputs.
