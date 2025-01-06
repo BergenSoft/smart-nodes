@@ -44,7 +44,7 @@ module.exports = function (RED)
 
         // Holds references to the nodes to access them by room name
         // Format: RoomName => [Node1, Node2, ..., NodeX]
-        let lookup = [];
+        let lookup = new Map();
 
 
         node.status({});
@@ -214,9 +214,9 @@ module.exports = function (RED)
                             let room = rooms[parseInt(word.substring(1), 10)];
                             // node.log("Found room " + room);
 
-                            if (lookup[room] && Array.isArray(lookup[room]))
+                            if (lookup.has(room))
                             {
-                                for (const node of lookup[room])
+                                for (const node of lookup.get(room))
                                 {
                                     if (without && affectedNodes.includes(node))
                                         affectedNodes.splice(affectedNodes.indexOf(node), 1);
@@ -265,7 +265,7 @@ module.exports = function (RED)
         {
             for (const link of config.links)
             {
-                // node.log("Check node = " + link);
+                node.log("Check node = " + link);
                 let linkedNode = RED.nodes.getNode(link);
 
                 if (linkedNode == null || linkedNode.exec_text_names == null || linkedNode.exec_text_names.length == 0)
@@ -280,22 +280,22 @@ module.exports = function (RED)
                         case "smart_scene-control":
                         case "smart_shutter-control":
                         case "smart_shutter-complex-control":
-                            // node.log("Add room " + name);
-                            if (!lookup[name])
-                                lookup[name] = [];
+                            node.log("Add room: " + name);
+                            if (!lookup.has(name))
+                                lookup.set(name, []);
 
-                            if (!lookup[name].includes(linkedNode))
-                                lookup[name].push(linkedNode);
+                            if (!lookup.get(name).includes(linkedNode))
+                                lookup.get(name).push(linkedNode);
+
+                            if (!rooms.includes(name))
+                            {
+                                node.log("Add room to room list: " + name);
+                                rooms.push(name);
+                            }
                             break;
 
                         default:
                             break;
-                    }
-
-                    if (!rooms.includes(name))
-                    {
-                        // node.log("Add room " + name);
-                        rooms.push(name);
                     }
                 }
             }

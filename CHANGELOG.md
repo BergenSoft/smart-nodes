@@ -132,3 +132,7 @@
 ## Version 0.4.12:
 
 -   Fixed text exec node.
+
+## Version 0.4.13:
+
+-   Fixed text exec node again.
