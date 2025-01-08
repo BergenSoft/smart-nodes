@@ -140,7 +140,6 @@
                 name: { value: "" },
                 exec_text_names: { value: "" },
                 data_type: { value: "SIMPLE" }, // SIMPLE || HOMEASSISTANT
-                outputs: { value: 3 },
                 max_time: { value: 60 },
                 max_time_up: { value: 60 },
                 max_time_down: { value: 60 },
@@ -156,7 +155,7 @@
                 if (this.data_type == "SIMPLE")
                     return ["Up", "Down", "Status Position"][index];
 
-                return ["HA Shutter", "HA State Position"][index];
+                return ["HA Up", "HA Down", "HA Status Position"][index];
             },
             icon: "font-awesome/fa-align-justify",
             label: function ()
@@ -181,9 +180,6 @@
                                 { value: "HOMEASSISTANT", label: node._("shutter.ui.home_assistant") }
                             ],
                         }],
-                    }).on("change", function (event, type, value)
-                    {
-                        node.outputs = value == "SIMPLE" ? 3 : 2;
                     });
 
                 $("#node-input-max_time_up")

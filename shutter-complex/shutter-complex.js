@@ -572,7 +572,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [{ payload: { action: "cover.open_cover" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
+                    data = [{ payload: { action: "homeassistant.turn_on" } }, { payload: { action: "homeassistant.turn_off" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
@@ -596,7 +596,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [{ payload: { action: "cover.close_cover" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
+                    data = [{ payload: { action: "homeassistant.turn_off" } }, { payload: { action: "homeassistant.turn_on" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
@@ -620,7 +620,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [{ payload: { action: "cover.stop_cover" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
+                    data = [{ payload: { action: "homeassistant.turn_off" } }, { payload: { action: "homeassistant.turn_off" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
@@ -645,7 +645,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [null, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
+                    data = [null, null, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
