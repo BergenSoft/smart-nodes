@@ -572,7 +572,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [{ payload: { action: "cover.open_cover" } }, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    data = [{ payload: { action: "cover.open_cover" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
@@ -596,7 +596,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [{ payload: { action: "cover.close_cover" } }, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    data = [{ payload: { action: "cover.close_cover" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
@@ -620,7 +620,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [{ payload: { action: "cover.stop_cover" } }, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    data = [{ payload: { action: "cover.stop_cover" } }, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
@@ -645,7 +645,7 @@ module.exports = function (RED)
                     break;
 
                 case "HOMEASSISTANT":
-                    data = [null, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    data = [null, { payload: { action: "number.set_value", data: { "value": node_settings.last_position } } }];
                     break;
 
                 default:
