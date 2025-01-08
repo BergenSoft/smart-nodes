@@ -139,6 +139,8 @@
             defaults: {
                 name: { value: "" },
                 exec_text_names: { value: "" },
+                data_type: { value: "SIMPLE" }, // SIMPLE || HOMEASSISTANT
+                outputs: { value: 3 },
                 max_time: { value: 60 },
                 max_time_up: { value: 60 },
                 max_time_down: { value: 60 },
@@ -149,7 +151,13 @@
             },
             inputs: 1,
             outputs: 3,
-            outputLabels: ["Up", "Down", "Status Position"],
+            outputLabels: function (index)
+            {
+                if (this.data_type == "SIMPLE")
+                    return ["Up", "Down", "Status Position"][index];
+
+                return ["HA Shutter", "HA State Position"][index];
+            },
             icon: "font-awesome/fa-align-justify",
             label: function ()
             {
@@ -161,6 +169,22 @@
 
                 onEditPrepare(this, ["smart_central-control"]);
                 initTreeList(node, ["smart_central-control"]);
+
+                $("#node-input-data_type")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            value: "data_type",
+                            default: "SIMPLE",
+                            options: [
+                                { value: "SIMPLE", label: node._("shutter.ui.simple") },
+                                { value: "HOMEASSISTANT", label: node._("shutter.ui.home_assistant") }
+                            ],
+                        }],
+                    }).on("change", function (event, type, value)
+                    {
+                        node.outputs = value == "SIMPLE" ? 3 : 2;
+                    });
 
                 $("#node-input-max_time_up")
                     .css("max-width", "4rem")
@@ -264,6 +288,10 @@
         <label for="node-input-exec_text_names"><i class="fa fa-comments-o"></i> <span data-i18n="shutter.ui.text"></span></label>
         <input id="node-input-exec_text_names" type="text" />
         <div style="max-width: 450px;" data-i18n="shutter.ui.controlled_by_words"></div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-data_type"><i class="fa fa-file-code-o"></i> <span data-i18n="shutter.ui.data_type"></span></label>
+        <input id="node-input-data_type"/>
     </div>
     <div class="form-row">
         <label for="node-input-max_time_up"><i class="fa fa-clock-o"></i> <span data-i18n="shutter.ui.time_up"></span></label>

@@ -4,6 +4,11 @@
             "name": "Name",
             "text": "Text",
             "controlled_by_words": "Diese Node kann über die eingegebenen Wörter gesteuert werden. Mehrere Wörter werden durch ein Komma getrennt.",
+            
+            "data_type": "Datentyp",
+            "simple": "Einfaches Format",
+            "home_assistant": "HA Action Format",
+
             "time_on": "Zeit Ein",
             "controlled_by_central": "Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:",
 

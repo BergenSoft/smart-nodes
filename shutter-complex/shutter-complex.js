@@ -61,6 +61,7 @@ module.exports = function (RED)
         let revert_time_ms = parseInt(config.revert_time_ms || 100, 10);
         let alarm_action = config.alarm_action || "NOTHING";
         let alarm_off_action = config.alarm_off_action || "NOTHING";
+        let data_type = config.data_type || "SIMPLE";
 
 
         // ##################
@@ -484,7 +485,10 @@ module.exports = function (RED)
             else if (down)
                 node_settings.last_direction_up = false;
 
-            node.send([{ payload: up }, { payload: down }, { payload: node_settings.last_position }]);
+            if (up || down)
+                sendDirection(down);
+            else
+                sendStop()
 
             // Inform central nodes that shutter is running/stopped
             notifyCentral(up || down);
@@ -540,6 +544,117 @@ module.exports = function (RED)
 
             node.status({ fill, shape, text: helper.getCurrentTimeForStatus() + ": " + texts.join(", ") });
         }
+
+        /**
+         * Turns the shutter to the given direction and returns the sent message
+         * @param {bool} down True if down, else up
+         * @returns The sent message
+         */
+        let sendDirection = down =>
+        {
+            if (down)
+                return sendTurnDown();
+
+            return sendTurnUp();
+        }
+
+        /**
+         * Turns the shutter up and returns the sent message
+         * @returns The sent message
+         */
+        let sendTurnUp = () =>
+        {
+            let data = null;
+            switch (data_type)
+            {
+                case "SIMPLE":
+                    data = [{ payload: true }, { payload: false }, { payload: node_settings.last_position }];
+                    break;
+
+                case "HOMEASSISTANT":
+                    data = [{ payload: { action: "cover.open_cover" } }, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    break;
+
+                default:
+                    return null;
+            }
+            node.send(data);
+            return data;
+        }
+
+        /**
+         * Turns the shutter down and returns the sent message
+         * @returns The sent message
+         */
+        let sendTurnDown = () =>
+        {
+            let data = null;
+            switch (data_type)
+            {
+                case "SIMPLE":
+                    data = [{ payload: false }, { payload: true }, { payload: node_settings.last_position }];
+                    break;
+
+                case "HOMEASSISTANT":
+                    data = [{ payload: { action: "cover.close_cover" } }, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    break;
+
+                default:
+                    return null;
+            }
+            node.send(data);
+            return data;
+        }
+
+        /**
+         * Stops the shutter and returns the sent message
+         * @returns The sent message
+         */
+        let sendStop = () =>
+        {
+            let data = null;
+            switch (data_type)
+            {
+                case "SIMPLE":
+                    data = [null, { payload: true }, null];
+                    break;
+
+                case "HOMEASSISTANT":
+                    data = [{ payload: { action: "cover.stop_cover" } }, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    break;
+
+                default:
+                    return null;
+            }
+            node.send(data);
+            return data;
+        }
+
+        /**
+         * Sets the current position state of the shutter to the given value and returns the sent message
+         * @param {int} position The current position in percent
+         * @returns The sent message
+         */
+        let sendPositionState = position =>
+        {
+            let data = null;
+            switch (data_type)
+            {
+                case "SIMPLE":
+                    data = [null, null, { payload: position }];
+                    break;
+
+                case "HOMEASSISTANT":
+                    data = [null, { payload: { action: "number.set_value", data: { "value": parseInt(node_settings.last_position * 2.55, 10) } } }];
+                    break;
+
+                default:
+                    return null;
+            }
+            node.send(data);
+            return data;
+        }
+
 
         /**
          * Notify all connected central nodes

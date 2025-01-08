@@ -45,6 +45,7 @@ module.exports = function (RED)
         let max_time_on = helper.getTimeInMs(config.max_time_on, config.max_time_on_unit);
         let alarm_action = config.alarm_action || "NOTHING";
         let alarm_off_action = config.alarm_off_action || "NOTHING";
+        let data_type = config.data_type || "SIMPLE";
 
         // ##################
         // # Runtime values #
@@ -230,7 +231,7 @@ module.exports = function (RED)
                     if (!node_settings.alarm_active)
                     {
                         isBlinking = true;
-                        node.send({ payload: !node_settings.last_value });
+                        sendState(!node_settings.last_value)
                         setStatus();
                         setTimeout(
                             () =>
@@ -238,7 +239,7 @@ module.exports = function (RED)
                                 isBlinking = false;
                                 if (!node_settings.alarm_active)
                                 {
-                                    node.send({ payload: node_settings.last_value });
+                                    sendState(node_settings.last_value)
                                     setStatus();
                                 }
                             },
@@ -283,7 +284,7 @@ module.exports = function (RED)
             }
 
             if (node_settings.alarm_active || helper.getTopicName(msg.topic) != "status")
-                node.send({ payload: node_settings.last_value });
+                sendState(node_settings.last_value)
 
             // Output is on, now
             if (node_settings.last_value && doRestartTimer)
@@ -326,7 +327,7 @@ module.exports = function (RED)
             {
                 timeout = null;
                 node_settings.last_value = false;
-                node.send({ payload: false });
+                sendTurnOff();
                 notifyCentral(false);
 
                 setStatus();
@@ -370,6 +371,67 @@ module.exports = function (RED)
             {
                 node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Off" });
             }
+        }
+
+        /**
+         * Turns the output to the given state and returns the sent message
+         * @param {bool} state The new state of the output
+         * @returns The sent message
+         */
+        let sendState = state =>
+        {
+            if (state)
+                return sendTurnOn();
+
+            return sendTurnOff();
+        }
+
+        /**
+         * Turns the output on and returns the sent message
+         * @returns The sent message
+         */
+        let sendTurnOn = () =>
+        {
+            let data = null;
+            switch (data_type)
+            {
+                case "SIMPLE":
+                    data = { payload: true };
+                    break;
+
+                case "HOMEASSISTANT":
+                    data = { payload: { action: "homeassistant.turn_on" } };
+                    break;
+
+                default:
+                    return null;
+            }
+            node.send(data);
+            return data;
+        }
+
+        /**
+         * Turns the output off and returns the sent message
+         * @returns The sent message
+         */
+        let sendTurnOff = () =>
+        {
+            let data = null;
+            switch (data_type)
+            {
+                case "SIMPLE":
+                    data = { payload: false };
+                    break;
+
+                case "HOMEASSISTANT":
+                    data = { payload: { action: "homeassistant.turn_off" } };
+                    break;
+
+                default:
+                    return null;
+            }
+            node.send(data);
+            return data;
         }
 
         /**
