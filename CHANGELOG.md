@@ -141,13 +141,6 @@
 
 -   Removed log outputs.
 
-## Version 0.5.0:
+## Version 0.4.15:
 
--   Added new option to define node output format.
-
-    -   Simple: Compatible with knx_ultimate nodes.
-    -   HomeAssistant: Outputs messages that can directly be sent to home assistant entities via action nodes.
-
-        **Important Action node settings:**
-
-        -   Disable option `Block input overrides`, so the smart nodes can control the actions and the sended data.
+-   Reverted some tests.
