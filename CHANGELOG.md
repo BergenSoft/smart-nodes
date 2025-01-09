@@ -140,3 +140,7 @@
 ## Version 0.4.14:
 
 -   Removed log outputs.
+
+## Version 0.4.15:
+
+-   Reverted some tests.
