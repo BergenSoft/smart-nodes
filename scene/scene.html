@@ -144,7 +144,7 @@
             $("#node-input-property-outputs").editableList("height", outputHeight);
 
             // links tree list
-            var rows = $("#dialog-form>div:not(#smart-control-scenes)");
+            var rows = $("#dialog-form>div:not(#light-control-scenes)");
             var height = $("#dialog-form").height();
             for (var i = 0; i < rows.length; i++)
             {
@@ -219,7 +219,6 @@
             defaults: {
                 name: { value: "" },
                 exec_text_names: { value: "" },
-                data_type: { value: "SIMPLE" }, // SIMPLE || HOMEASSISTANT
                 max_time_on: { value: "0" },
                 max_time_on_unit: { value: "s" },
                 outputs: { value: 1 },
@@ -247,19 +246,6 @@
 
                 onEditPrepare(this, ["smart_central-control"]);
                 initTreeList(node, ["smart_central-control"]);
-
-                $("#node-input-data_type")
-                    .css("max-width", "70%")
-                    .typedInput({
-                        types: [{
-                            value: "data_type",
-                            default: "SIMPLE",
-                            options: [
-                                { value: "SIMPLE", label: node._("scene.ui.simple") },
-                                { value: "HOMEASSISTANT", label: node._("scene.ui.home_assistant") }
-                            ],
-                        }],
-                    });
 
                 // Output list
                 var outputList = $("#node-input-property-outputs").css("min-height", "120px").css("min-width", "445px");
@@ -470,16 +456,12 @@
         <div style="max-width: 450px;" data-i18n="scene.ui.controlled_by_words"></div>
     </div>
     <div class="form-row">
-        <label for="node-input-data_type"><i class="fa fa-file-code-o"></i> <span data-i18n="scene.ui.data_type"></span></label>
-        <input id="node-input-data_type"/>
-    </div>
-    <div class="form-row">
         <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> <span data-i18n="scene.ui.time_on"></span></label>
         <input id="node-input-max_time_on" value="0" />
         <input id="node-input-max_time_on_unit" />
     </div>
 
-    <div id="smart-control-scenes">
+    <div id="light-control-scenes">
         <div class="form-row scene-tabs-row">
             <ul style="min-width: 600px; margin-bottom: 20px;" id="scene-tabs"></ul>
         </div>

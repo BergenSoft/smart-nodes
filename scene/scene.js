@@ -41,8 +41,6 @@ module.exports = function (RED)
         // # Dynamic config #
         // ##################
         let max_time_on = helper.getTimeInMs(config.max_time_on, config.max_time_on_unit);
-        let data_type = config.data_type || "SIMPLE";
-
 
         // ##################
         // # Runtime values #
@@ -205,7 +203,7 @@ module.exports = function (RED)
 
             stopAutoOff();
 
-            sendStates(node_settings.last_values);
+            node.send(node_settings.last_values.map(val => { return { payload: val }; }));
             notifyCentral();
         }
 
@@ -274,7 +272,7 @@ module.exports = function (RED)
             {
                 timeout = null;
                 node_settings.last_values = new Array(config.outputs).fill(false);
-                sendStates(node_settings.last_values);
+                node.send(node_settings.last_values.map(val => { return { payload: val }; }));
                 notifyCentral();
 
                 setStatus();
@@ -305,31 +303,6 @@ module.exports = function (RED)
             {
                 node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Off" });
             }
-        }
-
-        /**
-         * Turns the outputs to the given states and returns the sent messages
-         * @param {bool[]} states The new states of the outputs
-         * @returns The sent messages
-         */
-        let sendStates = states =>
-        {
-            let data = null;
-            switch (data_type)
-            {
-                case "SIMPLE":
-                    data = states.map(val => { return { payload: val }; });
-                    break;
-
-                case "HOMEASSISTANT":
-                    data = states.map(val => { return { payload: { action: val ? "homeassistant.turn_on" : "homeassistant.turn_off" } }; });
-                    break;
-
-                default:
-                    return null;
-            }
-            node.send(data);
-            return data;
         }
 
         let notifyCentral = () =>

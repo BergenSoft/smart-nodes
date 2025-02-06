@@ -41,7 +41,6 @@ module.exports = function (RED)
         // # Dynamic config #
         // ##################
         let short_time_on_ms = parseInt(config.short_time_on_ms || 200, 10);
-        let data_type = config.data_type || "SIMPLE";
 
 
         // ##################
@@ -180,17 +179,17 @@ module.exports = function (RED)
 
             if (resultUpDown != null)
             {
-                sendDirection(resultUpDown);
+                node.send([{ payload: resultUpDown }, null, null]);
                 notifyCentral(true);
             }
             else if (resultStop != null)
             {
-                sendStop();
+                node.send([null, { payload: resultStop }, null]);
                 notifyCentral(false);
             }
             else if (resultPosition != null)
             {
-                sendPosition(cover.set_cover_position);
+                node.send([null, null, { payload: resultPosition }]);
             }
         };
 
@@ -219,7 +218,7 @@ module.exports = function (RED)
                 is_running = false;
                 timeout = null;
 
-                sendStop();
+                node.send([null, { payload: true }, null]);
                 notifyCentral(false);
 
                 smart_context.set(node.id, node_settings);
@@ -239,6 +238,7 @@ module.exports = function (RED)
                 timeout = null;
             }
         };
+
         /**
          * Set the current node status
          */
@@ -261,118 +261,6 @@ module.exports = function (RED)
 
             node.status({ fill, shape, text: helper.getCurrentTimeForStatus() + ": " + texts.join(", ") });
         }
-
-        /**
-         * Turns the shutter to the given direction and returns the sent message
-         * @param {bool} down True if down, else up
-         * @returns The sent message
-         */
-        let sendDirection = down =>
-        {
-            if (down)
-                return sendTurnDown();
-
-            return sendTurnUp();
-        }
-
-        /**
-         * Turns the shutter up and returns the sent message
-         * @returns The sent message
-         */
-        let sendTurnUp = () =>
-        {
-            let data = null;
-            switch (data_type)
-            {
-                case "SIMPLE":
-                    data = [{ payload: false }, null, null];
-                    break;
-
-                case "HOMEASSISTANT":
-                    data = { payload: { action: "cover.open_cover" } };
-                    break;
-
-                default:
-                    return null;
-            }
-            node.send(data);
-            return data;
-        }
-
-        /**
-         * Turns the shutter down and returns the sent message
-         * @returns The sent message
-         */
-        let sendTurnDown = () =>
-        {
-            let data = null;
-            switch (data_type)
-            {
-                case "SIMPLE":
-                    data = [{ payload: true }, null, null];
-                    break;
-
-                case "HOMEASSISTANT":
-                    data = { payload: { action: "cover.close_cover" } };
-                    break;
-
-                default:
-                    return null;
-            }
-            node.send(data);
-            return data;
-        }
-
-        /**
-         * Stops the shutter and returns the sent message
-         * @returns The sent message
-         */
-        let sendStop = () =>
-        {
-            let data = null;
-            switch (data_type)
-            {
-                case "SIMPLE":
-                    data = [null, { payload: true }, null];
-                    break;
-
-                case "HOMEASSISTANT":
-                    data = { payload: { action: "cover.stop_cover" } };
-                    break;
-
-                default:
-                    return null;
-            }
-            node.send(data);
-            return data;
-        }
-
-        /**
-         * Turns the shutter to the given position and returns the sent message
-         * @returns The sent message
-         */
-        let sendPosition = position =>
-        {
-            let data = null;
-            switch (data_type)
-            {
-                case "SIMPLE":
-                    data = [null, null, { payload: position }];
-                    break;
-
-                case "HOMEASSISTANT":
-                    // In Simple, 0% is open
-                    // In HomeAssistant 100% is open
-                    data = { payload: { action: "cover.set_cover_position", data: { position: 100 - position } } };
-                    break;
-
-                default:
-                    return null;
-            }
-            node.send(data);
-            return data;
-        }
-
 
         /**
          * Notify all connected central nodes

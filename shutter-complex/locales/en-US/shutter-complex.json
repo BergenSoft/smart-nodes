@@ -4,11 +4,6 @@
             "name": "Name",
             "text": "Text",
             "controlled_by_words": "This node can be controlled using the words entered. Multiple words are separated by a comma.",
-
-            "data_type": "Data type",
-            "simple": "Simple format",
-            "home_assistant": "HA Action format",
-
             "time_up": "Time up",
             "time_down": "Time down",
             "pause_change": "Pause change",
