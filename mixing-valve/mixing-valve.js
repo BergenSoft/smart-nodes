@@ -30,6 +30,9 @@ module.exports = function (RED)
             setpoint: config.setpoint,
             off_mode: config.off_mode,
             valve_mode: config.valve_mode,
+            precision: config.precision || 1,
+            max_change_percent: config.max_change_percent || 2,
+            max_change_temp_difference: config.max_change_temp_difference || 20,
             last_position: null
         }, smart_context.get(node.id));
 
@@ -243,15 +246,18 @@ module.exports = function (RED)
 
             // +/- 1°C => already good enough, do nothing
             let temp_diff = Math.abs(current_temperature - node_settings.setpoint);
-            if (temp_diff < 1)
+            if (temp_diff < node_settings.precision)
                 return;
 
             // Calculate change time
             // Change time in ms for 1%
             let moving_time = time_total_s * 1000 / 100;
             // 0 °C diff => 0% change
-            // 20 °C diff => 2% change
-            moving_time *= helper.scale(Math.min(temp_diff, 20), 0, 20, 0, 2);
+            // for max_change_temp_difference (default: 20 °C) diff => max_change_percent (default: 2%) change
+            moving_time *= helper.scale(Math.min(temp_diff, node_settings.max_change_temp_difference),
+               0, node_settings.max_change_temp_difference,
+               0, node_settings.max_change_percent
+            );
 
             // calculate direction
             let adjustAction = ADJUST_CLOSE;

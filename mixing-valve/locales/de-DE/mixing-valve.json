@@ -13,7 +13,11 @@
             "open": "Öffnen (100%)",
             "close": "Schließen (0%)",
             "heating": "Heizen (normal)",
-            "cooling": "Kühlen (invertiert)"
+            "cooling": "Kühlen (invertiert)",
+
+            "precision": "Hysterese (Präzision)",
+            "max_change_percent": "Max Positionsänderung",
+            "max_change_temp_difference": "Temperaturen für max Positionsänderung"
         }
     }
 }
