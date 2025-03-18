@@ -290,10 +290,7 @@ module.exports = function (RED)
             adjusting = adjustAction;
             changing_timeout = setTimeout(() =>
             {
-                changing_timeout = null;
-                adjusting = null;
                 stopChanging();
-                setStatus();
             }, time_ms);
 
             setStatus();
@@ -317,10 +314,12 @@ module.exports = function (RED)
             adjusting_start_time = null;
 
             let changed_value = (time_passed / time_total_s) * 100; // calculate in % value (0-100)
-            if (adjusting == ADJUST_OPEN)
+            if (adjusting === ADJUST_OPEN)
                 node_settings.last_position += changed_value;
             else
                 node_settings.last_position -= changed_value;
+
+            adjusting = null;
 
             // Only values from 0 to 100 are allowed
             node_settings.last_position = Math.min(Math.max(node_settings.last_position, 0), 100);
