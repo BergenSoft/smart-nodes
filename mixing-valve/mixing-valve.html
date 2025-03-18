@@ -11,6 +11,9 @@
             time_sampling: { value: 60 },
             off_mode: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
             valve_mode: { value: "HEATING" }, // HEATING | COOLING
+            precision: { value: 1.0 },
+            max_change_percent: { value: 1 },
+            max_change_temp_difference: { value: 20 },
         },
         inputs: 1,
         outputs: 3,
@@ -93,6 +96,51 @@
                         ],
                     }],
                 });
+
+            $("#node-input-precision")
+                  .css("max-width", "4rem")
+                  .spinner({
+                      min: 0.1,
+                      max: 1,
+                      change: function (event, ui)
+                      {
+                          var value = parseFloat(this.value);
+                          value = isNaN(value) ? 0 : value;
+                          value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
+                          value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
+                          if (value !== this.value) $(this).spinner("value", value);
+                      },
+                  });
+
+            $("#node-input-max_change_percent")
+                  .css("max-width", "4rem")
+                  .spinner({
+                      min: 1,
+                      max: 20,
+                      change: function (event, ui)
+                      {
+                          var value = parseInt(this.value);
+                          value = isNaN(value) ? 0 : value;
+                          value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                          value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                          if (value !== this.value) $(this).spinner("value", value);
+                      },
+                  });
+
+            $("#node-input-max_change_temp_difference")
+                  .css("max-width", "4rem")
+                  .spinner({
+                      min: 1,
+                      max: 20,
+                      change: function (event, ui)
+                      {
+                          var value = parseInt(this.value);
+                          value = isNaN(value) ? 0 : value;
+                          value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                          value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                          if (value !== this.value) $(this).spinner("value", value);
+                      },
+                  });
         },
     });
 </script>
@@ -125,5 +173,17 @@
     <div class="form-row">
         <label for="node-input-valve_mode"><i class="fa fa-fire"></i> <span data-i18n="mixing-valve.ui.mode"></span></label>
         <input id="node-input-valve_mode" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-precision"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.precision"></span></label>
+        <input id="node-input-precision" value="0" /> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_change_percent"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.max_change_percent"></span></label>
+        <input id="node-input-max_change_percent" value="0" /> %
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_change_temp_difference"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.max_change_temp_difference"></span></label>
+        <input id="node-input-max_change_temp_difference" value="0" /> °C
     </div>
 </script>
