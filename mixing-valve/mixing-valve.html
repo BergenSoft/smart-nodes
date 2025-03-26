@@ -14,6 +14,7 @@
             precision: { value: 1.0 },
             max_change_percent: { value: 1 },
             max_change_temp_difference: { value: 20 },
+            min_change_time: { value: 0 }
         },
         inputs: 1,
         outputs: 3,
@@ -117,7 +118,7 @@
                   .css("max-width", "4rem")
                   .spinner({
                       min: 1,
-                      max: 20,
+                      max: 40,
                       change: function (event, ui)
                       {
                           var value = parseInt(this.value);
@@ -133,6 +134,22 @@
                   .spinner({
                       min: 1,
                       max: 20,
+                      change: function (event, ui)
+                      {
+                          var value = parseInt(this.value);
+                          value = isNaN(value) ? 0 : value;
+                          value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                          value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                          if (value !== this.value) $(this).spinner("value", value);
+                      },
+                  });
+
+            $("#node-input-min_change_time")
+                  .css("max-width", "4rem")
+                  .spinner({
+                      min: 0,
+                      max: 2000,
+                      step: 100,
                       change: function (event, ui)
                       {
                           var value = parseInt(this.value);
@@ -186,5 +203,9 @@
     <div class="form-row">
         <label for="node-input-max_change_temp_difference"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.max_change_temp_difference"></span></label>
         <input id="node-input-max_change_temp_difference" value="20" /> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-min_change_time"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.min_change_time"></span></label>
+        <input id="node-input-min_change_time" value="0" /> ms
     </div>
 </script>
