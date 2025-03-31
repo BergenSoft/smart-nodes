@@ -120,6 +120,10 @@ module.exports = function (RED)
             switch (real_topic)
             {
                 case "enable":
+                    if(node_settings.enabled)
+                    {
+                        break;
+                    }
                     node_settings.enabled = true;
 
                     stopChanging();
@@ -127,6 +131,10 @@ module.exports = function (RED)
                     break;
 
                 case "disable":
+                    if(!node_settings.enabled)
+                    {
+                        break;
+                    }
                     node_settings.enabled = false;
 
                     stopSampling();
