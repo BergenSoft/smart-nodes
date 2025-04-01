@@ -13,7 +13,11 @@
             "open": "Open (100%)",
             "close": "Close (0%)",
             "heating": "Heating (normal)",
-            "cooling": "Cooling (inverted)"
+            "cooling": "Cooling (inverted)",
+
+            "precision": "Hysteresis (precision)",
+            "max_change_percent": "Max change",
+            "max_change_temp_difference": "Temp at max change"
         }
     }
 }

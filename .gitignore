@@ -1,2 +1,5 @@
 *.tgz
 my.md
+*.iml
+.idea
+node_modules
