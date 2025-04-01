@@ -33,7 +33,8 @@ module.exports = function (RED)
             precision: config.precision || 1,
             max_change_percent: config.max_change_percent || 2,
             max_change_temp_difference: config.max_change_temp_difference || 20,
-            last_position: null
+            last_position: null,
+            min_change_time: config.min_change_time || 0
         }, smart_context.get(node.id));
 
 
@@ -119,6 +120,9 @@ module.exports = function (RED)
             switch (real_topic)
             {
                 case "enable":
+                    if (node_settings.enabled)
+                        break;
+
                     node_settings.enabled = true;
 
                     stopChanging();
@@ -126,6 +130,9 @@ module.exports = function (RED)
                     break;
 
                 case "disable":
+                    if (!node_settings.enabled)
+                        break;
+
                     node_settings.enabled = false;
 
                     stopSampling();
@@ -254,10 +261,16 @@ module.exports = function (RED)
             let moving_time = time_total_s * 1000 / 100;
             // 0 °C diff => 0% change
             // for max_change_temp_difference (default: 20 °C) diff => max_change_percent (default: 2%) change
-            moving_time *= helper.scale(Math.min(temp_diff, node_settings.max_change_temp_difference),
-               0, node_settings.max_change_temp_difference,
-               0, node_settings.max_change_percent
+            moving_time *= helper.scale(
+                Math.min(temp_diff, node_settings.max_change_temp_difference),
+                0,
+                node_settings.max_change_temp_difference,
+                0,
+                node_settings.max_change_percent
             );
+
+            if (moving_time < node_settings.min_change_time)
+                moving_time = node_settings.min_change_time;
 
             // calculate direction
             let adjustAction = ADJUST_CLOSE;

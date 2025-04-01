@@ -17,7 +17,8 @@
 
             "precision": "Hysterese (Präzision)",
             "max_change_percent": "Max Positionsänderung",
-            "max_change_temp_difference": "Temperaturen für max Positionsänderung"
+            "max_change_temp_difference": "Temperaturen für max Positionsänderung",
+            "min_change_time": "Mindeständerungsdauer"
         }
     }
 }

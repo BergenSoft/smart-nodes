@@ -17,7 +17,8 @@
 
             "precision": "Hysteresis (precision)",
             "max_change_percent": "Max change",
-            "max_change_temp_difference": "Temp at max change"
+            "max_change_temp_difference": "Temp at max change",
+            "min_change_time": "Min change duration"
         }
     }
 }

@@ -157,3 +157,7 @@
 ## Version 0.4.18:
 
 -   Fixed up_down message for central node.
+
+## Version 0.4.19:
+
+-   Added min_change_time option to mixing valve node.
