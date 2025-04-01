@@ -107,13 +107,15 @@ module.exports = function (RED)
                     }
                     else if (real_topic == "up_down")
                     {
-                        if (new_msg.payload === false)
+                        if (new_msg.payload === true)
                         {
                             new_msg.topic = "down";
+                            delete new_msg.payload;
                         }
-                        else if (new_msg.payload === true)
+                        else if (new_msg.payload === false)
                         {
                             new_msg.topic = "up";
+                            delete new_msg.payload;
                         }
                         else
                         {
