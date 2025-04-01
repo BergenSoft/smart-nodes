@@ -105,6 +105,13 @@ module.exports = function (RED)
                         else
                             new_msg.topic = "stop";
                     }
+                    else if (real_topic == "up_down")
+                    {
+                        if (new_msg.payload)
+                            new_msg.topic = "down";
+                        else
+                            new_msg.topic = "up";
+                    }
                     break;
 
                 case MODE_LIGHT:

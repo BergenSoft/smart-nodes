@@ -144,3 +144,12 @@
 ## Version 0.4.15:
 
 -   Reverted some tests.
+
+## Version 0.4.16:
+
+-   Reverted some tests.
+
+## Version 0.4.17:
+
+-   Fixed mixing valve position calculation.
+-   Fixed up_down message for central node.

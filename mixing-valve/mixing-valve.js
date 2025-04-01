@@ -291,8 +291,8 @@ module.exports = function (RED)
             changing_timeout = setTimeout(() =>
             {
                 changing_timeout = null;
-                adjusting = null;
                 stopChanging();
+                adjusting = null;
                 setStatus();
             }, time_ms);
 
