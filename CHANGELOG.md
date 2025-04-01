@@ -153,3 +153,7 @@
 
 -   Fixed mixing valve position calculation.
 -   Fixed up_down message for central node.
+
+## Version 0.4.18:
+
+-   Fixed up_down message for central node.

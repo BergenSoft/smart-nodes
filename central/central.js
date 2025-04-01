@@ -107,10 +107,19 @@ module.exports = function (RED)
                     }
                     else if (real_topic == "up_down")
                     {
-                        if (new_msg.payload)
+                        if (new_msg.payload === false)
+                        {
                             new_msg.topic = "down";
-                        else
+                        }
+                        else if (new_msg.payload === true)
+                        {
                             new_msg.topic = "up";
+                        }
+                        else
+                        {
+                            helper.warn("Invalid payload for central, topic=up_down. Only boolean is allowed and required");
+                            return;
+                        }
                     }
                     break;
 
