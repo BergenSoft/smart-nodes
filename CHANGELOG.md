@@ -165,3 +165,11 @@
 ## Version 0.4.20:
 
 -   Small bugfix.
+
+## Version 0.4.21:
+
+-   Fixed up_down direction in central node..
+
+## Version 0.4.22:
+
+-   Added set_state_inverted topic to forwarder node.
