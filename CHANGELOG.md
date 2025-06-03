@@ -173,3 +173,11 @@
 ## Version 0.4.22:
 
 -   Added set_state_inverted topic to forwarder node.
+
+## Version 0.4.23:
+
+-   Added set_state_inverted topic to mixing-valve node.
+-   Added set_state_inverted topic to scheduler node.
+-   Changed default of save_state and resend_on_start to false for all nodes.
+-   Hysteresis node can now be defined by min/max values.
+-   Added support for percentage output for the light node.

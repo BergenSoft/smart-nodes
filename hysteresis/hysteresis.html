@@ -5,16 +5,19 @@
         color: "#E2D96E",
         defaults: {
             name: { value: "" },
+            mode: { value: "HYSTERESIS" }, // HYSTERESIS | MIN_MAX
             setpoint: { value: 10 },
             hysteresis: { value: 1 },
+            min: { value: 10 },
+            max: { value: 20 },
             out_higher: { value: '{"topic": ""}' },
             out_higher_type: { value: 'json' },
             out_lower: { value: '{"topic": ""}' },
             out_lower_type: { value: 'json' },
             send_only_change: { value: true },
             outputs: { value: 1 },
-            save_state: { value: true },
-            resend_on_start: { value: true }
+            save_state: { value: false },
+            resend_on_start: { value: false }
         },
         inputs: 1,
         outputs: 2,
@@ -31,6 +34,34 @@
         {
             let node = this;
 
+            $("#node-input-mode")
+                .css("max-width", "70%")
+                .typedInput({
+                    types: [{
+                        value: "mode",
+                        default: "HYSTERESIS",
+                        options: [
+                            { value: "HYSTERESIS", label: node._("hysteresis.ui.hysteresis") },
+                            { value: "MIN_MAX", label: node._("hysteresis.ui.min_max") }
+                        ],
+                    }],
+                });
+
+            $("#node-input-mode").on("change", function ()
+            {
+                if (this.value == "HYSTERESIS")
+                {
+                    $(".hysteresis-row").show();
+                    $(".min-max-row").hide();
+                }
+                else
+                {
+                    $(".hysteresis-row").hide();
+                    $(".min-max-row").show();
+                }
+            });
+            $("#node-input-mode").trigger("change");
+
             $("#node-input-setpoint")
                 .css("max-width", "70%")
                 .typedInput({
@@ -45,7 +76,19 @@
                     types: ["num"]
                 });
 
+            $("#node-input-min")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "num",
+                    types: ["num"]
+                });
 
+            $("#node-input-max")
+                .css("max-width", "70%")
+                .typedInput({
+                    type: "num",
+                    types: ["num"]
+                });
 
             $("#node-input-out_higher")
                 .css("max-width", "70%")
@@ -153,8 +196,10 @@
         {
             let node = this;
 
-            this.setpoint = parseFloat(this.setpoint);
-            this.hysteresis = parseFloat(this.hysteresis);
+            this.setpoint = parseFloat(this.setpoint ?? 10);
+            this.hysteresis = parseFloat(this.hysteresis ?? 1);
+            this.min = parseFloat(this.min ?? 10);
+            this.max = parseFloat(this.max ?? 20);
         }
     });
 </script>
@@ -165,12 +210,24 @@
         <input type="text" id="node-input-name" data-i18n="[placeholder]hysteresis.ui.name" />
     </div>
     <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-arrow-right"></i> <span data-i18n="hysteresis.ui.mode"></span></label>
+        <input id="node-input-mode"/>
+    </div>
+    <div class="form-row hysteresis-row">
         <label for="node-input-setpoint"><i class="fa fa-sign-out"></i> <span data-i18n="hysteresis.ui.setpoint"></span></label>
         <input id="node-input-setpoint" />
     </div>
-    <div class="form-row">
+    <div class="form-row hysteresis-row">
         <label for="node-input-hysteresis"><i class="fa fa-sort"></i> <span data-i18n="hysteresis.ui.hysteresis"></span></label>
         <input id="node-input-hysteresis" />
+    </div>
+    <div class="form-row min-max-row">
+        <label for="node-input-min"><i class="fa fa-angle-down"></i> <span data-i18n="hysteresis.ui.min"></span></label>
+        <input id="node-input-min" />
+    </div>
+    <div class="form-row min-max-row">
+        <label for="node-input-max"><i class="fa fa-angle-up"></i> <span data-i18n="hysteresis.ui.max"></span></label>
+        <input id="node-input-max" />
     </div>
     <hr/>
     <h4 style="margin: 0.5rem 0;" data-i18n="hysteresis.ui.output_messages"></h4>

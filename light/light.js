@@ -45,6 +45,7 @@ module.exports = function (RED)
         let max_time_on = helper.getTimeInMs(config.max_time_on, config.max_time_on_unit);
         let alarm_action = config.alarm_action || "NOTHING";
         let alarm_off_action = config.alarm_off_action || "NOTHING";
+        let mode = config.mode || "BOOL";
 
         // ##################
         // # Runtime values #
@@ -116,8 +117,11 @@ module.exports = function (RED)
                     if (isBlinking)
                         return;
 
-                    // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    // Make sure it is bool or int
+                    if (mode == "BOOL")
+                        msg.payload = !!msg.payload;
+                    else if (mode == "PERCENTAGE")
+                        msg.payload = boolToInt(msg.payload);
 
                     // Output is already in the state of the status value and the timeout is running.
                     // No need to restart the timeout.
@@ -132,7 +136,13 @@ module.exports = function (RED)
                     if (msg.payload === false)
                         return;
 
-                    node_settings.last_value = false;
+                    isBlinking = false;
+
+                    if (mode == "BOOL")
+                        node_settings.last_value = false;
+                    else if (mode == "PERCENTAGE")
+                        node_settings.last_value = 0;
+
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 
@@ -141,22 +151,38 @@ module.exports = function (RED)
                     if (msg.payload === false)
                         return;
 
-                    node_settings.last_value = true;
+                    isBlinking = false;
+
+                    if (mode == "BOOL")
+                        node_settings.last_value = true;
+                    else if (mode == "PERCENTAGE")
+                        node_settings.last_value = 100;
+
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 
                 case "set":
-                    // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    // Make sure it is bool or int
+                    if (mode == "BOOL")
+                        msg.payload = !!msg.payload;
+                    else if (mode == "PERCENTAGE")
+                        msg.payload = boolToInt(msg.payload);
+
+                    isBlinking = false;
 
                     node_settings.last_value = msg.payload;
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 
                 case "set_permanent":
-                    // Make sure it is bool
-                    msg.payload = !!msg.payload;
-                    isPermanent = msg.payload;
+                    // Make sure it is bool or int
+                    if (mode == "BOOL")
+                        msg.payload = !!msg.payload;
+                    else if (mode == "PERCENTAGE")
+                        msg.payload = boolToInt(msg.payload);
+
+                    isBlinking = false;
+                    isPermanent = !!msg.payload; // false or 0 => not permanent
 
                     node_settings.last_value = msg.payload;
                     node_settings.last_value_sended = node_settings.last_value;
@@ -166,25 +192,38 @@ module.exports = function (RED)
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
                     isMotion = msg.payload;
+                    isBlinking = false;
 
                     if (msg.payload == false)
                     {
-                        // It already was off, so don't turn on
-                        if (node_settings.last_value == false)
+                        // It already was off, so don't turn on                        
+                        if (mode == "BOOL" && node_settings.last_value == false)
+                            return;
+                        if (mode == "PERCENTAGE" && node_settings.last_value == 0)
                             return;
 
                         // If time is set to 0, then turn off immediately
                         if (helper.getTimeInMsFromString(msg.time_on ?? max_time_on) == 0)
-                            node_settings.last_value = false;
+                        {
+                            if (mode == "BOOL")
+                                node_settings.last_value = false;
+                            else if (mode == "PERCENTAGE")
+                                node_settings.last_value = 0;
+                        }
                     }
                     else
                     {
-                        node_settings.last_value = true;
+                        if (mode == "BOOL")
+                            node_settings.last_value = true;
+                        else if (mode == "PERCENTAGE")
+                            node_settings.last_value = 100;
                     }
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 
                 case "alarm":
+                    isBlinking = false;
+                    
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
 
@@ -207,11 +246,17 @@ module.exports = function (RED)
                                 break;
 
                             case "ON":
-                                node_settings.last_value = true;
+                                if (mode == "BOOL")
+                                    node_settings.last_value = true;
+                                else if (mode == "PERCENTAGE")
+                                    node_settings.last_value = 100;
                                 break;
 
                             case "OFF":
-                                node_settings.last_value = false;
+                                if (mode == "BOOL")
+                                    node_settings.last_value = false;
+                                else if (mode == "PERCENTAGE")
+                                    node_settings.last_value = 0;
                                 break;
 
                             case "LAST":
@@ -230,7 +275,11 @@ module.exports = function (RED)
                     if (!node_settings.alarm_active)
                     {
                         isBlinking = true;
-                        node.send({ payload: !node_settings.last_value });
+                        if (mode == "BOOL")
+                            node.send({ payload: !node_settings.last_value });
+                        else if (mode == "PERCENTAGE")
+                            node.send({ payload: node_settings.last_value == 100 ? 0 : 100 });
+
                         setStatus();
                         setTimeout(
                             () =>
@@ -253,7 +302,11 @@ module.exports = function (RED)
                     if (msg.payload === false)
                         return;
 
-                    node_settings.last_value = !node_settings.last_value;
+                    if (mode == "BOOL")
+                        node_settings.last_value = !node_settings.last_value;
+                    else if (mode == "PERCENTAGE")
+                        node_settings.last_value = node_settings.last_value == 100 ? 0 : 100;
+
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
             }
@@ -269,11 +322,17 @@ module.exports = function (RED)
                 switch (alarm_action)
                 {
                     case "ON":
-                        node_settings.last_value = true;
+                        if (mode == "BOOL")
+                            node_settings.last_value = true;
+                        else if (mode == "PERCENTAGE")
+                            node_settings.last_value = 100;
                         break;
 
                     case "OFF":
-                        node_settings.last_value = false;
+                        if (mode == "BOOL")
+                            node_settings.last_value = false;
+                        else if (mode == "PERCENTAGE")
+                            node_settings.last_value = 0;
                         break;
 
                     case "NOTHING":
@@ -289,7 +348,7 @@ module.exports = function (RED)
             if (node_settings.last_value && doRestartTimer)
                 startAutoOffIfNeeded(helper.getTimeInMsFromString(msg.time_on ?? max_time_on));
 
-            notifyCentral(node_settings.last_value);
+            notifyCentral(!!node_settings.last_value);
         }
 
 
@@ -325,8 +384,13 @@ module.exports = function (RED)
             timeout = setTimeout(() =>
             {
                 timeout = null;
-                node_settings.last_value = false;
-                node.send({ payload: false });
+
+                if (mode == "BOOL")
+                    node_settings.last_value = false;
+                else if (mode == "PERCENTAGE")
+                    node_settings.last_value = 0;
+
+                node.send({ payload: node_settings.last_value });
                 notifyCentral(false);
 
                 setStatus();
@@ -370,6 +434,16 @@ module.exports = function (RED)
             {
                 node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Off" });
             }
+        }
+
+        let boolToInt = boolValue =>
+        {
+            if (boolValue === true)
+                return 100;
+            if (boolValue === false)
+                return 0;
+
+            return parseInt(boolValue, 10);
         }
 
         /**

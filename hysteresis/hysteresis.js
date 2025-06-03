@@ -27,8 +27,10 @@ module.exports = function (RED)
             last_value: null,
             last_result: null,
             last_message: null,
-            setpoint: parseFloat(config.setpoint),
-            hysteresis: parseFloat(config.hysteresis)
+            setpoint: parseFloat(config.setpoint ?? 10),
+            hysteresis: parseFloat(config.hysteresis ?? 1),
+            min: parseFloat(config.min ?? 10),
+            max: parseFloat(config.max ?? 20)
         };
 
         if (config.save_state)
@@ -65,6 +67,7 @@ module.exports = function (RED)
         let out_lower = helper.evaluateNodeProperty(RED, config.out_lower, config.out_lower_type);
         let send_only_change = helper.evaluateNodeProperty(RED, config.send_only_change, "bool");
         let outputs = helper.evaluateNodeProperty(RED, config.outputs, "num");
+        let mode = config.mode || "HYSTERESIS";
 
 
         // ##################
@@ -116,6 +119,14 @@ module.exports = function (RED)
                     node_settings.hysteresis = value;
                     break;
 
+                case "min":
+                    node_settings.min = value;
+                    break;
+
+                case "max":
+                    node_settings.max = value;
+                    break;
+
                 default:
                     node_settings.last_value = value
                     break;
@@ -158,11 +169,22 @@ module.exports = function (RED)
 
         let getResult = value =>
         {
-            if (value >= node_settings.setpoint + node_settings.hysteresis && node_settings.last_result !== true)
-                return true;
+            if (mode == "HYSTERESIS")
+            {
+                if (value >= node_settings.setpoint + node_settings.hysteresis && node_settings.last_result !== true)
+                    return true;
 
-            if (value <= node_settings.setpoint - node_settings.hysteresis && node_settings.last_result !== false)
-                return false;
+                if (value <= node_settings.setpoint - node_settings.hysteresis && node_settings.last_result !== false)
+                    return false;
+            }
+            else if (mode == "MIN_MAX")
+            {
+                if (value >= node_settings.max && node_settings.last_result !== true)
+                    return true;
+
+                if (value <= node_settings.min && node_settings.last_result !== false)
+                    return false;
+            }
 
             if (send_only_change)
                 return null;
@@ -172,10 +194,21 @@ module.exports = function (RED)
 
         let setStatus = () =>
         {
-            if (node_settings.last_result == null)
-                node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": ❓ S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + (node_settings.last_value?.toFixed(2) ?? "null") });
-            else
-                node.status({ fill: node_settings.last_result ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.last_result ? "⬆️" : "⬇️") + " S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + node_settings.last_value?.toFixed(2) });
+            if (mode == "HYSTERESIS")
+            {
+                if (node_settings.last_result == null)
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": ❓ S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + (node_settings.last_value?.toFixed(2) ?? "null") });
+                else
+                    node.status({ fill: node_settings.last_result ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.last_result ? "⬆️" : "⬇️") + " S: " + node_settings.setpoint + " - H: " + node_settings.hysteresis + " - V: " + node_settings.last_value?.toFixed(2) });
+            }
+            else if (mode == "MIN_MAX")
+            {
+
+                if (node_settings.last_result == null)
+                    node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": ❓ Min: " + node_settings.min + " - Max: " + node_settings.max + " - V: " + (node_settings.last_value?.toFixed(2) ?? "null") });
+                else
+                    node.status({ fill: node_settings.last_result ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.last_result ? "⬆️" : "⬇️") + " Min: " + node_settings.min + " - Max: " + node_settings.max + " - V: " + node_settings.last_value?.toFixed(2) });
+            }
         }
 
         let createMessage = (out_msg, out_type, msg, value) =>

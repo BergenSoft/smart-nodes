@@ -21,32 +21,32 @@
                 <tr>
                     <td><code>status</code></td>
                     <td>
-                        Specifies the current status of the output via <code>msg.payload = true</code> or <code>msg.payload = false</code>.<br />
+                        Specifies the current status of the output via <code>msg.payload = true</code> or <code>msg.payload = false</code> respective <code>msg.payload = 100</code> or <code>msg.payload = 0</code>.<br />
                         When changing from switched off to switched on, the time measurement is started for the stored or  time, if available. </td>
                     <td>No</td>
                 </tr>
                 <tr>
                     <td><code>on</code></td>
-                    <td>Switches the output on and starts the time measurement for the stored or sent time, if available.</td>
+                    <td>Switches the output on (<code>true</code>/<code>100%</code>) and starts the time measurement for the stored or sent time, if available.</td>
                     <td>Yes</td>
                 </tr>
                 <tr>
                     <td><code>off</code></td>
-                    <td>Switches the output off.</td>
+                    <td>Switches the output off (<code>false</code>/<code>0%</code>).</td>
                     <td>Yes</td>
                 </tr>
                 <tr>
                     <td><code>set</code></td>
                     <td>
-                        Switches the output on when <code>msg.payload = true</code> and off when <code>msg.payload = false</code>.<br />
-                        When changing from switched off to switched on, the time measurement is started for the stored or sent time, if available.
+                        Switches the output on when <code>msg.payload = true</code> and off when <code>msg.payload = false, or sets the output to the sent percent value <code>msg.payload = 50</code>.</code>.<br />
+                        When changing the output value, the time measurement is started for the stored or sent time, if available.
                     </td>
                     <td>No</td>
                 </tr>
                 <tr>
                     <td><code>set_permanent</code></td>
                     <td>
-                        Switches the output on permanently when <code>msg.payload = true</code> and off when <code>msg.payload = false</code>.<br />
+                        Permanently sets the output to the value sent by <code>msg.payload</code>.<br/>
                         No time measurement is started.
                     </td>
                     <td>No</td>

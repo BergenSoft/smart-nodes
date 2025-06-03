@@ -83,7 +83,7 @@ module.exports = function (RED)
 
             if (real_topic == "set_state_inverted")
             {
-                real_topic == "set_state";
+                real_topic = "set_state";
                 msg.payload = !msg.payload;
             }
 

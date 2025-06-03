@@ -2,8 +2,12 @@
     "hysteresis": {
         "ui": {
             "name": "Name",
+            "mode": "Mode",
             "setpoint": "Setpoint",
             "hysteresis": "Hysteresis",
+            "min_max": "Min/Max",
+            "min": "Min",
+            "max": "Max",
             "output_messages": "Output messages",
             "over": "Over",
             "under": "Under",
@@ -11,7 +15,7 @@
             "outputs": "Outputs",
 
             "note": "Note:",
-            "note_text": "<code>msg.payload</code> is automatically set to the hysteresis result,<br/>if it has not already been set here in the configuration.<br/><code>true</code> if higher, <code>false</code> if lower",
+            "note_text": "<code>msg.payload</code> is automatically set to the hysteresis result,<br/>if it has not already been set here in the configuration.<br/><code>true</code> if higher, <code>false</code> if lower.",
             "system_start": "System start",
             "save_state": "Save state",
             "send_after_start": "Send last message 10 seconds after start",

@@ -21,33 +21,33 @@
                 <tr>
                     <td><code>status</code></td>
                     <td>
-                        Gibt über <code>msg.payload = true</code> oder <code>msg.payload = false</code> den aktuellen Status des Ausgangs an.<br/>
+                        Gibt über <code>msg.payload = true</code>, <code>msg.payload = false</code> bzw. über <code>msg.payload = 100</code>, <code>msg.payload = 0</code> den aktuellen Status des Ausgangs an.<br/>
                         Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
                     </td>
                     <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>on</code></td>
-                    <td>Schaltet den Ausgang ein und startet die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.</td>
+                    <td>Schaltet den Ausgang ein (<code>true</code>/<code>100%</code>) und startet die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.</td>
                     <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>off</code></td>
-                    <td>Schaltet den Ausgang aus.</td>
+                    <td>Schaltet den Ausgang aus (<code>false</code>/<code>0%</code>).</td>
                     <td>Ja</td>
                 </tr>
                 <tr>
                     <td><code>set</code></td>
                     <td>
-                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus.<br/>
-                        Bei einem Wechsel von ausgeschaltet nach eingeschaltet wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus, bzw. setzt den Ausgang auf den gesendeten Prozent Wert <code>msg.payload = 50</code>.<br/>
+                        Bei einem Wechsel des Ausgangswerts wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
                     </td>
                     <td>Nein</td>
                 </tr>
                 <tr>
                     <td><code>set_permanent</code></td>
                     <td>
-                        Schaltet den Ausgang bei <code>msg.payload = true</code> dauerhaft ein und bei <code>msg.payload = false</code> aus.<br/>
+                        Setzt den Ausgang dauerhaft auf den gesendeten Wert von <code>msg.payload</code>.<br/>
                         Es wird dabei keine Zeitmessung gestartet.
                     </td>
                     <td>Nein</td>

@@ -2,8 +2,12 @@
     "hysteresis": {
         "ui": {
             "name": "Name",
+            "mode": "Modus",
             "setpoint": "Sollwert",
             "hysteresis": "Hysterese",
+            "min_max": "Min/Max",
+            "min": "Min",
+            "max": "Max",
             "output_messages": "Ausgangsnachrichten",
             "over": "Über",
             "under": "Unter",
@@ -11,7 +15,7 @@
             "outputs": "Ausgänge",
 
             "note": "Hinweis:",
-            "note_text": "<code>msg.payload</code> wird automatisch auf das Hystere-Ergebnis gesetzt,<br/>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.<br/><code>true</code> wenn höher, <code>false</code> wenn niedriger",
+            "note_text": "<code>msg.payload</code> wird automatisch auf das Hystere-Ergebnis gesetzt,<br/>sofern es nicht bereits hier in der Konfiguration gesetzt wurde.<br/><code>true</code> wenn höher, <code>false</code> wenn niedriger.",
             "system_start": "Systemstart",
             "save_state": "Zustand speichern",
             "send_after_start": "Letze Nachricht 10 Sekunden nach dem Start senden",

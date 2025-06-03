@@ -139,6 +139,7 @@
             defaults: {
                 name: { value: "" },
                 exec_text_names: { value: "" },
+                mode: { value: "BOOL" }, // BOOL | PERCENTAGE
                 max_time_on: { value: "0" },
                 max_time_on_unit: { value: "s" },
                 alarm_action: { value: 'NOTHING' }, // NOTHING | ON | OFF
@@ -158,6 +159,19 @@
 
                 onEditPrepare(this, ["smart_central-control"]);
                 initTreeList(node, ["smart_central-control"]);
+
+                $("#node-input-mode")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            value: "mode",
+                            default: "BOOL",
+                            options: [
+                                { value: "BOOL", label: node._("light.ui.bool") },
+                                { value: "PERCENTAGE", label: node._("light.ui.percentage") }
+                            ],
+                        }],
+                    });
 
                 $("#node-input-max_time_on")
                     .css("max-width", "4rem")
@@ -241,6 +255,10 @@
         <label for="node-input-max_time_on"><i class="fa fa-clock-o"></i> <span data-i18n="light.ui.max_time_on"></span></label>
         <input id="node-input-max_time_on" value="0" />
         <input id="node-input-max_time_on_unit" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-arrow-right"></i> <span data-i18n="light.ui.mode"></span></label>
+        <input id="node-input-mode"/>
     </div>
     <div class="form-row">
         <label for="node-input-alarm_action"><i class="fa fa-exclamation-triangle"></i> <span data-i18n="light.ui.alarm_on"></span></label>

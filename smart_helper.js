@@ -359,10 +359,10 @@ module.exports = {
     /**
      * Forward all arguments to the console if it is enabled
      */
-    log()
+    log(node, ...args)
     {
         // uncomment to see all log values
-        // console.log(typeof node + " (" + node.id + "):", ...arguments);
+        // console.log(typeof node + " (" + node.id + "):", ...args);
     },
 
     /**
