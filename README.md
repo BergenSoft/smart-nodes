@@ -95,7 +95,7 @@ You can also choose 2-4 press detection.
 
 ## 7. Hysteresis
 
-This node is checking if the input value reachs a defined value until the upper message is send. When the lower level is reached, the lower masssage will be send
+This node is checking if the input value reachs a defined value until the upper message is send. When the lower level is reached, the lower message will be send.
 
 ### **Features:**
 
@@ -104,7 +104,7 @@ This node is checking if the input value reachs a defined value until the upper 
 
 ## 8. Logic
 
-This node can be used for AND, OR and XOR logics.
+This node can be used for AND, OR and XOR logics. Inputs and outputs can be individually selected to be inverted.
 
 ### **Features:**
 
