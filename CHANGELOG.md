@@ -181,3 +181,7 @@
 -   Changed default of save_state and resend_on_start to false for all nodes.
 -   Hysteresis node can now be defined by min/max values.
 -   Added support for percentage output for the light node.
+
+## Version 0.4.24:
+
+- Added set_inverted to light node.

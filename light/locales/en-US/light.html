@@ -38,7 +38,15 @@
                 <tr>
                     <td><code>set</code></td>
                     <td>
-                        Switches the output on when <code>msg.payload = true</code> and off when <code>msg.payload = false, or sets the output to the sent percent value <code>msg.payload = 50</code>.</code>.<br />
+                        Switches the output on when <code>msg.payload = true</code> and off when <code>msg.payload = false, or sets the output to the sent percent value <code>msg.payload = 30</code>.</code>.<br />
+                        When changing the output value, the time measurement is started for the stored or sent time, if available.
+                    </td>
+                    <td>No</td>
+                </tr>
+                <tr>
+                    <td><code>set_inverted</code></td>
+                    <td>
+                        Switches the output on when <code>msg.payload = false</code> and off when <code>msg.payload = true, or sets the output to 100 - the sent percent value <code>msg.payload = 30</code> => sent 70%.</code>.<br />
                         When changing the output value, the time measurement is started for the stored or sent time, if available.
                     </td>
                     <td>No</td>

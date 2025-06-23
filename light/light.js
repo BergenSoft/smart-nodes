@@ -110,6 +110,16 @@ module.exports = function (RED)
             let doRestartTimer = true;
             let real_topic = helper.getTopicName(msg.topic);
 
+            if (real_topic == "set_inverted")
+            {
+                real_topic = "set";
+
+                if (mode == "BOOL")
+                    msg.payload = !msg.payload;
+                else if (mode == "PERCENTAGE")
+                    msg.payload = 100 - boolToInt(msg.payload);
+            }
+
             switch (real_topic)
             {
                 case "status":
@@ -223,7 +233,7 @@ module.exports = function (RED)
 
                 case "alarm":
                     isBlinking = false;
-                    
+
                     // Make sure it is bool
                     msg.payload = !!msg.payload;
 

@@ -39,7 +39,15 @@
                 <tr>
                     <td><code>set</code></td>
                     <td>
-                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus, bzw. setzt den Ausgang auf den gesendeten Prozent Wert <code>msg.payload = 50</code>.<br/>
+                        Schaltet den Ausgang bei <code>msg.payload = true</code> ein und bei <code>msg.payload = false</code> aus, bzw. setzt den Ausgang auf den gesendeten Prozent Wert <code>msg.payload = 30</code>.<br/>
+                        Bei einem Wechsel des Ausgangswerts wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
+                    </td>
+                    <td>Nein</td>
+                </tr>
+                <tr>
+                    <td><code>set_inverted</code></td>
+                    <td>
+                        Schaltet den Ausgang bei <code>msg.payload = false</code> ein und bei <code>msg.payload = true</code> aus, bzw. setzt den Ausgang auf 100 - den gesendeten Prozent Wert <code>msg.payload = 30</code> => sendet 70%.<br/>
                         Bei einem Wechsel des Ausgangswerts wird die Zeitmessung für die hinterlegte, bzw. mitgesendete Zeit gestartet, sofern vorhanden.
                     </td>
                     <td>Nein</td>
