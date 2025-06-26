@@ -8,6 +8,7 @@
             "name": "Name",
             "type": "Typ",
             "cover": "Rollladen",
+            "valve": "Mischer",
             "light_outlet": "Licht/Steckdose"
         }
     }

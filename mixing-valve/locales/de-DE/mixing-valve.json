@@ -15,10 +15,11 @@
             "heating": "Heizen (normal)",
             "cooling": "Kühlen (invertiert)",
 
-            "precision": "Hysterese (Präzision)",
-            "max_change_percent": "Max Positionsänderung",
-            "max_change_temp_difference": "Temperaturen für max Positionsänderung",
-            "min_change_time": "Mindeständerungsdauer"
+            "precision": "Genauigkeit",
+            "max_change_percent": "Max Änderung",
+            "max_change_temp_difference": "Temperatur für max Änderung",
+            "min_change_time": "Min Änderungsdauer",
+            "controlled_by_central": "Dieser Baustein wird von folgenden Zentralbausteinen gesteuert:"
         }
     }
 }

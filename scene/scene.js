@@ -314,8 +314,7 @@ module.exports = function (RED)
 
             config.links.forEach(link =>
             {
-                helper.log(node.id + " -> " + link);
-                helper.log({ source: node.id, state: state });
+                helper.log(node, link, { source: node.id, state: state });
                 RED.events.emit("node:" + link, { source: node.id, state: state });
             });
         }

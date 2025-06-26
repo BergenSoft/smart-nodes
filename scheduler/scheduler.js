@@ -211,7 +211,7 @@ module.exports = function (RED)
                 schedule.second
             );
 
-            // helper.log({
+            // helper.log(node, {
             //     i,
             //     findNextDay,
             //     nextEvent

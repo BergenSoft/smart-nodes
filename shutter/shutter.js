@@ -91,8 +91,7 @@ module.exports = function (RED)
         // This is the main function which handles all topics that was received.
         let handleTopic = msg =>
         {
-            helper.log("handle topic:");
-            helper.log(msg);
+            helper.log(node, "handle topic:", msg);
 
             var resultUpDown = null;
             var resultStop = null;
@@ -129,7 +128,7 @@ module.exports = function (RED)
                     real_topic = "up";
             }
 
-            helper.log("handle real topic: " + real_topic);
+            helper.log(node, "handle real topic: " + real_topic);
             switch (real_topic)
             {
                 case "status":
@@ -273,8 +272,7 @@ module.exports = function (RED)
 
             config.links.forEach(link =>
             {
-                helper.log(node.id + " -> " + link);
-                helper.log({ source: node.id, state: state });
+                helper.log(node, link, { source: node.id, state: state });
                 RED.events.emit("node:" + link, { source: node.id, state: state });
             });
         };

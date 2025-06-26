@@ -79,8 +79,7 @@ module.exports = function (RED)
         // This is the main function which handles all topics that was received.
         let handleTopic = msg =>
         {
-            helper.log("handle topic:");
-            helper.log(msg);
+            helper.log(node, "handle topic:", msg);
 
             let real_topic_number = helper.getTopicNumber(msg.topic);
 
@@ -97,9 +96,7 @@ module.exports = function (RED)
 
             let result = getResult();
 
-            helper.log("getResult:");
-            helper.log(result);
-            helper.log(node_settings);
+            helper.log(node, "getResult:", result, node_settings);
 
             let out_msg = null;
 

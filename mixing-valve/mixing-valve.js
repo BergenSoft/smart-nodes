@@ -68,6 +68,17 @@ module.exports = function (RED)
         let adjusting_start_time = null;
 
 
+        // #########################
+        // # Central node handling #
+        // #########################
+        var event = "node:" + node.id;
+        var handler = function (msg)
+        {
+            node.receive(msg);
+        }
+        RED.events.on(event, handler);
+
+
         // ###############
         // # Node events #
         // ###############
@@ -112,6 +123,8 @@ module.exports = function (RED)
         // This is the main function which handles all topics that was received.
         let handleTopic = msg =>
         {
+            notifyCentral(msg.topic);
+
             let real_topic = helper.getTopicName(msg.topic);
 
             if (real_topic == "set_state_inverted")
@@ -209,6 +222,8 @@ module.exports = function (RED)
                     helper.warn(this, "Invalid topic: " + real_topic);
                     return;
             }
+
+            notifyCentral(node_settings.enabled);
         }
 
         let startSampling = () =>
@@ -249,7 +264,7 @@ module.exports = function (RED)
             // No current temperature available or in calibration => no action
             if (current_temperature === null || calibration_timeout !== null || !node_settings.enabled)
             {
-                helper.log("No sample possible", {
+                helper.log(node, "No sample possible", {
                     current_temperature,
                     calibration_timeout,
                     enabled: node_settings.enabled
@@ -297,7 +312,7 @@ module.exports = function (RED)
 
         let startChanging = (adjustAction, time_ms) =>
         {
-            helper.log("Start changing", adjustAction, time_ms)
+            helper.log(node, "Start changing", adjustAction, time_ms)
             stopChanging();
 
             // Already oppened/closed
@@ -319,6 +334,7 @@ module.exports = function (RED)
                 stopChanging();
                 adjusting = null;
                 setStatus();
+                notifyCentral(node_settings.enabled);
             }, time_ms);
 
             setStatus();
@@ -376,6 +392,7 @@ module.exports = function (RED)
                     stopSampling();
 
                 setStatus();
+                notifyCentral(node_settings.enabled);
             }, time_total_s * 1000);
         }
 
@@ -405,6 +422,23 @@ module.exports = function (RED)
                 node.status({ fill: node_settings.enabled ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + "  " + (adjusting == ADJUST_OPEN ? "Opening" : "Closing") + ", Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
             else
                 node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
+        }
+
+        /**
+         * Notify all connected central nodes
+         * @param {boolean} state The state if the valve is enabled
+         */
+        let notifyCentral = state =>
+        {
+            helper.log(node, "notifyCentral", config.links, node);
+            if (!config.links)
+                return;
+
+            config.links.forEach(link =>
+            {
+                helper.log(node, link, { source: node.id, state: state });
+                RED.events.emit("node:" + link, { source: node.id, state: state });
+            });
         }
 
         if (node_settings.last_position == null)

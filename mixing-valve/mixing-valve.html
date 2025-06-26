@@ -1,166 +1,309 @@
 <script type="text/javascript">
-    RED.nodes.registerType("smart_mixing-valve", {
-        category: "Smart Nodes",
-        paletteLabel: "Mixing Valve",
-        color: "#3FADB5",
-        defaults: {
-            name: { value: "" },
-            enabled: { value: true },
-            setpoint: { value: 45 },
-            time_total: { value: 60 },
-            time_sampling: { value: 60 },
-            off_mode: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
-            valve_mode: { value: "HEATING" }, // HEATING | COOLING
-            precision: { value: 1.0 },
-            max_change_percent: { value: 1 },
-            max_change_temp_difference: { value: 20 },
-            min_change_time: { value: 0 }
-        },
-        inputs: 1,
-        outputs: 3,
-        outputLabels: ["Open", "Close", "Status Position"],
-        icon: "mixing-valve.png",
-        label: function ()
+    (function ()
+    {
+        let treeList;
+        let candidateNodesCount = 0;
+        let flows = [];
+        let flowMap = {};
+
+        function onEditPrepare(node, targetTypes)
         {
-            return this.name || "Mixing Valve";
-        },
-        oneditprepare: function ()
+            if (!node.links)
+                node.links = [];
+
+            const activeSubflow = RED.nodes.subflow(node.z);
+
+            treeList = $("<div>")
+                .css({ width: "100%", height: "100%" })
+                .appendTo(".node-input-link-row")
+                .treeList({ autoSelect: false })
+                .on("treelistitemmouseover", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = true;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                })
+                .on("treelistitemmouseout", function (e, item)
+                {
+                    if (item.node)
+                    {
+                        item.node.highlighted = false;
+                        item.node.dirty = true;
+                        RED.view.redraw();
+                    }
+                });
+
+            flows = [];
+            flowMap = {};
+
+            if (activeSubflow)
+            {
+                flowMap[activeSubflow.id] = {
+                    id: activeSubflow.id,
+                    class: "red-ui-palette-header",
+                    label: "Subflow : " + (activeSubflow.name || activeSubflow.id),
+                    expanded: true,
+                    children: []
+                };
+                flows.push(flowMap[activeSubflow.id]);
+            }
+            else
+            {
+                RED.nodes.eachWorkspace(function (ws)
+                {
+                    if (!ws.disabled)
+                    {
+                        flowMap[ws.id] = {
+                            id: ws.id,
+                            class: "red-ui-palette-header",
+                            label: (ws.label || ws.id) + (node.z === ws.id ? " *" : ""),
+                            expanded: true,
+                            children: []
+                        };
+                        flows.push(flowMap[ws.id]);
+                    }
+                });
+            }
+
+            setTimeout(function ()
+            {
+                treeList.treeList("show", node.z);
+            }, 100);
+        }
+
+        function initTreeList(node, targetTypes)
         {
-            let node = this;
+            candidateNodesCount = 0;
+            for (const key in flowMap)
+            {
+                flowMap[key].children = [];
+            }
 
-            $("#node-input-setpoint")
-                .css("max-width", "4rem")
-                .spinner({
-                    min: -30,
-                    max: 100,
-                    change: function (event, ui)
+            let candidateNodes = [];
+
+            targetTypes.forEach(function (targetType)
+            {
+                candidateNodes = candidateNodes.concat(RED.nodes.filterNodes({ type: targetType }));
+            });
+
+            candidateNodes.forEach(function (n)
+            {
+                if (flowMap[n.z])
+                {
+                    const isChecked = (node.links.indexOf(n.id) !== -1) || (n.links || []).indexOf(node.id) !== -1;
+                    if (isChecked)
                     {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value) $(this).spinner("value", value);
-                    },
-                });
+                        flowMap[n.z].children.push({
+                            id: n.id,
+                            node: n,
+                            label: n.name || n.id,
+                            selected: false,
+                            checkbox: false,
+                            radio: false
+                        });
+                        candidateNodesCount++;
+                    }
+                }
+            });
 
-            $("#node-input-time_total")
-                .css("max-width", "4rem")
-                .spinner({
-                    min: 0,
-                    change: function (event, ui)
-                    {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value) $(this).spinner("value", value);
-                    },
-                });
+            for (const key in flowMap)
+            {
+                flowMap[key].children.sort((a, b) => a.label.localeCompare(b.label));
+            }
 
-            $("#node-input-time_sampling")
-                .css("max-width", "4rem")
-                .spinner({
-                    min: 0,
-                    change: function (event, ui)
-                    {
-                        var value = parseInt(this.value);
-                        value = isNaN(value) ? 0 : value;
-                        value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                        // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                        if (value !== this.value) $(this).spinner("value", value);
-                    },
-                });
+            const flowsFiltered = flows.filter(function (f) { return f.children.length > 0 });
+            treeList.treeList("empty");
+            treeList.treeList("data", flowsFiltered);
+        }
 
-            $("#node-input-off_mode")
-                .css("max-width", "70%")
-                .typedInput({
-                    types: [{
-                        default: "NOTHING",
-                        value: "off_mode",
-                        options: [
-                            { value: "NOTHING", label: node._("mixing-valve.ui.nothing") },
-                            { value: "OPEN", label: node._("mixing-valve.ui.open") },
-                            { value: "CLOSE", label: node._("mixing-valve.ui.close") }
-                        ],
-                    }],
-                });
+        function resizeNodeList()
+        {
+            var rows = $("#dialog-form>div:not(.node-input-link-row)");
+            var height = $("#dialog-form").height();
+            for (var i = 0; i < rows.length; i++)
+            {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var editorRow = $("#dialog-form>div.node-input-link-row");
+            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            $(".node-input-link-row").css("height", Math.max(height, 200) + "px");
+        }
 
-            $("#node-input-valve_mode")
-                .css("max-width", "70%")
-                .typedInput({
-                    types: [{
-                        default: "HEATING",
-                        value: "valve_mode",
-                        options: [
-                            { value: "HEATING", label: node._("mixing-valve.ui.heating") },
-                            { value: "COOLING", label: node._("mixing-valve.ui.cooling") }
-                        ],
-                    }],
-                });
+        RED.nodes.registerType("smart_mixing-valve", {
+            category: "Smart Nodes",
+            paletteLabel: "Mixing Valve",
+            color: "#3FADB5",
+            defaults: {
+                name: { value: "" },
+                enabled: { value: true },
+                setpoint: { value: 45 },
+                time_total: { value: 60 },
+                time_sampling: { value: 60 },
+                off_mode: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
+                valve_mode: { value: "HEATING" }, // HEATING | COOLING
+                precision: { value: 1.0 },
+                max_change_percent: { value: 1 },
+                max_change_temp_difference: { value: 20 },
+                min_change_time: { value: 100 },
+                links: { value: [], type: "smart_central-control[]" }
+            },
+            inputs: 1,
+            outputs: 3,
+            outputLabels: ["Open", "Close", "Status Position"],
+            icon: "mixing-valve.png",
+            label: function ()
+            {
+                return this.name || "Mixing Valve";
+            },
+            oneditprepare: function ()
+            {
+                let node = this;
 
-            $("#node-input-precision")
-                  .css("max-width", "4rem")
-                  .spinner({
-                      min: 0.1,
-                      max: 1.0,
-                      step: 0.1,
-                      change: function (event, ui)
-                      {
-                          var value = parseFloat(this.value);
-                          value = isNaN(value) ? 0.0 : value;
-                          value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
-                          value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
-                          if (value !== this.value) $(this).spinner("value", value);
-                      },
-                  });
+                onEditPrepare(this, ["smart_central-control"]);
+                initTreeList(node, ["smart_central-control"]);
 
-            $("#node-input-max_change_percent")
-                  .css("max-width", "4rem")
-                  .spinner({
-                      min: 1,
-                      max: 40,
-                      change: function (event, ui)
-                      {
-                          var value = parseInt(this.value);
-                          value = isNaN(value) ? 0 : value;
-                          value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                          value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                          if (value !== this.value) $(this).spinner("value", value);
-                      },
-                  });
+                $("#node-input-setpoint")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: -30,
+                        max: 100,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
 
-            $("#node-input-max_change_temp_difference")
-                  .css("max-width", "4rem")
-                  .spinner({
-                      min: 1,
-                      max: 20,
-                      change: function (event, ui)
-                      {
-                          var value = parseInt(this.value);
-                          value = isNaN(value) ? 0 : value;
-                          value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                          value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                          if (value !== this.value) $(this).spinner("value", value);
-                      },
-                  });
+                $("#node-input-time_total")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
 
-            $("#node-input-min_change_time")
-                  .css("max-width", "4rem")
-                  .spinner({
-                      min: 0,
-                      max: 2000,
-                      step: 100,
-                      change: function (event, ui)
-                      {
-                          var value = parseInt(this.value);
-                          value = isNaN(value) ? 0 : value;
-                          value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
-                          value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
-                          if (value !== this.value) $(this).spinner("value", value);
-                      },
-                  });
-        },
-    });
+                $("#node-input-time_sampling")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            // value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
+
+                $("#node-input-off_mode")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            default: "NOTHING",
+                            value: "off_mode",
+                            options: [
+                                { value: "NOTHING", label: node._("mixing-valve.ui.nothing") },
+                                { value: "OPEN", label: node._("mixing-valve.ui.open") },
+                                { value: "CLOSE", label: node._("mixing-valve.ui.close") }
+                            ],
+                        }],
+                    });
+
+                $("#node-input-valve_mode")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            default: "HEATING",
+                            value: "valve_mode",
+                            options: [
+                                { value: "HEATING", label: node._("mixing-valve.ui.heating") },
+                                { value: "COOLING", label: node._("mixing-valve.ui.cooling") }
+                            ],
+                        }],
+                    });
+
+                $("#node-input-precision")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0.1,
+                        max: 1.0,
+                        step: 0.1,
+                        change: function (event, ui)
+                        {
+                            var value = parseFloat(this.value);
+                            value = isNaN(value) ? 0.0 : value;
+                            value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
+
+                $("#node-input-max_change_percent")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 1,
+                        max: 40,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
+
+                $("#node-input-max_change_temp_difference")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 1,
+                        max: 20,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
+
+                $("#node-input-min_change_time")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0,
+                        max: 2000,
+                        step: 100,
+                        change: function (event, ui)
+                        {
+                            var value = parseInt(this.value);
+                            value = isNaN(value) ? 0 : value;
+                            value = Math.max(value, parseInt($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseInt($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
+            },
+            onadd: function ()
+            {
+                this.links = [];
+            },
+            oneditresize: resizeNodeList
+        });
+    })();
 </script>
 
 <script type="text/html" data-template-name="smart_mixing-valve">
@@ -208,4 +351,6 @@
         <label for="node-input-min_change_time"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.min_change_time"></span></label>
         <input id="node-input-min_change_time" value="0" /> ms
     </div>
+    <span><i class="fa fa-link"></i> <span data-i18n="mixing-valve.ui.controlled_by_central"></span></span>
+    <div class="form-row node-input-link-row node-input-link-rows"></div>
 </script>

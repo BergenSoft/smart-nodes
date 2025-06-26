@@ -119,8 +119,7 @@ module.exports = function (RED)
         // This is the main function which handles all topics that was received.
         let handleTopic = msg =>
         {
-            helper.log("handle topic:");
-            helper.log(msg);
+            helper.log(node, "handle topic:", msg);
 
             let real_topic = helper.getRealTopic(msg.topic, "toggle", ["up", "up_stop", "down", "down_stop", "stop", "toggle", "up_down", "position", "alarm"]);
 
@@ -163,7 +162,7 @@ module.exports = function (RED)
                 }
             }
 
-            helper.log("handle real topic: " + real_topic);
+            helper.log(node, "handle real topic: " + real_topic);
             switch (real_topic)
             {
                 case "up":
@@ -252,8 +251,7 @@ module.exports = function (RED)
          */
         let startAction = (action, data = null, exact = false, ignoreAlarm = false) =>
         {
-            helper.log("startAction");
-            helper.log({ action, data, exact, ignoreAlarm });
+            helper.log(node, "startAction", { action, data, exact, ignoreAlarm });
 
             // Nothing allowed if alarm is on
             if (ignoreAlarm === false && node_settings.alarm_active)
@@ -392,7 +390,7 @@ module.exports = function (RED)
             {
                 // This happens if the time needs to be changed, but the direction is the same
                 clearTimeout(timeout);
-                helper.log("stop after " + run_time_ms + "ms");
+                helper.log(node, "stop after " + run_time_ms + "ms");
 
                 off_time = Date.now();
                 on_time = off_time;
@@ -412,7 +410,7 @@ module.exports = function (RED)
             else if (off_time + revert_time_ms - now > 0 && dirChange)
             {
                 // revert time is not fully passed
-                helper.log("revert time is not fully passed, wait for " + (off_time + revert_time_ms - now) + "ms");
+                helper.log(node, "revert time is not fully passed, wait for " + (off_time + revert_time_ms - now) + "ms");
                 wait_timeout = setTimeout(() =>
                 {
                     wait_timeout = null;
@@ -434,12 +432,12 @@ module.exports = function (RED)
                 switch (action)
                 {
                     case ACTION_UP:
-                        helper.log("start ACTION_UP");
+                        helper.log(node, "start ACTION_UP");
                         sendToOutput(true, false);
                         break;
 
                     case ACTION_DOWN:
-                        helper.log("start ACTION_DOWN");
+                        helper.log(node, "start ACTION_DOWN");
                         sendToOutput(false, true);
                         break;
                 }
@@ -449,7 +447,7 @@ module.exports = function (RED)
 
                 on_time = Date.now();
 
-                helper.log("stop after " + run_time_ms + "ms");
+                helper.log(node, "stop after " + run_time_ms + "ms");
                 timeout = setTimeout(() =>
                 {
                     startAction(ACTION_STOP, null, null, ignoreAlarm);
@@ -470,8 +468,7 @@ module.exports = function (RED)
          */
         let sendToOutput = (up, down) =>
         {
-            helper.log("sendToOutput");
-            helper.log({ up, down });
+            helper.log(node, "sendToOutput", { up, down });
 
             if (up && down)
             {
@@ -553,8 +550,7 @@ module.exports = function (RED)
 
             config.links.forEach(link =>
             {
-                helper.log(node.id + " -> " + link);
-                helper.log({ source: node.id, state: state });
+                helper.log(node, link, { source: node.id, state: state });
                 RED.events.emit("node:" + link, { source: node.id, state: state });
             });
         };

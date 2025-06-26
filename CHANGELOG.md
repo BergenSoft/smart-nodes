@@ -184,4 +184,12 @@
 
 ## Version 0.4.24:
 
-- Added set_inverted to light node.
+-   Added set_inverted to light node.
+
+## Version 0.4.25:
+
+-   Changed some texts.
+
+## Version 0.4.26:
+
+-   Added possibility to control mixing-valve nodes from central node.

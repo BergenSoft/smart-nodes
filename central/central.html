@@ -166,7 +166,7 @@
             }
             var editorRow = $("#dialog-form>div.node-input-link-row");
             height -= parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom"));
-            $(".node-input-link-row").css("height", height + "px");
+            $(".node-input-link-row").css("height", Math.max(height, 200) + "px");
         }
 
         function onEditSave(node)
@@ -257,17 +257,20 @@
             color: "#6EE2D9",
             defaults: {
                 name: { value: "" },
-                mode: { value: "LIGHT" }, // LIGHT | SHUTTER
+                mode: { value: "LIGHT" }, // LIGHT | SHUTTER | VALVE
                 links: { value: [], type: "smart_shutter-complex-control[]" },
             },
             inputs: 1,
             outputs: 0,
             icon: function ()
             {
+                if (this.mode === "LIGHT")
+                    return "font-awesome/fa-lightbulb-o";
+
                 if (this.mode === "SHUTTER")
                     return "font-awesome/fa-align-justify";
 
-                return "font-awesome/fa-lightbulb-o";
+                return "mixing-valve.png";
             },
             label: function ()
             {
@@ -282,8 +285,10 @@
                 {
                     if (this.value == "SHUTTER")
                         initTreeList(node, ["smart_shutter-complex-control", "smart_shutter-control"]);
-                    else
+                    else if (this.value == "LIGHT")
                         initTreeList(node, ["smart_light-control", "smart_scene-control"]);
+                    else
+                        initTreeList(node, ["smart_mixing-valve"]);
                 });
 
                 $("#node-input-mode")
@@ -294,7 +299,8 @@
                             value: "mode",
                             options: [
                                 { value: "LIGHT", label: node._("central.ui.light_outlet") },
-                                { value: "SHUTTER", label: node._("central.ui.cover") }
+                                { value: "SHUTTER", label: node._("central.ui.cover") },
+                                { value: "VALVE", label: node._("central.ui.valve") }
                             ],
                         }],
                     });

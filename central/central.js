@@ -139,8 +139,7 @@ module.exports = function (RED)
             // Send cloned message to all linked nodes
             config.links.forEach(link =>
             {
-                helper.log(node.id + " -> " + link);
-                helper.log(new_msg);
+                helper.log(node, link, { source: node.id, state: state }, new_msg);
                 RED.events.emit("node:" + link, new_msg);
             });
         }

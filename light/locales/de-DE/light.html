@@ -1,7 +1,8 @@
 <script type="text/html" data-help-name="smart_light-control">
     <p>
         Diese Node steuert einen Ausgang. Dies kann ein Licht, eine Steckdose oder ähnliches sein.
-        Als Ausgang wird immer <code>msg.payload = true</code> oder <code>msg.payload = false</code> gesendet um den Ausgang ein-, bzw. auszuschalten.
+        Im Modus true/false wird als Ausgang wird immer <code>msg.payload = true</code> oder <code>msg.payload = false</code> gesendet um den Ausgang ein-, bzw. auszuschalten.
+        Im Modus Prozent wird als Ausgang wird immer der Prozentwert, z.B. <code>msg.payload = 75</code> gesendet um den Ausgang zu schalten.
     </p>
     <p>
         <b>Hinweis:</b> Smart Nodes verwenden Topics im Format <code>name#nummer</code>, damit können verschiedene Smart Nodes mit dem gleichen Topic angesteuert werden.<br/>

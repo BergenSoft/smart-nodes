@@ -8,6 +8,7 @@
             "name": "Name",
             "type": "Type",
             "cover": "Cover",
+            "valve": "Valve",
             "light_outlet": "Light/Outlet"
         }
     }

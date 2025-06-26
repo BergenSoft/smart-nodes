@@ -129,7 +129,7 @@
             }
             var editorRow = $("#dialog-form>div.node-input-link-row");
             height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
-            $(".node-input-link-row").css("height", height + "px");
+            $(".node-input-link-row").css("height", Math.max(height, 200) + "px");
         }
 
         RED.nodes.registerType("smart_shutter-complex-control", {

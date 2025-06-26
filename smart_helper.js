@@ -362,7 +362,7 @@ module.exports = {
     log(node, ...args)
     {
         // uncomment to see all log values
-        // console.log(typeof node + " (" + node.id + "):", ...args);
+        // console.log(node.constructor.name + " (" + node.id + "):", ...args);
     },
 
     /**
@@ -371,6 +371,6 @@ module.exports = {
     warn(node, ...args)
     {
         // uncomment to see all warn values
-        console.warn(typeof node + " (" + node.id + "):", ...args);
+        // console.warn(node.constructor.name + " (" + node.id + "):", ...args);
     }
 };
