@@ -138,6 +138,7 @@ module.exports = function (RED)
 
             switch (real_topic)
             {
+                case "on":
                 case "enable":
                     if (node_settings.enabled)
                         break;
@@ -148,6 +149,7 @@ module.exports = function (RED)
                     startSampling();
                     break;
 
+                case "off":
                 case "disable":
                     if (!node_settings.enabled)
                         break;

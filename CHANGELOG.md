@@ -193,3 +193,8 @@
 ## Version 0.4.26:
 
 -   Added possibility to control mixing-valve nodes from central node.
+
+## Version 0.4.27:
+
+-   Fixed central node.
+-   Added on and off topic to mixing-valve.
