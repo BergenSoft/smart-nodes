@@ -197,4 +197,7 @@
 ## Version 0.4.27:
 
 -   Fixed central node.
+
+## Version 0.4.28:
+
 -   Added on and off topic to mixing-valve.
