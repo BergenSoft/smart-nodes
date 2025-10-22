@@ -20,7 +20,22 @@
                 </tr>
                 <tr>
                     <td><code>set_mode</code></td>
-                    <td>Aktiviert den in <code>msg.payload</code> angegebenen Modus, sofern dieser konfiguriert wurde.</td>
+                    <td>Aktiviert den in <code>msg.payload</code> angegebenen Modus, sofern dieser auch konfiguriert wurde.</td>
+                </tr>
+                <tr>
+                    <td><code>set_mode#MODE_NAME</code></td>
+                    <td>
+                        Wenn <code>msg.payload = true</code>, dann wird der Modus <code>MODE_NAME</code> aktiviert, sofern dieser auch konfiguriert wurde.<br/>
+                        Wenn <code>msg.payload = false</code>, dann wird default Modus, der erste in der Liste, aktiviert.<br/>
+                        Dieser Topic eignet sich besonders in Kombination mit den KNX-Ultimate Bausteinen.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>toggle_mode</code></td>
+                    <td>
+                        Aktiviert den in <code>msg.payload</code> angegebenen Modus, sofern dieser auch konfiguriert wurde.<br/>
+                        Sollte dieser bereits der aktive Modus sein, wird der default Modus, der erste in der Liste, aktiviert.
+                    </td>
                 </tr>
                 <tr>
                     <td><code>refresh</code></td>

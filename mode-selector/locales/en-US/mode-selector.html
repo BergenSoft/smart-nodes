@@ -6,27 +6,42 @@
     </p>
     <p>
         The following topics are accepted:
-    <table>
-        <thead>
-            <tr>
-                <th>Topic</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>debug</code></td>
-                <td>Displays current node settings in the debug window.</td>
-            </tr>
-            <tr>
-                <td><code>set_mode</code></td>
-                <td>Activates the mode specified in <code>msg.payload</code>, if configured.</td>
-            </tr>
-            <tr>
-                <td><code>refresh</code></td>
-                <td>Outputs the last set mode.</td>
-            </tr>
-        </tbody>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>debug</code></td>
+                    <td>Displays current node settings in the debug window.</td>
+                </tr>
+                <tr>
+                    <td><code>set_mode</code></td>
+                    <td>Activates the mode specified in <code>msg.payload</code>, if configured.</td>
+                </tr>
+                <tr>
+                    <td><code>set_mode#MODE_NAME</code></td>
+                    <td>
+                        If <code>msg.payload = true</code>, then the <code>MODE_NAME</code> mode is activated, if configured.<br />
+                        If <code>msg.payload = false</code>, then the default mode, the first in the list, is activated.<br />
+                        This topic is particularly suitable in combination with the KNX Ultimate module.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>toggle_mode</code></td>
+                    <td>
+                        Activates the mode specified in <code>msg.payload</code>, if configured.<br />
+                        If this is already the active mode, then the default mode, the first in the list, is activated.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>refresh</code></td>
+                    <td>Outputs the last set mode.</td>
+                </tr>
+            </tbody>
+        </table>
     </p>
 </script>

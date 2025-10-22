@@ -217,5 +217,9 @@
 
 ## Version 0.4.31:
 
--   Added set_mode_with_default to mode-selector node to toggle mode if sended mode already set.
+-   Added toggle_mode to mode-selector node to toggle mode if sended mode already set.
 -   Added option to mode-selector to update only changed outputs.
+
+## Version 0.4.32:
+
+-   Added special set_mode topic to mode-selector node to improve work with KNX Ultimate module.
