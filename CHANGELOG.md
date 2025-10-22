@@ -202,7 +202,7 @@
 
 -   Added on and off topic to mixing-valve.
 
-## Version 0.4.29:
+## Version 0.5.0:
 
 -   Improved light control percentage status text.
 -   Fixed logic node when common outputs is configured but one value is set to "send nothing".
@@ -210,16 +210,3 @@
 -   Mixing valve tries to guess the best position, when getting enabled.
 -   Added debug topic to all nodes, to see current values.
 -   Added new node "mode-selector".
-
-## Version 0.4.30:
-
--   Fixed mode-selector to only send if the mode is really changed.
-
-## Version 0.4.31:
-
--   Added toggle_mode to mode-selector node to toggle mode if sended mode already set.
--   Added option to mode-selector to update only changed outputs.
-
-## Version 0.4.32:
-
--   Added special set_mode topic to mode-selector node to improve work with KNX Ultimate module.

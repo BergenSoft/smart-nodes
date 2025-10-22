@@ -80,6 +80,9 @@ module.exports = function (RED)
 
                 case "set_mode":
                     {
+                        if (msg.payload == null)
+                            return;
+
                         if (typeof msg.payload === "boolean")
                         {
                             // Syntax: set_mode#MODE_NAME and payload is boolean
@@ -89,28 +92,56 @@ module.exports = function (RED)
                             if (msg.payload === false)
                                 new_mode = mode_items[0];
 
-                            let selectedIndex = mode_items.indexOf(new_mode);
+                            // make sure the sended topics exists
+                            let selectedIndex = mode_items.indexOf(mode_from_topic);
+                            if (selectedIndex === -1)
+                            {
+                                node.warn("set_mode: invalid mode: '" + mode_from_topic + "' not defined");
+                                return;
+                            }
+
+                            selectedIndex = mode_items.indexOf(new_mode);
                             if (selectedIndex === -1)
                             {
                                 node.warn("set_mode: invalid mode: '" + new_mode + "' not defined");
-                                break;
+                                return;
+                            }
+
+                            // If a mode is turned off that wasn't active before, do nothing
+                            if (msg.payload === false)
+                            {
+                                // if the given mode_from_topic is turned off but it never was active, now
+                                // ignore that
+                                if (node_settings.last_mode != mode_from_topic)
+                                    return;
+
+                                // don't send turn off again
+                                previous_mode = null;
+                            }
+
+                            // Don't allow turning off the default mode
+                            if (msg.payload === false && mode_from_topic == mode_items[0])
+                            {
+                                // turn default on again
+                                sendCurrentMode();
+                                return;
                             }
 
                             // No change, don't send anything
                             if (node_settings.last_mode == new_mode)
-                                break;
+                                return;
 
-                            node_settings.last_mode = new_mode;
-
-                            // if the given mode_from_topic was the previous mode and is turned off, now
-                            // don't send turn off again
-                            if (msg.payload === false && previous_mode == mode_from_topic)
-                                previous_mode = null;
-
-                            // if the given mode_from_topic is the new mode and is turned on, now
-                            // don't send turn on again
+                            // if a mode is activated, now
                             if (msg.payload === true)
+                            {
+                                // don't send turn on again
                                 node_settings.last_mode = null;
+                            }
+                            else
+                            {
+                                // set as current mode
+                                node_settings.last_mode = new_mode;
+                            }
 
                             sendCurrentMode();
 
@@ -123,19 +154,19 @@ module.exports = function (RED)
                             if (new_mode != null)
                             {
                                 node.warn("set_mode: when using mode in topic, payload has to be boolean");
-                                break;
+                                return;
                             }
 
                             let selectedIndex = mode_items.indexOf(msg.payload);
                             if (selectedIndex === -1)
                             {
                                 node.warn("set_mode: invalid mode: '" + msg.payload + "' not defined");
-                                break;
+                                return;
                             }
 
                             // No change, don't send anything
                             if (node_settings.last_mode == msg.payload)
-                                break;
+                                return;
 
                             node_settings.last_mode = msg.payload;
                             smart_context.set(node.id, node_settings);
@@ -151,6 +182,9 @@ module.exports = function (RED)
 
                 case "toggle_mode":
                     {
+                        if (msg.payload == null)
+                            return;
+
                         let new_mode = msg.payload;
                         let selectedIndex = mode_items.indexOf(new_mode);
                         if (selectedIndex === -1)
