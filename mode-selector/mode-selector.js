@@ -82,6 +82,10 @@ module.exports = function (RED)
                             break;
                         }
 
+                        // No change, don't send anything
+                        if (node_settings.last_mode == msg.payload)
+                            break;
+
                         node_settings.last_mode = msg.payload;
                         smart_context.set(node.id, node_settings);
                         sendCurrentMode();

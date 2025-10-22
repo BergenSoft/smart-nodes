@@ -210,3 +210,7 @@
 -   Mixing valve tries to guess the best position, when getting enabled.
 -   Added debug topic to all nodes, to see current values.
 -   Added new node "mode-selector".
+
+## Version 0.4.30:
+
+-   Fixed mode-selector to only send if the mode is really changed.
