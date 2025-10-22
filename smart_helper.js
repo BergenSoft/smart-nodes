@@ -372,5 +372,13 @@ module.exports = {
     {
         // uncomment to see all warn values
         // console.warn(node.constructor.name + " (" + node.id + "):", ...args);
+    },
+
+    /**
+     * Show all relevant debug information in node red debug tab
+     */
+    nodeDebug(node, arg)
+    {
+        node.warn(arg);
     }
 };

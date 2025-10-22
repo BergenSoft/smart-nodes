@@ -1,0 +1,32 @@
+<script type="text/html" data-help-name="smart_mode-selector">
+    <p>This node manages a list of modes that can be selected.</p>
+    <p>
+        <b>Note:</b> Smart Nodes use topics in the format <code>name#number</code>, so different Smart Nodes can be controlled with the same topic.<br />
+        This node only uses the <code>name</code> part. <code>#</code> and <code>number</code> are optional.
+    </p>
+    <p>
+        The following topics are accepted:
+    <table>
+        <thead>
+            <tr>
+                <th>Topic</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>debug</code></td>
+                <td>Displays current node settings in the debug window.</td>
+            </tr>
+            <tr>
+                <td><code>set_mode</code></td>
+                <td>Activates the mode specified in <code>msg.payload</code>, if configured.</td>
+            </tr>
+            <tr>
+                <td><code>refresh</code></td>
+                <td>Outputs the last set mode.</td>
+            </tr>
+        </tbody>
+    </table>
+    </p>
+</script>

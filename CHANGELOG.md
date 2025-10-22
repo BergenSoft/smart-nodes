@@ -201,3 +201,12 @@
 ## Version 0.4.28:
 
 -   Added on and off topic to mixing-valve.
+
+## Version 0.4.29:
+
+-   Improved light control percentage status text.
+-   Fixed logic node when common outputs is configured but one value is set to "send nothing".
+-   Mixing valve can now output as percentage directly or with open/close impulses.
+-   Mixing valve tries to guess the best position, when getting enabled.
+-   Added debug topic to all nodes, to see current values.
+-   Added new node "mode-selector".

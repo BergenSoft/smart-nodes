@@ -113,6 +113,12 @@ module.exports = function (RED)
 
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                    });
+                    break;
+
                 case "enable":
                     node_settings.enabled = true;
                     initNextTimeout();

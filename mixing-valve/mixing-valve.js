@@ -14,6 +14,9 @@ module.exports = function (RED)
         const ADJUST_OPEN = 0;
         const ADJUST_CLOSE = 1;
 
+        const OUTPUT_MODE_OPEN_CLOSE = "OPEN_CLOSE";
+        const OUTPUT_MODE_PERCENTAGE = "PERCENTAGE";
+
 
         // #######################
         // # Global help objects #
@@ -33,17 +36,32 @@ module.exports = function (RED)
             precision: config.precision || 1,
             max_change_percent: config.max_change_percent || 2,
             max_change_temp_difference: config.max_change_temp_difference || 20,
+            min_change_time: config.min_change_time || 0,
             last_position: null,
-            min_change_time: config.min_change_time || 0
         }, smart_context.get(node.id));
 
+        // Ensure correct types
+        node_settings.enabled = !!node_settings.enabled;
+        node_settings.setpoint = parseFloat(node_settings.setpoint);
+        if (isNaN(node_settings.setpoint) || !isFinite(node_settings.setpoint))
+            node_settings.setpoint = 20;
+        node_settings.precision = parseInt(node_settings.precision, 10);
+        node_settings.max_change_percent = parseInt(node_settings.max_change_percent, 10);
+        node_settings.max_change_temp_difference = parseInt(node_settings.max_change_temp_difference, 10);
+        node_settings.min_change_time = parseInt(node_settings.min_change_time, 10);
 
         // ##################
         // # Dynamic config #
         // ##################
         let time_total_s = config.time_total;
         let time_sampling_s = config.time_sampling;
-
+        let output_mode = config.output_mode || OUTPUT_MODE_OPEN_CLOSE;
+        let force_position = null;
+        let min_temperature = null;
+        let min_temperature_position = null;
+        let max_temperature = null;
+        let max_temperature_position = null;
+        let temp_save_date = Date.now();
 
         // ##################
         // # Runtime values #
@@ -87,6 +105,7 @@ module.exports = function (RED)
             handleTopic(msg);
 
             setStatus();
+            resetSavedTemperatures();
             smart_context.set(node.id, node_settings);
         });
 
@@ -96,7 +115,9 @@ module.exports = function (RED)
 
             if (sampling_interval !== null)
             {
-                clearInterval(sampling_interval);
+                if (sampling_interval !== -1)
+                    clearInterval(sampling_interval);
+
                 sampling_interval = null;
             }
 
@@ -138,14 +159,67 @@ module.exports = function (RED)
 
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        force_position,
+                        current_mode: calibration_timeout !== null ? "CALIBRATION" : (changing_timeout !== null ? (adjusting == ADJUST_OPEN ? "OPENING" : "CLOSING") : "IDLE"),
+                        enabled: (node_settings.enabled ? "ENABLED" : "DISABLED"),
+                        heating_mode: node_settings.valve_mode,
+                        current_temperature,
+                        output_mode,
+                        min_temperature,
+                        min_temperature_position,
+                        max_temperature,
+                        max_temperature_position,
+                    });
+                    break;
+
                 case "on":
                 case "enable":
                     if (node_settings.enabled)
+                    {
+                        helpers.log(node, "Already enabled");
                         break;
+                    }
 
                     node_settings.enabled = true;
-
                     stopChanging();
+
+                    // Set the most probable position
+                    if (
+                        min_temperature !== null &&
+                        max_temperature !== null &&
+                        min_temperature_position !== null &&
+                        max_temperature_position !== null
+                    )
+                    {
+                        let temp_range = max_temperature - min_temperature;
+                        let pos_range = max_temperature_position - min_temperature_position;
+
+                        if (
+                            temp_range > 0 &&
+                            pos_range !== 0 &&
+                            node_settings.setpoint >= min_temperature &&
+                            node_settings.setpoint <= max_temperature
+                        )
+                        {
+                            let rel_pos;
+                            if (node_settings.valve_mode === "HEATING")
+                            {
+                                // For HEATING, min_temperature_position is closed, max_temperature_position is open
+                                rel_pos = min_temperature_position + ((node_settings.setpoint - min_temperature) / temp_range) * pos_range;
+                            }
+                            else
+                            {
+                                // For COOLING, max_temperature_position is closed, min_temperature_position is open
+                                rel_pos = max_temperature_position + ((node_settings.setpoint - max_temperature) / -temp_range) * pos_range;
+                            }
+                            force_position = Math.min(Math.max(rel_pos, 0), 100);
+                            helper.log(node, "Set force position to " + force_position.toFixed(1) + "% based on previous min/max temperature positions");
+                        }
+                    }
+
                     startSampling();
                     break;
 
@@ -162,7 +236,7 @@ module.exports = function (RED)
 
                 case "setpoint":
                     let new_setpoint = parseFloat(msg.payload);
-                    if (isNaN(new_setpoint) && !isFinite(new_setpoint))
+                    if (isNaN(new_setpoint) || !isFinite(new_setpoint))
                     {
                         // helper.warn(this, "Invalid payload: " + msg.payload);
                         return;
@@ -194,6 +268,16 @@ module.exports = function (RED)
                     {
                         case "HEATING":
                         case "COOLING":
+
+                            if (node_settings.valve_mode != msg.payload)
+                            {
+                                // When changing the mode, reset min/max temperature
+                                min_temperature = null;
+                                max_temperature = null;
+                                min_temperature_position = null;
+                                max_temperature_position = null;
+                            }
+
                             node_settings.valve_mode = msg.payload;
                             setStatus();
                             break;
@@ -208,7 +292,7 @@ module.exports = function (RED)
 
                 case "current_temperature":
                     let new_temp = parseFloat(msg.payload);
-                    if (isNaN(new_temp) && !isFinite(new_temp))
+                    if (isNaN(new_temp) || !isFinite(new_temp))
                     {
                         // helper.warn(this, "Invalid payload for current_temperature: " + msg.payload);
                         return;
@@ -230,15 +314,63 @@ module.exports = function (RED)
 
         let startSampling = () =>
         {
-            // Wait for calibration first
-            if (node_settings.last_position === null || calibration_timeout !== null || !node_settings.enabled)
+            if (!node_settings.enabled)
+            {
+                helper.log(node, "Node is disabled, cannot start sampling");
                 return;
+            }
+
+            // Wait for calibration first
+            if (node_settings.last_position === null || calibration_timeout !== null)
+            {
+                helper.log(node, "Cannot start sampling yet");
+                return;
+            }
 
             // sampling is already running, so do nothing
             if (sampling_interval !== null)
+            {
+                helper.log(node, "Sampling already running");
                 return;
+            }
 
             // start sampling
+            if (force_position !== null)
+            {
+                switch (output_mode)
+                {
+                    case OUTPUT_MODE_OPEN_CLOSE:
+
+                        sampling_interval = -1; // mark as running
+
+                        helper.log(node, "Force position to " + force_position.toFixed(1) + "%");
+
+                        // Under precision % difference => do nothing
+                        if (Math.abs(node_settings.last_position - force_position) <= node_settings.precision)
+                        {
+                            helper.log(node, "No Force position needed");
+                            force_position = null;
+                            return;
+                        }
+
+                        let adjustAction = ADJUST_CLOSE;
+                        if (node_settings.last_position < force_position)
+                            adjustAction = ADJUST_OPEN;
+
+                        let time_ms = Math.abs(node_settings.last_position - force_position) * time_total_s * 1000 / 100;
+                        helper.log(node, "Start force changing " + adjustAction + " for " + time_ms + " ms");
+                        startChanging(adjustAction, time_ms);
+                        return;
+
+                    case OUTPUT_MODE_PERCENTAGE:
+                        // Output mode percentage
+                        node_settings.last_position = force_position;
+                        node.send({ payload: node_settings.last_position });
+                        smart_context.set(node.id, node_settings);
+                        setStatus();
+                }
+            }
+
             sampling_interval = setInterval(sample, time_sampling_s * 1000);
 
             setStatus();
@@ -277,23 +409,32 @@ module.exports = function (RED)
             // +/- 1°C => already good enough, do nothing
             let temp_diff = Math.abs(current_temperature - node_settings.setpoint);
             if (temp_diff < node_settings.precision)
-                return;
+            {
+                // Found a good position for the current setpoint
+                // Update min/max temperature
+                if (min_temperature === null || current_temperature < min_temperature)
+                {
+                    min_temperature = current_temperature;
+                    min_temperature_position = node_settings.last_position;
+                }
 
-            // Calculate change time
-            // Change time in ms for 1%
-            let moving_time = time_total_s * 1000 / 100;
+                if (max_temperature === null || current_temperature > max_temperature)
+                {
+                    max_temperature = current_temperature;
+                    max_temperature_position = node_settings.last_position;
+                }
+                return;
+            }
+
             // 0 °C diff => 0% change
             // for max_change_temp_difference (default: 20 °C) diff => max_change_percent (default: 2%) change
-            moving_time *= helper.scale(
+            let change_percentage = helper.scale(
                 Math.min(temp_diff, node_settings.max_change_temp_difference),
                 0,
                 node_settings.max_change_temp_difference,
                 0,
                 node_settings.max_change_percent
             );
-
-            if (moving_time < node_settings.min_change_time)
-                moving_time = node_settings.min_change_time;
 
             // calculate direction
             let adjustAction = ADJUST_CLOSE;
@@ -308,19 +449,56 @@ module.exports = function (RED)
                     adjustAction = ADJUST_OPEN;
             }
 
+            switch (output_mode)
+            {
+                case OUTPUT_MODE_PERCENTAGE:
+                    if (adjustAction == ADJUST_CLOSE)
+                        node_settings.last_position -= change_percentage;
+                    else
+                        node_settings.last_position += change_percentage;
+
+                    // Only values from 0 to 100 are allowed
+                    node_settings.last_position = Math.min(Math.max(node_settings.last_position, 0), 100);
+
+                    node.send({ payload: node_settings.last_position });
+                    smart_context.set(node.id, node_settings);
+                    setStatus();
+                    return;
+
+                case OUTPUT_MODE_OPEN_CLOSE:
+                    break;
+            }
+
+            // Calculate change time in ms
+            // Change time in ms
+            let moving_time = (time_total_s * 1000 / 100) * change_percentage;
+
+            if (moving_time < node_settings.min_change_time)
+                moving_time = node_settings.min_change_time;
+
             // start moving
             startChanging(adjustAction, moving_time);
         }
 
         let startChanging = (adjustAction, time_ms) =>
         {
+            if (output_mode !== OUTPUT_MODE_OPEN_CLOSE)
+            {
+                helper.log(node, "startChanging is only supported in OPEN/CLOSE output mode");
+                return;
+            }
+
+            // Already changing
+            if (changing_timeout !== null)
+                return;
+
             helper.log(node, "Start changing", adjustAction, time_ms)
             stopChanging();
 
             // Already oppened/closed
-            if (adjustAction == ADJUST_OPEN && node_settings.last_position == 100)
+            if (adjustAction == ADJUST_OPEN && node_settings.last_position >= 100)
                 time_ms = time_total_s * 1000 / 200; // Change at least 1/200 => 0.5 %
-            else if (adjustAction == ADJUST_CLOSE && node_settings.last_position == 0)
+            else if (adjustAction == ADJUST_CLOSE && node_settings.last_position <= 0)
                 time_ms = time_total_s * 1000 / 200; // Change at least 1/200 => 0.5 %
 
             adjusting_start_time = Date.now();
@@ -347,6 +525,13 @@ module.exports = function (RED)
             // Stop any runnting timeout
             if (changing_timeout !== null)
             {
+                if (force_position !== null)
+                {
+                    force_position = null;
+                    sampling_interval = null;
+                    startSampling();
+                }
+
                 clearTimeout(changing_timeout);
                 changing_timeout = null;
             }
@@ -367,14 +552,21 @@ module.exports = function (RED)
 
             // Only values from 0 to 100 are allowed
             node_settings.last_position = Math.min(Math.max(node_settings.last_position, 0), 100);
+            smart_context.set(node.id, node_settings);
 
-            node.send([{ payload: false }, { payload: false }, { payload: helper.toFixed(node_settings.last_position, 1) }]);
+            node.send([{ payload: false }, { payload: false }, { payload: node_settings.last_position }]);
 
             setStatus();
         }
 
         let calibrate = () =>
         {
+            if (output_mode !== OUTPUT_MODE_OPEN_CLOSE)
+            {
+                node.warn("Calibration is only supported in OPEN/CLOSE output mode");
+                return;
+            }
+
             // start closing
             node.send([{ payload: false }, { payload: true }, null]);
 
@@ -403,16 +595,54 @@ module.exports = function (RED)
             switch (node_settings.off_mode)
             {
                 case "OPEN":
-                    startChanging(ADJUST_OPEN, time_total_s * 1000);
+                    switch (output_mode)
+                    {
+                        case OUTPUT_MODE_OPEN_CLOSE:
+                            startChanging(ADJUST_OPEN, time_total_s * 1000);
+                            break;
+
+                        case OUTPUT_MODE_PERCENTAGE:
+                            node_settings.last_position = 100;
+                            node.send({ payload: node_settings.last_position });
+                            smart_context.set(node.id, node_settings);
+                            setStatus();
+                            break;
+                    }
                     break;
 
                 case "CLOSE":
-                    startChanging(ADJUST_CLOSE, time_total_s * 1000);
-                    break;
+                    switch (output_mode)
+                    {
+                        case OUTPUT_MODE_OPEN_CLOSE:
+                            startChanging(ADJUST_CLOSE, time_total_s * 1000);
+                            break;
+
+                        case OUTPUT_MODE_PERCENTAGE:
+                            node_settings.last_position = 0;
+                            node.send({ payload: node_settings.last_position });
+                            smart_context.set(node.id, node_settings);
+                            setStatus();
+                            break;
+                    }
 
                 case "NOTHING":
                 default:
                     break;
+            }
+        }
+
+        let resetSavedTemperatures = () =>
+        {
+            let now = Date.now();
+
+            // Reset saved temperatures after 7 days, to avoid using too old data
+            if (now - temp_save_date >= 7 * 24 * 60 * 60 * 1000)
+            {
+                temp_save_date = now;
+                min_temperature = null;
+                min_temperature_position = null;
+                max_temperature = null;
+                max_temperature_position = null;
             }
         }
 
@@ -432,21 +662,28 @@ module.exports = function (RED)
          */
         let notifyCentral = state =>
         {
-            helper.log(node, "notifyCentral", config.links, node);
+            // helper.log(node, "notifyCentral", config.links, node);
             if (!config.links)
                 return;
 
             config.links.forEach(link =>
             {
-                helper.log(node, link, { source: node.id, state: state });
+                // helper.log(node, link, { source: node.id, state: state });
                 RED.events.emit("node:" + link, { source: node.id, state: state });
             });
         }
 
-        if (node_settings.last_position == null)
+        if (node_settings.last_position === null)
         {
-            // Start calibration after 10s
-            setTimeout(calibrate, 10 * 1000);
+            if (output_mode === OUTPUT_MODE_OPEN_CLOSE)
+            {
+                // Start calibration after 10s
+                setTimeout(calibrate, 10 * 1000);
+            }
+            else
+            {
+                node_settings.last_position = 0;
+            }
         }
         else if (node_settings.enabled)
         {

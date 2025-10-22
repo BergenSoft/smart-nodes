@@ -144,6 +144,8 @@
                 time_sampling: { value: 60 },
                 off_mode: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
                 valve_mode: { value: "HEATING" }, // HEATING | COOLING
+                outputs: { value: 3 },
+                output_mode: { value: "OPEN_CLOSE" },
                 precision: { value: 1.0 },
                 max_change_percent: { value: 1 },
                 max_change_temp_difference: { value: 20 },
@@ -151,8 +153,11 @@
                 links: { value: [], type: "smart_central-control[]" }
             },
             inputs: 1,
-            outputs: 3,
-            outputLabels: ["Open", "Close", "Status Position"],
+            outputs: 1,
+            outputLabels: function (index)
+            {
+                return this.output_mode == "OPEN_CLOSE" ? ["Open", "Close", "Status Position"][index] : "Position";
+            },
             icon: "mixing-valve.png",
             label: function ()
             {
@@ -235,21 +240,49 @@
                         }],
                     });
 
-                $("#node-input-precision")
-                    .css("max-width", "4rem")
-                    .spinner({
-                        min: 0.1,
-                        max: 1.0,
-                        step: 0.1,
-                        change: function (event, ui)
-                        {
-                            var value = parseFloat(this.value);
-                            value = isNaN(value) ? 0.0 : value;
-                            value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
-                            value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
-                            if (value !== this.value) $(this).spinner("value", value);
-                        },
+                $("#node-input-output_mode")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        type: "num",
+                        types: [{
+                            value: "output_mode",
+                            options: [
+                                { value: "OPEN_CLOSE", label: node._("mixing-valve.ui.open_close") },
+                                { value: "PERCENTAGE", label: node._("mixing-valve.ui.percentage") },
+                            ]
+                        }]
                     });
+
+                $("#node-input-output_mode").on("change", function ()
+                {
+                    if (this.value == "OPEN_CLOSE")
+                    {
+                        $(".only-open-close").show();
+                        node.outputs = 3;
+                    }
+                    else
+                    {
+                        $(".only-open-close").hide();
+                        node.outputs = 1;
+                    }
+                });
+
+
+                $("#node-input-precision")
+                        .css("max-width", "4rem")
+                        .spinner({
+                            min: 0.1,
+                            max: 1.0,
+                            step: 0.1,
+                            change: function (event, ui)
+                            {
+                                var value = parseFloat(this.value);
+                                value = isNaN(value) ? 0.0 : value;
+                                value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
+                                value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
+                                if (value !== this.value) $(this).spinner("value", value);
+                            },
+                        });
 
                 $("#node-input-max_change_percent")
                     .css("max-width", "4rem")
@@ -316,10 +349,14 @@
         <span for="node-input-enabled" style="width: 200px;"> <span data-i18n="mixing-valve.ui.enabled"></span></span>
     </div>
     <div class="form-row">
+        <label for="node-input-output_mode"><i class="fa fa-hashtag"></i> <span data-i18n="mixing-valve.ui.output_mode"></span></label>
+        <input id="node-input-output_mode" />
+    </div>
+    <div class="form-row">
         <label for="node-input-setpoint"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.setpoint"></span></label>
         <input id="node-input-setpoint" value="0" /> °C
     </div>
-    <div class="form-row">
+    <div class="form-row only-open-close">
         <label for="node-input-time_total"><i class="fa fa-clock-o"></i> <span data-i18n="mixing-valve.ui.runtime"></span></label>
         <input id="node-input-time_total" value="0" /> s
     </div>
@@ -336,21 +373,22 @@
         <input id="node-input-valve_mode" />
     </div>
     <div class="form-row">
-        <label for="node-input-precision"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.precision"></span></label>
+        <label for="node-input-precision" style="width: 250px;"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.precision"></span></label>
         <input id="node-input-precision" value="1.0" /> °C
     </div>
     <div class="form-row">
-        <label for="node-input-max_change_percent"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.max_change_percent"></span></label>
+        <label for="node-input-max_change_percent" style="width: 250px;"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.max_change_percent"></span></label>
         <input id="node-input-max_change_percent" value="2" /> %
     </div>
     <div class="form-row">
-        <label for="node-input-max_change_temp_difference"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.max_change_temp_difference"></span></label>
+        <label for="node-input-max_change_temp_difference" style="width: 250px;"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.max_change_temp_difference"></span></label>
         <input id="node-input-max_change_temp_difference" value="20" /> °C
     </div>
-    <div class="form-row">
-        <label for="node-input-min_change_time"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.min_change_time"></span></label>
+    <div class="form-row only-open-close">
+        <label for="node-input-min_change_time" style="width: 250px;"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.min_change_time"></span></label>
         <input id="node-input-min_change_time" value="0" /> ms
     </div>
+    <hr/>
     <span><i class="fa fa-link"></i> <span data-i18n="mixing-valve.ui.controlled_by_central"></span></span>
     <div class="form-row node-input-link-row node-input-link-rows"></div>
 </script>

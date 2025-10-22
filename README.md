@@ -219,5 +219,15 @@ This node countes up and down within a specified range.
 ### **Features:**
 
 -   Define min, max and step values.
--   Set to a specific value
+-   Set to a specific value.
 -   Increment and decrement by default or by a given value.
+
+## 18. Mode Selector
+
+This node can define multiple modes which stores the last selected mode persitent.
+
+### **Features:**
+
+-   Define custom modes.
+-   The first mode is the default on first start.
+-   Save last mode persistent and resend it at start, if wanted.

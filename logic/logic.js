@@ -139,7 +139,6 @@ module.exports = function (RED)
 
             node_settings.last_result = result;
             node_settings.last_message = out_msg;
-
         }
 
         let getResult = () =>

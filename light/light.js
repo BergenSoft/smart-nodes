@@ -122,6 +122,16 @@ module.exports = function (RED)
 
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        max_time_on,
+                        alarm_action,
+                        alarm_off_action,
+                        mode,
+                    });
+                    break;
+
                 case "status":
                     // Ignore if it is in blinking mode
                     if (isBlinking)
@@ -436,13 +446,23 @@ module.exports = function (RED)
             else if (node_settings.last_value)
             {
                 if (isPermanent || isMotion || timeout == null)
-                    node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": On" });
+                {
+                    if (mode === "BOOL")
+                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": On" });
+                    else
+                        node.status({ fill: "green", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + helper.toFixed(node_settings.last_value, 0) + "%" });
+                }
                 else if (timeout)
+                {
                     node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": Wait " + helper.formatDateToStatus(timeout_end_date, "until") + " for auto off" });
+                }
             }
             else
             {
-                node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Off" });
+                if (mode === "BOOL")
+                    node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": Off" });
+                else
+                    node.status({ fill: "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": 0%" });
             }
         }
 

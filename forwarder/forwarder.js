@@ -93,38 +93,52 @@ module.exports = function (RED)
             else if (real_topic == "disable" || (real_topic == "set_state" && !msg.payload))
                 new_state = false;
 
-            // Already the correct state
-            if (new_state != null && node_settings.enabled == new_state)
-                return;
-
-            switch (new_state)
+            switch (real_topic)
             {
-                case true:
-                case false:
-                    node_settings.enabled = new_state;
-
-                    if (node_settings.enabled && forward_last_on_enable && node_settings.last_message != null && !node_settings.last_msg_was_sended)
-                    {
-                        node.send(helper.cloneObject(node_settings.last_message));
-                        node_settings.last_msg_was_sended = true;
-                    }
-
-                    setStatus();
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        forward_true,                        
+                        forward_false,
+                        forward_last_on_enable,
+                    });
                     break;
 
                 default:
-                    // Forward if enabled or forced
-                    if (node_settings.enabled || (forward_true && msg.payload) || (forward_false && !msg.payload))
-                    {
-                        node.send(helper.cloneObject(msg));
-                        node_settings.last_msg_was_sended = true;
-                    }
-                    else
-                    {
-                        node_settings.last_msg_was_sended = false;
-                    }
+                    // Already the correct state
+                    if (new_state != null && node_settings.enabled == new_state)
+                        return;
 
-                    node_settings.last_message = helper.cloneObject(msg);
+                    switch (new_state)
+                    {
+                        case true:
+                        case false:
+                            node_settings.enabled = new_state;
+
+                            if (node_settings.enabled && forward_last_on_enable && node_settings.last_message != null && !node_settings.last_msg_was_sended)
+                            {
+                                node.send(helper.cloneObject(node_settings.last_message));
+                                node_settings.last_msg_was_sended = true;
+                            }
+
+                            setStatus();
+                            break;
+
+                        default:
+                            // Forward if enabled or forced
+                            if (node_settings.enabled || (forward_true && msg.payload) || (forward_false && !msg.payload))
+                            {
+                                node.send(helper.cloneObject(msg));
+                                node_settings.last_msg_was_sended = true;
+                            }
+                            else
+                            {
+                                node_settings.last_msg_was_sended = false;
+                            }
+
+                            node_settings.last_message = helper.cloneObject(msg);
+                            break;
+                    }
                     break;
             }
         }

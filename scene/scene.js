@@ -111,6 +111,15 @@ module.exports = function (RED)
 
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        max_time_on,
+                        isPermanent,
+                        currentScene,
+                    });
+                    break;
+
                 case "status":
                     // Make sure it is bool
                     msg.payload = !!msg.payload;

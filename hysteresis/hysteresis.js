@@ -111,6 +111,16 @@ module.exports = function (RED)
 
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        out_higher,
+                        out_lower,
+                        send_only_change,
+                        mode,
+                    });
+                    break;
+
                 case "setpoint":
                     node_settings.setpoint = value;
                     break;

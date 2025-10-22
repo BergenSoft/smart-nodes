@@ -8,6 +8,10 @@
             "sampling": "Abtastzeit",
             "power_off": "Aus-Modus",
             "mode": "Modus",
+            "output_mode": "Ausgänge",
+
+            "open_close": "Öffnen/Schließen",
+            "percentage": "Prozentual",
 
             "nothing": "Nichts",
             "open": "Öffnen (100%)",

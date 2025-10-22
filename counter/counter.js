@@ -74,6 +74,17 @@ module.exports = function (RED)
             let temp_value;
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        start,
+                        step,
+                        min,
+                        max,
+                        out_message,
+                    });
+                    break;
+
                 case "set_min":
                     min = parseFloat(msg.payload);
                     break;

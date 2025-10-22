@@ -1,0 +1,11 @@
+{
+    "modeSelector": {
+        "ui": {
+            "name": "Name",
+            "modes": "Modi",
+
+            "system_start": "System start",
+            "send_after_start": "Send last message 10 seconds after start"
+        }
+    }
+}

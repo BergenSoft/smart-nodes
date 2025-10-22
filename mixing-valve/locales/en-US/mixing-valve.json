@@ -8,6 +8,10 @@
             "sampling": "Sampling",
             "power_off": "Off mode",
             "mode": "Mode",
+            "output_mode": "Outputs",
+
+            "open_close": "Open/Close",
+            "percentage": "Percentage",
 
             "nothing": "Nothing",
             "open": "Open (100%)",

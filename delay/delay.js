@@ -111,6 +111,13 @@ module.exports = function (RED)
 
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        delay_only_on_change,
+                    });
+                    break;
+
                 case "set_delay_on":
                     node_settings.on_delay_ms = helper.getTimeInMsFromString(msg.payload);
                     node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + "New on delay: " + helper.formatMsToStatus(node_settings.on_delay_ms) });

@@ -1,0 +1,225 @@
+[
+    {
+        "id": "b33aca888f9ec037",
+        "type": "smart_mode-selector",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "outputs": 3,
+        "mode_items": [
+            {
+                "name": "OFF"
+            },
+            {
+                "name": "COOL"
+            },
+            {
+                "name": "HEAT"
+            }
+        ],
+        "resend_on_start": true,
+        "x": 420,
+        "y": 160,
+        "wires": [
+            [
+                "81ee5e80db7748e6"
+            ],
+            [
+                "d3ee3b38834ce6d1"
+            ],
+            [
+                "183f10a05472b8ce"
+            ]
+        ]
+    },
+    {
+        "id": "cacd2123f498db13",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "refresh",
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "a4517f2fe26a78a3",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode",
+        "payload": "OFF",
+        "payloadType": "str",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "d616bfb55d4b2e05",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode",
+        "payload": "HEAT",
+        "payloadType": "str",
+        "x": 140,
+        "y": 200,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "34ec6475a0112da8",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode",
+        "payload": "COOL",
+        "payloadType": "str",
+        "x": 140,
+        "y": 260,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "81ee5e80db7748e6",
+        "type": "debug",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "debug 23",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "d3ee3b38834ce6d1",
+        "type": "debug",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "debug 49",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "183f10a05472b8ce",
+        "type": "debug",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "debug 50",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "4e7b09d07c9debda",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode",
+        "payload": "INVALID",
+        "payloadType": "str",
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    }
+]

@@ -71,6 +71,14 @@ module.exports = function (RED)
             let real_topic = helper.getTopicName(msg.topic);
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        slope,                        
+                        offset,
+                    });
+                    break;
+
                 case "room_setpoint":
                     let new_setpoint = parseFloat(msg.payload);
                     if (isNaN(new_setpoint) && !isFinite(new_setpoint))

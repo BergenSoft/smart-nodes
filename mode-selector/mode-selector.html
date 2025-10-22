@@ -1,0 +1,158 @@
+<script type="text/javascript">
+    (function ()
+    {
+        function getModes(el)
+        {
+            var result = {
+                modes: []
+            }
+            el.each(function (i)
+            {
+                var prop = $(this);
+                result.modes.push({
+                    name: prop.find(".node-input-prop-name").val()
+                });
+            });
+            return result;
+        }
+
+        function resizeDialog(size)
+        {
+            size = size || { height: $(".red-ui-tray-content form").height() }
+            var rows = $("#dialog-form > div:not(.node-input-property-mode-row):visible");
+            var height = size.height;
+            for (var i = 0; i < rows.length; i++)
+            {
+                height -= $(rows[i]).outerHeight(true);
+            }
+
+            var editorRow = $("#dialog-form > div.node-input-property-mode-row");
+            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
+            height += 16;
+            $("#node-input-property-modes").editableList("height", height);
+        }
+
+        RED.nodes.registerType("smart_mode-selector", {
+            category: "Smart Nodes",
+            paletteLabel: "Mode selector",
+            color: "#E2D96E",
+            defaults: {
+                name: { value: "" },
+                outputs: { value: 1 },
+                mode_items: { value: ["MODE1", "MODE2"] },
+                resend_on_start: { value: false }
+            },
+            inputs: 1,
+            outputs: 1,
+            outputLabels: function (index)
+            {
+                return this.mode_items[index].name;
+            },
+            icon: "font-awesome/fa-list-ol",
+            label: function ()
+            {
+                return this.name || "Mode selector";
+            },
+            oneditprepare: function ()
+            {
+                let node = this;
+
+                // Modes list
+                var modesList = $("#node-input-property-modes").css("min-height", "120px").css("min-width", "445px");
+
+                modesList.editableList({
+                    addItem: function (container, i, opt)
+                    {
+                        var prop = opt;
+                        if (!prop.hasOwnProperty("name"))
+                        {
+                            prop = { name: "" };
+                        }
+                        container.css({
+                            overflow: "hidden",
+                            whiteSpace: "nowrap"
+                        });
+                        var row = $("<div/>").appendTo(container);
+
+                        // Output number
+                        $("<div/>", { style: "display:inline-block; padding:0px 6px;" })
+                            .text((i + 1) + ":")
+                            .appendTo(row);
+
+                        // Output name
+                        var modeName = $("<input/>", { class: "node-input-prop-name", placeholder: node._("modeSelector.ui.name"), type: "text" })
+                            .css("width", "90%")
+                            .appendTo(row);
+
+                        modeName.val(prop.name);
+                    },
+                    removable: true,
+                });
+
+                // Default modes
+                if (!this.mode_items)
+                    this.mode_items = [{ name: "" }];
+
+                // Add existing modes to list
+                for (var i = 0; i < this.mode_items.length; i++)
+                {
+                    var item = this.mode_items[i];
+                    var newItem = { name: item.name };
+                    modesList.editableList("addItem", newItem);
+                }
+
+                // Init tabs
+                var tabs = RED.tabs.create({
+                    id: "mode-tabs",
+                    onchange: function (tab)
+                    {
+                        $("#modes-tabs-content").children().hide();
+                        $("#" + tab.id).show();
+                        resizeDialog();
+                    }
+                });
+                tabs.addTab({
+                    id: "modes-tab-outputs",
+                    iconClass: "fa fa-list-ol",
+                    label: node._("modeSelector.ui.modes")
+                });
+            },
+            oneditsave: function ()
+            {
+                let node = this;
+
+                // Set modes
+                var items = $("#node-input-property-modes").editableList("items");
+                var result = getModes(items);
+                this.mode_items = result.modes;
+                this.outputs = this.mode_items.length;
+            },
+            oneditresize: resizeDialog
+        });
+    })();
+</script>
+
+<script type="text/html" data-template-name="smart_mode-selector">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="modeSelector.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]modeSelector.ui.name" />
+    </div>
+
+    <div id="mode-selector-modes">
+        <div class="form-row mode-tabs-row">
+            <ul style="min-width: 600px; margin-bottom: 20px;" id="mode-tabs"></ul>
+        </div>
+        <div id="modes-tabs-content">
+            <div id="modes-tab-outputs" style="display: none;">
+                <ol id="node-input-property-modes"></ol>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <h4 style="margin: 0.5rem 0;" data-i18n="modeSelector.ui.system_start"></h4>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);" data-i18n="modeSelector.ui.send_after_start"></label>
+    </div>
+
+</script>

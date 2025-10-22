@@ -131,6 +131,13 @@ module.exports = function (RED)
             helper.log(node, "handle real topic: " + real_topic);
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        short_time_on_ms,
+                    });
+                    break;
+
                 case "status":
                 case "status_position":
                     node_settings.last_direction_up = node_settings.last_position > msg.payload;

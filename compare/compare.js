@@ -80,70 +80,85 @@ module.exports = function (RED)
         {
             helper.log(node, "handle topic:", msg);
 
-            // Check if topic has a valid value
-            let real_topic_number = helper.getTopicNumber(msg.topic);
-            if (real_topic_number == null || real_topic_number < 1 || real_topic_number > 2)    
+            switch (msg.topic)
             {
-                helper.warn(this, "Topic has to be 1 or 2, sended: " + msg.topic);
-                return;
-            }
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        comparator,
+                        out_true,
+                        out_false,
+                        send_only_change,
+                    });
+                    break;
 
-            // check if payload has a valid value
-            let num = parseFloat(msg.payload);
-            if (Number.isNaN(num))
-            {
-                helper.warn(this, "Payload has to be numeric: " + msg.payload);
-                return;
-            }
-
-            // Save new value
-            node_settings.values[real_topic_number - 1] = num;
-
-            let result = getResult();
-
-            helper.log(node, "getResult:", result, node_settings);
-
-            let out_msg = null;
-
-            if (result != null)
-            {
-                // Get custom output message
-                if (result)
-                {
-                    if (out_true !== null)
-                        out_msg = helper.cloneObject(out_true);
-                }
-                else
-                {
-                    if (out_false !== null)
-                        out_msg = helper.cloneObject(out_false);
-                }
-
-                if (out_msg !== null)
-                {
-                    // Overwrite automatic values, if not already defined
-                    if (typeof out_msg.payload === "undefined")
-                        out_msg.payload = result;
-
-                    if (typeof out_msg.comparator === "undefined")
-                        out_msg.comparator = comparator;
-
-                    // Separate outputs if needed
-                    if (outputs == 2)
+                default:
+                    // Check if topic has a valid value
+                    let real_topic_number = helper.getTopicNumber(msg.topic);
+                    if (real_topic_number == null || real_topic_number < 1 || real_topic_number > 2)    
                     {
-                        if (result)
-                            out_msg = [out_msg, null];
-                        else
-                            out_msg = [null, out_msg];
+                        helper.warn(this, "Topic has to be 1 or 2, sended: " + msg.topic);
+                        return;
                     }
 
-                    // Send only if needed
-                    if (send_only_change == false || node_settings.last_result != result)
-                        node.send(out_msg);
-                }
+                    // check if payload has a valid value
+                    let num = parseFloat(msg.payload);
+                    if (Number.isNaN(num))
+                    {
+                        helper.warn(this, "Payload has to be numeric: " + msg.payload);
+                        return;
+                    }
 
-                node_settings.last_result = result;
-                node_settings.last_message = out_msg;
+                    // Save new value
+                    node_settings.values[real_topic_number - 1] = num;
+
+                    let result = getResult();
+
+                    helper.log(node, "getResult:", result, node_settings);
+
+                    let out_msg = null;
+
+                    if (result != null)
+                    {
+                        // Get custom output message
+                        if (result)
+                        {
+                            if (out_true !== null)
+                                out_msg = helper.cloneObject(out_true);
+                        }
+                        else
+                        {
+                            if (out_false !== null)
+                                out_msg = helper.cloneObject(out_false);
+                        }
+
+                        if (out_msg !== null)
+                        {
+                            // Overwrite automatic values, if not already defined
+                            if (typeof out_msg.payload === "undefined")
+                                out_msg.payload = result;
+
+                            if (typeof out_msg.comparator === "undefined")
+                                out_msg.comparator = comparator;
+
+                            // Separate outputs if needed
+                            if (outputs == 2)
+                            {
+                                if (result)
+                                    out_msg = [out_msg, null];
+                                else
+                                    out_msg = [null, out_msg];
+                            }
+
+                            // Send only if needed
+                            if (send_only_change == false || node_settings.last_result != result)
+                                node.send(out_msg);
+                        }
+
+                        node_settings.last_result = result;
+                        node_settings.last_message = out_msg;
+                    }
+                    break;
             }
         }
 

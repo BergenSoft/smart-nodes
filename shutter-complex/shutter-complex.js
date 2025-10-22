@@ -165,6 +165,17 @@ module.exports = function (RED)
             helper.log(node, "handle real topic: " + real_topic);
             switch (real_topic)
             {
+                case "debug":
+                    helper.nodeDebug(node, {
+                        node_settings,
+                        max_time_up,
+                        max_time_down,
+                        revert_time_ms,
+                        alarm_action,
+                        alarm_off_action,
+                    });
+                    break;
+
                 case "up":
                     startAction(ACTION_UP, msg.time_on ?? null, msg.exact ?? null);
                     break;
