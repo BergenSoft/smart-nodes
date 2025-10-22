@@ -16,9 +16,10 @@
                 "name": "HEAT"
             }
         ],
+        "update_only_changed_outputs": true,
         "resend_on_start": true,
-        "x": 420,
-        "y": 160,
+        "x": 540,
+        "y": 320,
         "wires": [
             [
                 "81ee5e80db7748e6"
@@ -155,8 +156,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 720,
-        "y": 120,
+        "x": 840,
+        "y": 280,
         "wires": []
     },
     {
@@ -172,8 +173,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 720,
-        "y": 160,
+        "x": 840,
+        "y": 320,
         "wires": []
     },
     {
@@ -189,8 +190,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 720,
-        "y": 200,
+        "x": 840,
+        "y": 360,
         "wires": []
     },
     {
@@ -216,6 +217,122 @@
         "payloadType": "str",
         "x": 150,
         "y": 320,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "b7396258239591c4",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode_with_default",
+        "payload": "OFF",
+        "payloadType": "str",
+        "x": 180,
+        "y": 380,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "a1a2dde948e7e8c0",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode_with_default",
+        "payload": "HEAT",
+        "payloadType": "str",
+        "x": 180,
+        "y": 440,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "d108434f961c5794",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode_with_default",
+        "payload": "COOL",
+        "payloadType": "str",
+        "x": 180,
+        "y": 500,
+        "wires": [
+            [
+                "b33aca888f9ec037"
+            ]
+        ]
+    },
+    {
+        "id": "6389fdc5da9dccbc",
+        "type": "inject",
+        "z": "e5afc2ee2cd84f5f",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "set_mode_with_default",
+        "payload": "INVALID",
+        "payloadType": "str",
+        "x": 190,
+        "y": 560,
         "wires": [
             [
                 "b33aca888f9ec037"

@@ -32,6 +32,8 @@ module.exports = function (RED)
         // # Dynamic config #
         // ##################
         let mode_items = (config.mode_items || [{ name: "NO_MODES_DEFINED" }]).map(m => m.name);
+        let previous_mode = null;
+        let update_only_changed_outputs = config.update_only_changed_outputs ?? true;
 
 
         // ##################
@@ -92,8 +94,35 @@ module.exports = function (RED)
                     }
                     break;
 
+
+                case "set_mode_with_default":
+                    {
+                        let selectedIndex = mode_items.indexOf(msg.payload);
+                        if (selectedIndex === -1)
+                        {
+                            node.warn("set_mode: invalid payload, mode '" + msg.payload + "' not found");
+                            break;
+                        }
+
+                        // No change, go to default mode
+                        if (node_settings.last_mode == msg.payload)
+                        {
+                            selectedIndex = 0;
+                            msg.payload = mode_items[0];
+                        }
+
+                        // No change, don't send anything
+                        if (node_settings.last_mode == msg.payload)
+                            break;
+
+                        node_settings.last_mode = msg.payload;
+                        smart_context.set(node.id, node_settings);
+                        sendCurrentMode();
+                    }
+                    break;
+
                 case "refresh":
-                    sendCurrentMode();
+                    sendCurrentMode(true);
                     break;
 
                 default:
@@ -101,12 +130,28 @@ module.exports = function (RED)
             }
         }
 
-        let sendCurrentMode = () =>
+        let sendCurrentMode = (force_send_all = false) =>
         {
-            const result = mode_items.map((m, idx) =>
+            let result;
+            if (!force_send_all && update_only_changed_outputs)
             {
-                return { payload: (m === node_settings.last_mode) };
-            });
+                result = mode_items.map((m, idx) =>
+                {
+                    if (m != node_settings.last_mode && m != previous_mode)
+                        return null;
+
+                    return { payload: (m === node_settings.last_mode) };
+                });
+            }
+            else
+            {
+                result = mode_items.map((m, idx) =>
+                {
+                    return { payload: (m === node_settings.last_mode) };
+                });
+            }
+
+            previous_mode = node_settings.last_mode;
 
             node.send(result);
         }

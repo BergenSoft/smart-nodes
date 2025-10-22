@@ -214,3 +214,8 @@
 ## Version 0.4.30:
 
 -   Fixed mode-selector to only send if the mode is really changed.
+
+## Version 0.4.31:
+
+-   Added set_mode_with_default to mode-selector node to toggle mode if sended mode already set.
+-   Added option to mode-selector to update only changed outputs.

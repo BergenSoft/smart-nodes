@@ -2,6 +2,7 @@
     "modeSelector": {
         "ui": {
             "name": "Name",
+            "update_only_changed_outputs": "Nur an geänderte Ausgänge senden",
             "modes": "Modes",
 
             "system_start": "Systemstart",
