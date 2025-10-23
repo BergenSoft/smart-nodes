@@ -1,6 +1,6 @@
 {
     "name": "smart-nodes",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Controls light, shutters and more. Includes common used logic and statistic nodes to control your home.",
     "keywords": [
         "node-red",

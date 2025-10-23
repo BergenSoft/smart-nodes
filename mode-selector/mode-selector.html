@@ -81,7 +81,7 @@
                             .appendTo(row);
 
                         // Output name
-                        var modeName = $("<input/>", { class: "node-input-prop-name", placeholder: node._("modeSelector.ui.name"), type: "text" })
+                        var modeName = $("<input/>", { class: "node-input-prop-name", placeholder: node._("mode-selector.ui.name"), type: "text" })
                             .css("width", "90%")
                             .appendTo(row);
 
@@ -115,7 +115,7 @@
                 tabs.addTab({
                     id: "modes-tab-outputs",
                     iconClass: "fa fa-list-ol",
-                    label: node._("modeSelector.ui.modes")
+                    label: node._("mode-selector.ui.modes")
                 });
             },
             oneditsave: function ()
@@ -135,12 +135,12 @@
 
 <script type="text/html" data-template-name="smart_mode-selector">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="modeSelector.ui.name"></span></label>
-        <input type="text" id="node-input-name" data-i18n="[placeholder]modeSelector.ui.name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="mode-selector.ui.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]mode-selector.ui.name" />
     </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-update_only_changed_outputs" style="width: 20px;" />
-        <label for="node-input-update_only_changed_outputs" style="width: calc(100% - 30px);" data-i18n="modeSelector.ui.update_only_changed_outputs"></label>
+        <label for="node-input-update_only_changed_outputs" style="width: calc(100% - 30px);" data-i18n="mode-selector.ui.update_only_changed_outputs"></label>
     </div>
 
     <div id="mode-selector-modes">
@@ -154,10 +154,10 @@
         </div>
     </div>
     <hr/>
-    <h4 style="margin: 0.5rem 0;" data-i18n="modeSelector.ui.system_start"></h4>
+    <h4 style="margin: 0.5rem 0;" data-i18n="mode-selector.ui.system_start"></h4>
     <div class="form-row">
         <input type="checkbox" id="node-input-resend_on_start" style="width: 20px;" />
-        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);" data-i18n="modeSelector.ui.send_after_start"></label>
+        <label for="node-input-resend_on_start" style="width: calc(100% - 30px);" data-i18n="mode-selector.ui.send_after_start"></label>
     </div>
 
 </script>

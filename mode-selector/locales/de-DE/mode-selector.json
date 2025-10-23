@@ -1,5 +1,5 @@
 {
-    "modeSelector": {
+    "mode-selector": {
         "ui": {
             "name": "Name",
             "update_only_changed_outputs": "Nur an geänderte Ausgänge senden",

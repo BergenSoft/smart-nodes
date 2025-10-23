@@ -170,6 +170,33 @@
                 onEditPrepare(this, ["smart_central-control"]);
                 initTreeList(node, ["smart_central-control"]);
 
+                $("#node-input-output_mode")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        type: "num",
+                        types: [{
+                            value: "output_mode",
+                            options: [
+                                { value: "OPEN_CLOSE", label: node._("mixing-valve.ui.open_close") },
+                                { value: "PERCENTAGE", label: node._("mixing-valve.ui.percentage") },
+                            ]
+                        }]
+                    });
+
+                $("#node-input-output_mode").on("change", function ()
+                {
+                    if (this.value == "OPEN_CLOSE")
+                    {
+                        $(".only-open-close").show();
+                        node.outputs = 3;
+                    }
+                    else
+                    {
+                        $(".only-open-close").hide();
+                        node.outputs = 1;
+                    }
+                });
+
                 $("#node-input-setpoint")
                     .css("max-width", "4rem")
                     .spinner({
@@ -240,49 +267,22 @@
                         }],
                     });
 
-                $("#node-input-output_mode")
-                    .css("max-width", "70%")
-                    .typedInput({
-                        type: "num",
-                        types: [{
-                            value: "output_mode",
-                            options: [
-                                { value: "OPEN_CLOSE", label: node._("mixing-valve.ui.open_close") },
-                                { value: "PERCENTAGE", label: node._("mixing-valve.ui.percentage") },
-                            ]
-                        }]
-                    });
-
-                $("#node-input-output_mode").on("change", function ()
-                {
-                    if (this.value == "OPEN_CLOSE")
-                    {
-                        $(".only-open-close").show();
-                        node.outputs = 3;
-                    }
-                    else
-                    {
-                        $(".only-open-close").hide();
-                        node.outputs = 1;
-                    }
-                });
-
 
                 $("#node-input-precision")
-                        .css("max-width", "4rem")
-                        .spinner({
-                            min: 0.1,
-                            max: 1.0,
-                            step: 0.1,
-                            change: function (event, ui)
-                            {
-                                var value = parseFloat(this.value);
-                                value = isNaN(value) ? 0.0 : value;
-                                value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
-                                value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
-                                if (value !== this.value) $(this).spinner("value", value);
-                            },
-                        });
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0.1,
+                        max: 1.0,
+                        step: 0.1,
+                        change: function (event, ui)
+                        {
+                            var value = parseFloat(this.value);
+                            value = isNaN(value) ? 0.0 : value;
+                            value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
 
                 $("#node-input-max_change_percent")
                     .css("max-width", "4rem")

@@ -102,13 +102,16 @@ module.exports = function (RED)
         {
             let real_topic = helper.getTopicName(msg.topic);
 
-            if (real_topic == "set_state_inverted")
+            if (real_topic.startsWith("set_state"))
+                real_topic = real_topic.replace("set_state", "set");
+
+            if (real_topic == "set_inverted")
             {
-                real_topic = "set_state";
+                real_topic = "set";
                 msg.payload = !msg.payload;
             }
 
-            if (real_topic == "set_state")
+            if (real_topic == "set")
                 real_topic = (!!msg.payload) ? "enable" : "disable";
 
             switch (real_topic)

@@ -288,7 +288,6 @@ module.exports = function (RED)
                                 break;
                         }
                     }
-
                     break;
 
                 case "blink":

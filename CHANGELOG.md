@@ -210,3 +210,7 @@
 -   Mixing valve tries to guess the best position, when getting enabled.
 -   Added debug topic to all nodes, to see current values.
 -   Added new node "mode-selector".
+
+## Version 0.5.1:
+
+-   To be more compatible, topic "set" is also possible instead of "set_state". Same for "set_inverted" instead of "set_state_inverted".
