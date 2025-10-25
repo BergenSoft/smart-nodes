@@ -150,7 +150,8 @@
                 max_change_percent: { value: 1 },
                 max_change_temp_difference: { value: 20 },
                 min_change_time: { value: 100 },
-                links: { value: [], type: "smart_central-control[]" }
+                links: { value: [], type: "smart_central-control[]" },
+                alarm_action: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
             },
             inputs: 1,
             outputs: 1,
@@ -266,7 +267,20 @@
                             ],
                         }],
                     });
-
+                
+                $("#node-input-alarm_action")
+                    .css("max-width", "70%")
+                    .typedInput({
+                        types: [{
+                            value: "alarm_action",
+                            default: "NOTHING",
+                            options: [
+                                { value: "NOTHING", label: node._("mixing-valve.ui.no_action") },
+                                { value: "OPEN", label: node._("mixing-valve.ui.open") },
+                                { value: "CLOSE", label: node._("mixing-valve.ui.close") }
+                            ],
+                        }],
+                    });
 
                 $("#node-input-precision")
                     .css("max-width", "4rem")
@@ -371,6 +385,10 @@
     <div class="form-row">
         <label for="node-input-valve_mode"><i class="fa fa-fire"></i> <span data-i18n="mixing-valve.ui.mode"></span></label>
         <input id="node-input-valve_mode" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-alarm_action"><i class="fa fa-exclamation-triangle"></i> <span data-i18n="mixing-valve.ui.alarm_on"></span></label>
+        <input id="node-input-alarm_action"/>
     </div>
     <div class="form-row">
         <label for="node-input-precision" style="width: 250px;"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.precision"></span></label>

@@ -214,3 +214,7 @@
 ## Version 0.5.1:
 
 -   To be more compatible, topic "set" is also possible instead of "set_state". Same for "set_inverted" instead of "set_state_inverted".
+
+## Version 0.5.2:
+
+-   Added alarm mode to mixing-valve.

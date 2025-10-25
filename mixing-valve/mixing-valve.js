@@ -33,11 +33,9 @@ module.exports = function (RED)
             setpoint: config.setpoint,
             off_mode: config.off_mode,
             valve_mode: config.valve_mode,
-            precision: config.precision || 1,
-            max_change_percent: config.max_change_percent || 2,
-            max_change_temp_difference: config.max_change_temp_difference || 20,
-            min_change_time: config.min_change_time || 0,
             last_position: null,
+            last_enabled_sended: null,
+            alarm_active: false
         }, smart_context.get(node.id));
 
         // Ensure correct types
@@ -45,10 +43,13 @@ module.exports = function (RED)
         node_settings.setpoint = parseFloat(node_settings.setpoint);
         if (isNaN(node_settings.setpoint) || !isFinite(node_settings.setpoint))
             node_settings.setpoint = 20;
-        node_settings.precision = parseInt(node_settings.precision, 10);
-        node_settings.max_change_percent = parseInt(node_settings.max_change_percent, 10);
-        node_settings.max_change_temp_difference = parseInt(node_settings.max_change_temp_difference, 10);
-        node_settings.min_change_time = parseInt(node_settings.min_change_time, 10);
+
+        // Remove old settings
+        delete node_settings.precision;
+        delete node_settings.max_change_percent;
+        delete node_settings.max_change_temp_difference;
+        delete node_settings.min_change_time;
+
 
         // ##################
         // # Dynamic config #
@@ -57,11 +58,17 @@ module.exports = function (RED)
         let time_sampling_s = config.time_sampling;
         let output_mode = config.output_mode || OUTPUT_MODE_OPEN_CLOSE;
         let force_position = null;
+        let alarm_action = config.alarm_action || "NOTHING"; // NOTHING | OPEN | CLOSE
         let min_temperature = null;
         let min_temperature_position = null;
         let max_temperature = null;
         let max_temperature_position = null;
         let temp_save_date = Date.now();
+        let precision = parseInt(config.precision || 1, 10);
+        let max_change_percent = parseInt(config.max_change_percent || 2, 10);
+        let max_change_temp_difference = parseInt(config.max_change_temp_difference || 20, 10);
+        let min_change_time = parseInt(config.min_change_time || 0, 10);
+
 
         // ##################
         // # Runtime values #
@@ -171,6 +178,10 @@ module.exports = function (RED)
                         heating_mode: node_settings.valve_mode,
                         current_temperature,
                         output_mode,
+                        precision,
+                        max_change_percent,
+                        max_change_temp_difference,
+                        min_change_time,
                         min_temperature,
                         min_temperature_position,
                         max_temperature,
@@ -187,6 +198,11 @@ module.exports = function (RED)
                     }
 
                     node_settings.enabled = true;
+
+                    // If in alarm mode, just save enabled state, but don't start changing
+                    if (node_settings.alarm_active)
+                        return;
+
                     stopChanging();
 
                     // Set the most probable position
@@ -232,6 +248,10 @@ module.exports = function (RED)
                         break;
 
                     node_settings.enabled = false;
+
+                    // If in alarm mode, just save enabled state, but don't start changing
+                    if (node_settings.alarm_active)
+                        return;
 
                     stopSampling();
                     doOffMode();
@@ -307,6 +327,45 @@ module.exports = function (RED)
                     calibrate();
                     break;
 
+                case "alarm":
+                    // Make sure it is bool
+                    msg.payload = !!msg.payload;
+
+                    // No alarm change -> nothing to do
+                    if (node_settings.alarm_active == msg.payload)
+                        break;
+
+                    node_settings.alarm_active = msg.payload;
+                    if (node_settings.alarm_active)
+                    {
+                        switch (alarm_action)
+                        {
+                            case "OPEN":
+                                force_position = 100;;
+                                break;
+
+                            case "CLOSE":
+                                force_position = 0;
+                                break;
+
+                            default:
+                            case "NOTHING":
+                                // Don't use alarm mode
+                                node_settings.alarm_active = false;
+                                return;
+                        }
+                    }
+                    else
+                    {
+                        force_position = null;
+                        if (!node_settings.enabled)
+                            doOffMode();
+                    }
+
+                    stopSampling();
+                    startSampling();
+                    break;
+
                 default:
                     helper.warn(this, "Invalid topic: " + real_topic);
                     return;
@@ -317,7 +376,7 @@ module.exports = function (RED)
 
         let startSampling = () =>
         {
-            if (!node_settings.enabled)
+            if (!node_settings.enabled && !node_settings.alarm_active)
             {
                 helper.log(node, "Node is disabled, cannot start sampling");
                 return;
@@ -349,7 +408,7 @@ module.exports = function (RED)
                         helper.log(node, "Force position to " + force_position.toFixed(1) + "%");
 
                         // Under precision % difference => do nothing
-                        if (Math.abs(node_settings.last_position - force_position) <= node_settings.precision)
+                        if (Math.abs(node_settings.last_position - force_position) <= precision)
                         {
                             helper.log(node, "No Force position needed");
                             force_position = null;
@@ -368,6 +427,7 @@ module.exports = function (RED)
                     case OUTPUT_MODE_PERCENTAGE:
                         // Output mode percentage
                         node_settings.last_position = force_position;
+                        force_position = null;
                         node.send({ payload: node_settings.last_position });
                         smart_context.set(node.id, node_settings);
                         setStatus();
@@ -411,20 +471,23 @@ module.exports = function (RED)
 
             // +/- 1°C => already good enough, do nothing
             let temp_diff = Math.abs(current_temperature - node_settings.setpoint);
-            if (temp_diff < node_settings.precision)
+            if (temp_diff < precision)
             {
-                // Found a good position for the current setpoint
-                // Update min/max temperature
-                if (min_temperature === null || current_temperature < min_temperature)
+                if (!node_settings.alarm_active)
                 {
-                    min_temperature = current_temperature;
-                    min_temperature_position = node_settings.last_position;
-                }
+                    // Found a good position for the current setpoint
+                    // Update min/max temperature
+                    if (min_temperature === null || current_temperature < min_temperature)
+                    {
+                        min_temperature = current_temperature;
+                        min_temperature_position = node_settings.last_position;
+                    }
 
-                if (max_temperature === null || current_temperature > max_temperature)
-                {
-                    max_temperature = current_temperature;
-                    max_temperature_position = node_settings.last_position;
+                    if (max_temperature === null || current_temperature > max_temperature)
+                    {
+                        max_temperature = current_temperature;
+                        max_temperature_position = node_settings.last_position;
+                    }
                 }
                 return;
             }
@@ -432,11 +495,11 @@ module.exports = function (RED)
             // 0 °C diff => 0% change
             // for max_change_temp_difference (default: 20 °C) diff => max_change_percent (default: 2%) change
             let change_percentage = helper.scale(
-                Math.min(temp_diff, node_settings.max_change_temp_difference),
+                Math.min(temp_diff, max_change_temp_difference),
                 0,
-                node_settings.max_change_temp_difference,
+                max_change_temp_difference,
                 0,
-                node_settings.max_change_percent
+                max_change_percent
             );
 
             // calculate direction
@@ -476,8 +539,8 @@ module.exports = function (RED)
             // Change time in ms
             let moving_time = (time_total_s * 1000 / 100) * change_percentage;
 
-            if (moving_time < node_settings.min_change_time)
-                moving_time = node_settings.min_change_time;
+            if (moving_time < min_change_time)
+                moving_time = min_change_time;
 
             // start moving
             startChanging(adjustAction, moving_time);
@@ -654,9 +717,9 @@ module.exports = function (RED)
             if (calibration_timeout !== null)
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": In calibration" });
             else if (changing_timeout != null)
-                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + "  " + (adjusting == ADJUST_OPEN ? "Opening" : "Closing") + ", Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
+                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.alarm_active ? "ALARM - " : "") + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + "  " + (adjusting == ADJUST_OPEN ? "Opening" : "Closing") + ", Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
             else
-                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
+                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.alarm_active ? "ALARM - " : "") + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
         }
 
         /**
@@ -688,10 +751,30 @@ module.exports = function (RED)
                 node_settings.last_position = 0;
             }
         }
+        else if (node_settings.alarm_active)
+        {
+            switch (alarm_action)
+            {
+                case "OPEN":
+                    force_position = 100;;
+                    break;
+
+                case "CLOSE":
+                    force_position = 0;
+                    break;
+
+                default:
+                case "NOTHING":
+                    // Don't use alarm mode
+                    node_settings.alarm_active = false;
+                    return;
+            }
+
+            startSampling();
+        }
         else if (node_settings.enabled)
         {
             startSampling();
-            node.send([null, null, { payload: helper.toFixed(node_settings.last_position, 1) }]);
         }
 
         setStatus();
