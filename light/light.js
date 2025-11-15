@@ -46,6 +46,7 @@ module.exports = function (RED)
         let alarm_action = config.alarm_action || "NOTHING";
         let alarm_off_action = config.alarm_off_action || "NOTHING";
         let mode = config.mode || "BOOL";
+        let current_output_state = null;
 
         // ##################
         // # Runtime values #
@@ -149,6 +150,7 @@ module.exports = function (RED)
                         doRestartTimer = false;
 
                     node_settings.last_value = msg.payload;
+                    current_output_state = node_settings.last_value;
                     break;
 
                 case "off":
@@ -360,8 +362,11 @@ module.exports = function (RED)
                 }
             }
 
-            if (node_settings.alarm_active || helper.getTopicName(msg.topic) != "status")
+            if (real_topic != "status" && current_output_state !== node_settings.last_value)
+            {
                 node.send({ payload: node_settings.last_value });
+                current_output_state = node_settings.last_value;
+            }
 
             // Output is on, now
             if (node_settings.last_value && doRestartTimer)
@@ -410,6 +415,7 @@ module.exports = function (RED)
                     node_settings.last_value = 0;
 
                 node.send({ payload: node_settings.last_value });
+                current_output_state = node_settings.last_value;
                 notifyCentral(false);
 
                 setStatus();

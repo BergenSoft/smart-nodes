@@ -3,3 +3,4 @@ my.md
 *.iml
 .idea
 node_modules
+SmartNodesContext.json

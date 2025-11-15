@@ -291,16 +291,16 @@ module.exports = {
      *  Target range = 100 to 200
      * 
      *  current number = 0
-     *  scale(5, 0, 10, 100, 200) => 100
+     *  scale(0, 0, 10, 100, 200) => 100
      * 
      *  current number = 5
      *  scale(5, 0, 10, 100, 200) => 150
      * 
      *  current number = 10
-     *  scale(5, 0, 10, 100, 200) => 200
+     *  scale(10, 0, 10, 100, 200) => 200
      * 
-     *  current number = 20 (out of input range!)
-     *  scale(5, 0, 10, 100, 200) => 300 (out of output range!)
+     *  current number = 20 (input out of range!)
+     *  scale(20, 0, 10, 100, 200) => 300 (output out of range!)
      */
     scale(number, inMin, inMax, outMin, outMax)
     {

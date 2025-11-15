@@ -218,3 +218,9 @@
 ## Version 0.5.2:
 
 -   Added alarm mode to mixing-valve.
+
+## Version 0.6.0:
+
+-   Reduced amount of messages sent by light node when it is in alarm mode.
+-   Fixed forwarder node causing an error when no topic was sent.
+-   Added Jest example for all nodes to be able to debug nodes in vscode.

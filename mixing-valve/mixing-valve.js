@@ -155,6 +155,9 @@ module.exports = function (RED)
 
             let real_topic = helper.getTopicName(msg.topic);
 
+            if (real_topic == null)
+                node.warn("No topic set");
+
             if (real_topic.startsWith("set_state"))
                 real_topic = real_topic.replace("set_state", "set");
 
@@ -354,16 +357,21 @@ module.exports = function (RED)
                                 node_settings.alarm_active = false;
                                 return;
                         }
+
+                        stopSampling();
+                        startSampling();
                     }
                     else
                     {
                         force_position = null;
-                        if (!node_settings.enabled)
+                        stopSampling();
+                        stopChanging();
+
+                        if (node_settings.enabled)
+                            startSampling();
+                        else
                             doOffMode();
                     }
-
-                    stopSampling();
-                    startSampling();
                     break;
 
                 default:

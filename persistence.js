@@ -1,3 +1,5 @@
+const { log } = require('console');
+
 let instance = null;
 
 module.exports = function (_RED)
@@ -5,21 +7,31 @@ module.exports = function (_RED)
     if (instance != null)
         return instance;
 
-    let RED = _RED;
     let hasChanges = false;
+    let inTestMode = _RED.settings.userDir == null;
+
+    // used for local debugging
+    if (inTestMode)
+        console.log("####### Test Mode detected #######");
 
     const fs = require('fs');
-    const path = RED.settings.userDir + '/SmartNodesContext.json';
+    const pathLib = require('path');
+
+    // Fallback, falls RED.settings.userDir in Tests nicht gesetzt ist
+    const userDir = (_RED.settings && _RED.settings.userDir) ? _RED.settings.userDir : process.cwd();
+    const filePath = pathLib.join(userDir, 'SmartNodesContext.json');
 
     let globalData = {};
 
-    if (fs.existsSync(path))
+    if (fs.existsSync(filePath))
     {
         try
         {
-            let fileContent = fs.readFileSync(path, "utf8");
+            let fileContent = fs.readFileSync(filePath, "utf8");
             globalData = Object.assign({}, JSON.parse(fileContent));
-            // console.log("Loaded " + Object.keys(globalData).length + " smart_nodes config items");
+
+            if (inTestMode)
+                console.log("Loaded:", globalData);
         }
         catch (error)
         {
@@ -35,12 +47,18 @@ module.exports = function (_RED)
 
     }, 30 * 1000);
 
+    // Prevent the interval from keeping the process alive (important for Jest)
+    if (interval && typeof interval.unref === "function")
+        interval.unref();
+
     function save()
     {
         try
         {
-            // console.log("Auto save");
-            fs.writeFile(path, JSON.stringify(globalData), err =>
+            if (inTestMode)
+                console.log("Save SmartNodeContext", globalData);
+
+            fs.writeFile(filePath, JSON.stringify(globalData), err =>
             {
                 if (err)
                     console.error(err);
@@ -57,6 +75,9 @@ module.exports = function (_RED)
     {
         hasChanges = true;
         globalData["id" + id] = data;
+
+        if (inTestMode)
+            save();
     }
 
     function get(id)
@@ -70,6 +91,15 @@ module.exports = function (_RED)
         delete globalData["id" + id];
     }
 
-    instance = { set, get, del };
+    function close()
+    {
+        if (interval)
+        {
+            clearInterval(interval);
+            interval = null;
+        }
+    }
+
+    instance = { set, get, del, close };
     return instance;
 };

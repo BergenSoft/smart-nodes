@@ -1,6 +1,6 @@
 {
     "name": "smart-nodes",
-    "version": "0.5.2",
+    "version": "0.6.0",
     "description": "Controls light, shutters and more. Includes common used logic and statistic nodes to control your home.",
     "keywords": [
         "node-red",
@@ -27,7 +27,9 @@
         "text execution"
     ],
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:debug": "node --inspect-brk node_modules/jest/bin/jest.js --runInBand"
     },
     "author": "Samuel Bergen",
     "license": "MIT",
@@ -59,9 +61,11 @@
         "type": "git",
         "url": "https://github.com/BergenSoft/smart-nodes"
     },
-    "dependencies": {},
     "devDependencies": {
-        "font-awesome": "^4.7.0"
+        "font-awesome": "^4.7.0",
+        "jest": "^27.5.1",
+        "node-red": "^4.1.1",
+        "node-red-node-test-helper": "^0.3.5"
     },
     "engines": {
         "node": ">=10"
