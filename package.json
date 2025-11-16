@@ -1,6 +1,6 @@
 {
     "name": "smart-nodes",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "Controls light, shutters and more. Includes common used logic and statistic nodes to control your home.",
     "keywords": [
         "node-red",
@@ -48,11 +48,11 @@
             "hysteresis": "hysteresis/hysteresis.js",
             "statistic": "statistic/statistic.js",
             "counter": "counter/counter.js",
+            "mode-selector": "mode-selector/mode-selector.js",
             "scheduler": "scheduler/scheduler.js",
             "delay": "delay/delay.js",
             "central": "central/central.js",
             "mixing-valve": "mixing-valve/mixing-valve.js",
-            "mode-selector": "mode-selector/mode-selector.js",
             "heating-curve": "heating-curve/heating-curve.js",
             "text-exec": "text-exec/text-exec.js"
         }
