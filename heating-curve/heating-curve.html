@@ -12,6 +12,7 @@
                 offset: { value: 0 },
                 flow_max: { value: 75 },
                 flow_min: { value: 20 },
+                config_change_date: { value: "" },
             },
             inputs: 1,
             outputs: 1,
@@ -108,6 +109,11 @@
 
                 drawCanvas();
 
+            },
+            oneditsave: function ()
+            {
+                let node = this;
+                node.config_change_date = (new Date()).toISOString();
             },
         });
 

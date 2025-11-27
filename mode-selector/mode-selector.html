@@ -41,7 +41,8 @@
                 outputs: { value: 1 },
                 mode_items: { value: ["MODE1", "MODE2"] },
                 update_only_changed_outputs: { value: true },
-                resend_on_start: { value: false }
+                resend_on_start: { value: false },
+                config_change_date: { value: "" },
             },
             inputs: 1,
             outputs: 1,
@@ -125,8 +126,10 @@
                 // Set modes
                 var items = $("#node-input-property-modes").editableList("items");
                 var result = getModes(items);
-                this.mode_items = result.modes;
-                this.outputs = this.mode_items.length;
+                node.mode_items = result.modes;
+                node.outputs = node.mode_items.length;
+                
+                node.config_change_date = (new Date()).toISOString();
             },
             oneditresize: resizeDialog
         });

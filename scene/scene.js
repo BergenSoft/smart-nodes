@@ -34,7 +34,8 @@ module.exports = function (RED)
         // #####################
         var node_settings = helper.cloneObject({
             last_values: [], // light is on or off for a scene
-        }, smart_context.get(node.id));
+            config_change_date: config.config_change_date,
+        }, smart_context.get(node.id, config.config_change_date));
 
 
         // ##################

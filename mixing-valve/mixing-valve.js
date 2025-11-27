@@ -33,10 +33,12 @@ module.exports = function (RED)
             setpoint: config.setpoint,
             off_mode: config.off_mode,
             valve_mode: config.valve_mode,
+            current_temperature: null,
             last_position: null,
             last_enabled_sended: null,
-            alarm_active: false
-        }, smart_context.get(node.id));
+            alarm_active: false,
+            config_change_date: config.config_change_date,
+        }, smart_context.get(node.id, config.config_change_date));
 
         // Ensure correct types
         node_settings.enabled = !!node_settings.enabled;
@@ -59,11 +61,6 @@ module.exports = function (RED)
         let output_mode = config.output_mode || OUTPUT_MODE_OPEN_CLOSE;
         let force_position = null;
         let alarm_action = config.alarm_action || "NOTHING"; // NOTHING | OPEN | CLOSE
-        let min_temperature = null;
-        let min_temperature_position = null;
-        let max_temperature = null;
-        let max_temperature_position = null;
-        let temp_save_date = Date.now();
         let precision = parseInt(config.precision || 1, 10);
         let max_change_percent = parseInt(config.max_change_percent || 2, 10);
         let max_change_temp_difference = parseInt(config.max_change_temp_difference || 20, 10);
@@ -85,9 +82,6 @@ module.exports = function (RED)
 
         // Store the direction of the adjustment
         let adjusting = null;
-
-        // Stores the current temperature which is used to determine the adjusting direction
-        let current_temperature = null;
 
         // The start time of the adjustment to count the change
         let adjusting_start_time = null;
@@ -112,7 +106,6 @@ module.exports = function (RED)
             handleTopic(msg);
 
             setStatus();
-            resetSavedTemperatures();
             smart_context.set(node.id, node_settings);
         });
 
@@ -179,16 +172,16 @@ module.exports = function (RED)
                         current_mode: calibration_timeout !== null ? "CALIBRATION" : (changing_timeout !== null ? (adjusting == ADJUST_OPEN ? "OPENING" : "CLOSING") : "IDLE"),
                         enabled: (node_settings.enabled ? "ENABLED" : "DISABLED"),
                         heating_mode: node_settings.valve_mode,
-                        current_temperature,
+                        current_temperature: node_settings.current_temperature,
                         output_mode,
                         precision,
                         max_change_percent,
                         max_change_temp_difference,
-                        min_change_time,
-                        min_temperature,
-                        min_temperature_position,
-                        max_temperature,
-                        max_temperature_position,
+                        sampling_interval,
+                        calibration_timeout,
+                        changing_timeout,
+                        adjusting,
+                        adjusting_start_time,
                     });
                     break;
 
@@ -207,41 +200,6 @@ module.exports = function (RED)
                         return;
 
                     stopChanging();
-
-                    // Set the most probable position
-                    if (
-                        min_temperature !== null &&
-                        max_temperature !== null &&
-                        min_temperature_position !== null &&
-                        max_temperature_position !== null
-                    )
-                    {
-                        let temp_range = max_temperature - min_temperature;
-                        let pos_range = max_temperature_position - min_temperature_position;
-
-                        if (
-                            temp_range > 0 &&
-                            pos_range !== 0 &&
-                            node_settings.setpoint >= min_temperature &&
-                            node_settings.setpoint <= max_temperature
-                        )
-                        {
-                            let rel_pos;
-                            if (node_settings.valve_mode === "HEATING")
-                            {
-                                // For HEATING, min_temperature_position is closed, max_temperature_position is open
-                                rel_pos = min_temperature_position + ((node_settings.setpoint - min_temperature) / temp_range) * pos_range;
-                            }
-                            else
-                            {
-                                // For COOLING, max_temperature_position is closed, min_temperature_position is open
-                                rel_pos = max_temperature_position + ((node_settings.setpoint - max_temperature) / -temp_range) * pos_range;
-                            }
-                            force_position = Math.min(Math.max(rel_pos, 0), 100);
-                            helper.log(node, "Set force position to " + force_position.toFixed(1) + "% based on previous min/max temperature positions");
-                        }
-                    }
-
                     startSampling();
                     break;
 
@@ -294,16 +252,6 @@ module.exports = function (RED)
                     {
                         case "HEATING":
                         case "COOLING":
-
-                            if (node_settings.valve_mode != msg.payload)
-                            {
-                                // When changing the mode, reset min/max temperature
-                                min_temperature = null;
-                                max_temperature = null;
-                                min_temperature_position = null;
-                                max_temperature_position = null;
-                            }
-
                             node_settings.valve_mode = msg.payload;
                             setStatus();
                             break;
@@ -312,18 +260,16 @@ module.exports = function (RED)
                             helper.warn(this, "Invalid valve_mode: " + msg.payload);
                             return;
                     }
-
-                    startSampling();
                     break;
 
                 case "current_temperature":
                     let new_temp = parseFloat(msg.payload);
                     if (isNaN(new_temp) || !isFinite(new_temp))
                     {
-                        // helper.warn(this, "Invalid payload for current_temperature: " + msg.payload);
+                        // helper.warn(this, "Invalid payload for node_settings.current_temperature: " + msg.payload);
                         return;
                     }
-                    current_temperature = new_temp;
+                    node_settings.current_temperature = new_temp;
                     break;
 
                 case "calibrate":
@@ -344,7 +290,7 @@ module.exports = function (RED)
                         switch (alarm_action)
                         {
                             case "OPEN":
-                                force_position = 100;;
+                                force_position = 100;
                                 break;
 
                             case "CLOSE":
@@ -467,10 +413,10 @@ module.exports = function (RED)
         let sample = () =>
         {
             // No current temperature available or in calibration => no action
-            if (current_temperature === null || calibration_timeout !== null || !node_settings.enabled)
+            if (node_settings.current_temperature === null || calibration_timeout !== null || !node_settings.enabled)
             {
                 helper.log(node, "No sample possible", {
-                    current_temperature,
+                    current_temperature: node_settings.current_temperature,
                     calibration_timeout,
                     enabled: node_settings.enabled
                 });
@@ -478,27 +424,9 @@ module.exports = function (RED)
             }
 
             // +/- 1°C => already good enough, do nothing
-            let temp_diff = Math.abs(current_temperature - node_settings.setpoint);
+            let temp_diff = Math.abs(node_settings.current_temperature - node_settings.setpoint);
             if (temp_diff < precision)
-            {
-                if (!node_settings.alarm_active)
-                {
-                    // Found a good position for the current setpoint
-                    // Update min/max temperature
-                    if (min_temperature === null || current_temperature < min_temperature)
-                    {
-                        min_temperature = current_temperature;
-                        min_temperature_position = node_settings.last_position;
-                    }
-
-                    if (max_temperature === null || current_temperature > max_temperature)
-                    {
-                        max_temperature = current_temperature;
-                        max_temperature_position = node_settings.last_position;
-                    }
-                }
                 return;
-            }
 
             // 0 °C diff => 0% change
             // for max_change_temp_difference (default: 20 °C) diff => max_change_percent (default: 2%) change
@@ -512,7 +440,7 @@ module.exports = function (RED)
 
             // calculate direction
             let adjustAction = ADJUST_CLOSE;
-            if (current_temperature < node_settings.setpoint)
+            if (node_settings.current_temperature < node_settings.setpoint)
             {
                 if (node_settings.valve_mode == "HEATING")
                     adjustAction = ADJUST_OPEN;
@@ -705,29 +633,14 @@ module.exports = function (RED)
             }
         }
 
-        let resetSavedTemperatures = () =>
-        {
-            let now = Date.now();
-
-            // Reset saved temperatures after 7 days, to avoid using too old data
-            if (now - temp_save_date >= 7 * 24 * 60 * 60 * 1000)
-            {
-                temp_save_date = now;
-                min_temperature = null;
-                min_temperature_position = null;
-                max_temperature = null;
-                max_temperature_position = null;
-            }
-        }
-
         let setStatus = () =>
         {
             if (calibration_timeout !== null)
                 node.status({ fill: "yellow", shape: "ring", text: helper.getCurrentTimeForStatus() + ": In calibration" });
             else if (changing_timeout != null)
-                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.alarm_active ? "ALARM - " : "") + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + "  " + (adjusting == ADJUST_OPEN ? "Opening" : "Closing") + ", Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
+                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "ring", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.alarm_active ? "ALARM - " : "") + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + "  " + (adjusting == ADJUST_OPEN ? "Opening" : "Closing") + ", Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(node_settings.current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
             else
-                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.alarm_active ? "ALARM - " : "") + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
+                node.status({ fill: node_settings.enabled ? "green" : "red", shape: "dot", text: helper.getCurrentTimeForStatus() + ": " + (node_settings.alarm_active ? "ALARM - " : "") + (node_settings.valve_mode == "HEATING" ? "🔥" : "❄️") + " Set: " + helper.toFixed(node_settings.setpoint, 1) + "°C, Cur: " + helper.toFixed(node_settings.current_temperature, 1) + "°C, Pos: " + helper.toFixed(node_settings.last_position, 1) + "%" });
         }
 
         /**
@@ -749,22 +662,14 @@ module.exports = function (RED)
 
         if (node_settings.last_position === null)
         {
-            if (output_mode === OUTPUT_MODE_OPEN_CLOSE)
-            {
-                // Start calibration after 10s
-                setTimeout(calibrate, 10 * 1000);
-            }
-            else
-            {
-                node_settings.last_position = 0;
-            }
+            node_settings.last_position = 50;
         }
         else if (node_settings.alarm_active)
         {
             switch (alarm_action)
             {
                 case "OPEN":
-                    force_position = 100;;
+                    force_position = 100;
                     break;
 
                 case "CLOSE":

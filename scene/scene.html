@@ -226,7 +226,8 @@
                 scenes: {
                     value: [{ name: "", outputs: "" }],
                 },
-                links: { value: [], type: "smart_central-control[]" }
+                links: { value: [], type: "smart_central-control[]" },
+                config_change_date: { value: "" },
             },
             inputs: 1,
             outputs: 1,
@@ -427,13 +428,15 @@
                 // Set scenes
                 var items = $("#node-input-property-scenes").editableList("items");
                 var result = getScenes(items);
-                this.scenes = result.scenes;
+                node.scenes = result.scenes;
 
                 // Set outputs
                 var items = $("#node-input-property-outputs").editableList("items");
                 var result = getOutputs(items);
-                this.output_items = result.output_items;
-                this.outputs = this.output_items.length;
+                node.output_items = result.output_items;
+                node.outputs = node.output_items.length;
+
+                node.config_change_date = (new Date()).toISOString();
             },
             onadd: function ()
             {

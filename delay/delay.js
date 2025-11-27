@@ -29,12 +29,13 @@ module.exports = function (RED)
             on_delay_ms: helper.getTimeInMs(config.on_delay, config.on_delay_unit),
             off_delay_ms: helper.getTimeInMs(config.off_delay, config.off_delay_unit),
             last_message: null,
+            config_change_date: config.config_change_date,
         };
 
         if (config.save_state)
         {
             // load old saved values
-            node_settings = Object.assign(node_settings, smart_context.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id, config.config_change_date));
 
             switch (node_settings.last_message?.payload)
             {

@@ -27,8 +27,9 @@ module.exports = function (RED)
             flow_min: config.flow_min,
             flow_max: config.flow_max,
             temperature_outside: 10,
-            last_flow_temperature: null
-        }, smart_context.get(node.id));
+            last_flow_temperature: null,
+            config_change_date: config.config_change_date,
+        }, smart_context.get(node.id, config.config_change_date));
 
 
         // ##################

@@ -17,7 +17,8 @@
             send_only_change: { value: true },
             outputs: { value: 1 },
             save_state: { value: false },
-            resend_on_start: { value: false }
+            resend_on_start: { value: false },
+            config_change_date: { value: "" },
         },
         inputs: 1,
         outputs: 2,
@@ -196,11 +197,13 @@
         {
             let node = this;
 
-            this.setpoint = parseFloat(this.setpoint ?? 10);
-            this.hysteresis = parseFloat(this.hysteresis ?? 1);
-            this.min = parseFloat(this.min ?? 10);
-            this.max = parseFloat(this.max ?? 20);
-        }
+            node.setpoint = parseFloat(node.setpoint ?? 10);
+            node.hysteresis = parseFloat(node.hysteresis ?? 1);
+            node.min = parseFloat(node.min ?? 10);
+            node.max = parseFloat(node.max ?? 20);
+
+            node.config_change_date = (new Date()).toISOString();
+        },
     });
 </script>
 

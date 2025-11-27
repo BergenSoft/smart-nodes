@@ -21,6 +21,8 @@ module.exports = function (_RED)
     const userDir = (_RED.settings && _RED.settings.userDir) ? _RED.settings.userDir : process.cwd();
     const filePath = pathLib.join(userDir, 'SmartNodesContext.json');
 
+    // console.log(filePath);    
+
     let globalData = {};
 
     if (fs.existsSync(filePath))
@@ -39,13 +41,13 @@ module.exports = function (_RED)
         }
     }
 
-    // Autosave each 30 seconds if changes exists.
+    // Autosave each 15 seconds if changes exists.
     let interval = setInterval(() =>
     {
         if (hasChanges)
             save();
 
-    }, 30 * 1000);
+    }, 15 * 1000);
 
     // Prevent the interval from keeping the process alive (important for Jest)
     if (interval && typeof interval.unref === "function")
@@ -80,9 +82,25 @@ module.exports = function (_RED)
             save();
     }
 
-    function get(id)
+    function get(id, config_change_date)
     {
-        return globalData["id" + id];
+        let data = globalData["id" + id];
+        if (id == "7e5e332f362a43fb")
+        {
+            log({
+                old_config_change_date: data.config_change_date,
+                new_config_change_date: config_change_date
+            });
+        }
+
+        if (data && data.config_change_date && data.config_change_date !== config_change_date)
+        {
+            console.log("id = " + id + " - config change date mismatch, ignoring stored data.");
+            return null;
+        }
+
+
+        return data;
     }
 
     function del(id)

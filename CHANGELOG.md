@@ -228,3 +228,8 @@
 ## Version 0.6.1:
 
 - Removed some ui limits of mixing valve.
+
+## Version 0.6.2:
+
+- Cached runtime config is revoked now, when new settings are applied in the web frontend.
+- Removed feature from Mixing valve to automatically start with the best known position, because it hadn't worked as expected.

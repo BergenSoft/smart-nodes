@@ -25,7 +25,8 @@ module.exports = function (RED)
         // #####################
         var node_settings = helper.cloneObject({
             last_mode: null,
-        }, smart_context.get(node.id));
+            config_change_date: config.config_change_date,
+        }, smart_context.get(node.id, config.config_change_date));
 
 
         // ##################

@@ -39,7 +39,8 @@ module.exports = function (RED)
             last_direction_up: true,       // remember last direction for toggle action
             last_position_before_alarm: 0, // remember position to restore on alarm off event
             alarm_active: false,           // remember if alarm is on or off
-        }, smart_context.get(node.id));
+            config_change_date: config.config_change_date,
+        }, smart_context.get(node.id, config.config_change_date));
 
 
         // ##########################

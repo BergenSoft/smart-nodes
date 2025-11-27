@@ -30,13 +30,14 @@ module.exports = function (RED)
             setpoint: parseFloat(config.setpoint ?? 10),
             hysteresis: parseFloat(config.hysteresis ?? 1),
             min: parseFloat(config.min ?? 10),
-            max: parseFloat(config.max ?? 20)
+            max: parseFloat(config.max ?? 20),
+            config_change_date: config.config_change_date,
         };
 
         if (config.save_state)
         {
             // load old saved values
-            node_settings = Object.assign(node_settings, smart_context.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id, config.config_change_date));
 
             switch (node_settings.last_result)
             {

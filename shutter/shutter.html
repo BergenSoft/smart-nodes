@@ -140,7 +140,8 @@
                 name: { value: "" },
                 exec_text_names: { value: "" },
                 short_time_on_ms: { value: 200 },
-                links: { value: [], type: "smart_central-control[]" }
+                links: { value: [], type: "smart_central-control[]" },
+                config_change_date: { value: "" },
             },
             inputs: 1,
             outputs: 3,
@@ -175,6 +176,11 @@
             onadd: function ()
             {
                 this.links = [];
+            },
+            oneditsave: function ()
+            {
+                let node = this;
+                node.config_change_date = (new Date()).toISOString();
             },
             oneditresize: resizeNodeList
         });

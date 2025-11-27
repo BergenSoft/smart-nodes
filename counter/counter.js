@@ -24,11 +24,12 @@ module.exports = function (RED)
         var node_settings = {
             value: null,
             last_message: null,
+            config_change_date: config.config_change_date,
         };
 
         // load or delete saved values
         if (config.save_state)
-            node_settings = Object.assign(node_settings, smart_context.get(node.id));
+            node_settings = Object.assign(node_settings, smart_context.get(node.id, config.config_change_date));
         else
             smart_context.del(node.id);
 

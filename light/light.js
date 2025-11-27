@@ -36,7 +36,8 @@ module.exports = function (RED)
             last_value_before_alarm: false,
             last_value_sended: false,
             alarm_active: false,
-        }, smart_context.get(node.id));
+            config_change_date: config.config_change_date,
+        }, smart_context.get(node.id, config.config_change_date));
 
 
         // ##################

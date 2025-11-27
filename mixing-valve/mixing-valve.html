@@ -152,6 +152,7 @@
                 min_change_time: { value: 100 },
                 links: { value: [], type: "smart_central-control[]" },
                 alarm_action: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
+                config_change_date: { value: "" },
             },
             inputs: 1,
             outputs: 1,
@@ -267,7 +268,7 @@
                             ],
                         }],
                     });
-                
+
                 $("#node-input-alarm_action")
                     .css("max-width", "70%")
                     .typedInput({
@@ -347,6 +348,11 @@
             onadd: function ()
             {
                 this.links = [];
+            },
+            oneditsave: function ()
+            {
+                let node = this;
+                node.config_change_date = (new Date()).toISOString();
             },
             oneditresize: resizeNodeList
         });

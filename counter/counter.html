@@ -12,7 +12,8 @@
             out_message: { value: '{"topic": ""}' },
             out_message_type: { value: 'json' },
             save_state: { value: false },
-            resend_on_start: { value: false }
+            resend_on_start: { value: false },
+            config_change_date: { value: "" },
         },
         inputs: 1,
         outputs: 1,
@@ -98,7 +99,12 @@
                 this.out_message_type = "NOTHING";
                 $("#node-input-out_message_type").val("NOTHING");
             }
-        }
+        },
+        oneditsave: function ()
+        {
+            let node = this;
+            node.config_change_date = (new Date()).toISOString();
+        },
     });
 </script>
 

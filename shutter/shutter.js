@@ -34,7 +34,8 @@ module.exports = function (RED)
         var node_settings = helper.cloneObject({
             last_position: 0,        // 0 = opened, 100 = closed
             last_direction_up: true, // remember last direction for toggle action
-        }, smart_context.get(node.id));
+            config_change_date: config.config_change_date,
+        }, smart_context.get(node.id, config.config_change_date));
 
 
         // ##################

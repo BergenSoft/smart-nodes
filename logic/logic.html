@@ -16,7 +16,8 @@
             send_only_change: { value: true },
             outputs: { value: 1 },
             save_state: { value: false },
-            resend_on_start: { value: false }
+            resend_on_start: { value: false },
+            config_change_date: { value: "" },
         },
         inputs: 1,
         outputs: 1,
@@ -139,7 +140,12 @@
                     $("#resend_on_start_row").hide();
             });
             $("#node-input-save_state").trigger("change");
-        }
+        },
+        oneditsave: function ()
+        {
+            let node = this;
+            node.config_change_date = (new Date()).toISOString();
+        },
     });
 
     let refreshInverts = inputs =>

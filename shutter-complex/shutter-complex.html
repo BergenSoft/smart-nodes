@@ -145,7 +145,8 @@
                 revert_time_ms: { value: 100 },
                 alarm_action: { value: 'NOTHING' }, // NOTHING | UP | DOWN
                 alarm_off_action: { value: 'NOTHING' }, // NOTHING | ON | OFF | LAST
-                links: { value: [], type: "smart_central-control[]" }
+                links: { value: [], type: "smart_central-control[]" },
+                config_change_date: { value: "" },
             },
             inputs: 1,
             outputs: 3,
@@ -249,6 +250,11 @@
             onadd: function ()
             {
                 this.links = [];
+            },
+            oneditsave: function ()
+            {
+                let node = this;
+                node.config_change_date = (new Date()).toISOString();
             },
             oneditresize: resizeNodeList
         });
