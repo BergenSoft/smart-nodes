@@ -85,20 +85,8 @@ module.exports = function (_RED)
     function get(id, config_change_date)
     {
         let data = globalData["id" + id];
-        if (id == "7e5e332f362a43fb")
-        {
-            log({
-                old_config_change_date: data.config_change_date,
-                new_config_change_date: config_change_date
-            });
-        }
-
         if (data && data.config_change_date && data.config_change_date !== config_change_date)
-        {
-            console.log("id = " + id + " - config change date mismatch, ignoring stored data.");
             return null;
-        }
-
 
         return data;
     }

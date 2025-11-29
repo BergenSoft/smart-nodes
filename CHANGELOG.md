@@ -151,7 +151,7 @@
 
 ## Version 0.4.17:
 
--   Fixed mixing valve position calculation.
+-   Fixed mixing-valve position calculation.
 -   Fixed up_down message for central node.
 
 ## Version 0.4.18:
@@ -160,7 +160,7 @@
 
 ## Version 0.4.19:
 
--   Added min_change_time option to mixing valve node.
+-   Added min_change_time option to mixing-valve node.
 
 ## Version 0.4.20:
 
@@ -206,8 +206,8 @@
 
 -   Improved light control percentage status text.
 -   Fixed logic node when common outputs is configured but one value is set to "send nothing".
--   Mixing valve can now output as percentage directly or with open/close impulses.
--   Mixing valve tries to guess the best position, when getting enabled.
+-   mixing-valve can now output as percentage directly or with open/close impulses.
+-   mixing-valve tries to guess the best position, when getting enabled.
 -   Added debug topic to all nodes, to see current values.
 -   Added new node "mode-selector".
 
@@ -227,9 +227,13 @@
 
 ## Version 0.6.1:
 
-- Removed some ui limits of mixing valve.
+- Removed some ui limits of mixing-valve.
 
 ## Version 0.6.2:
 
 - Cached runtime config is revoked now, when new settings are applied in the web frontend.
-- Removed feature from Mixing valve to automatically start with the best known position, because it hadn't worked as expected.
+- Removed feature from mixing-valve to automatically start with the best known position, because it hadn't worked as expected.
+
+## Version 0.6.3:
+
+- Fixed bug, when disabling mixing-valve while it is opening, the off mode close was not handled. Same for closing and off mode open.

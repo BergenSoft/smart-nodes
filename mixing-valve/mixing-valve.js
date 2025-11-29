@@ -214,6 +214,7 @@ module.exports = function (RED)
                     if (node_settings.alarm_active)
                         return;
 
+                    stopChanging();
                     stopSampling();
                     doOffMode();
                     break;
