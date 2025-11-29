@@ -498,12 +498,6 @@ module.exports = function (RED)
             helper.log(node, "Start changing", adjustAction, time_ms)
             stopChanging();
 
-            // Already oppened/closed
-            if (adjustAction == ADJUST_OPEN && node_settings.last_position >= 100)
-                time_ms = time_total_s * 1000 / 200; // Change at least 1/200 => 0.5 %
-            else if (adjustAction == ADJUST_CLOSE && node_settings.last_position <= 0)
-                time_ms = time_total_s * 1000 / 200; // Change at least 1/200 => 0.5 %
-
             adjusting_start_time = Date.now();
             if (adjustAction == ADJUST_OPEN)
                 node.send([{ payload: true }, { payload: false }, null]);

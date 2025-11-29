@@ -237,3 +237,7 @@
 ## Version 0.6.3:
 
 - Fixed bug, when disabling mixing-valve while it is opening, the off mode close was not handled. Same for closing and off mode open.
+
+## Version 0.6.4:
+
+- Do off mode for the full time, in case the real position dismatch the known position in the node.
