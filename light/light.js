@@ -363,7 +363,7 @@ module.exports = function (RED)
                 }
             }
 
-            if (real_topic != "status" && current_output_state !== node_settings.last_value)
+            if ((node_settings.alarm_active || real_topic != "status") && current_output_state !== node_settings.last_value)
             {
                 node.send({ payload: node_settings.last_value });
                 current_output_state = node_settings.last_value;
