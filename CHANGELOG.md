@@ -242,3 +242,8 @@
 ## Version 0.6.5:
 
 - Fixed light alarm mode, when status changed to an invalid.
+
+## Version 0.6.6:
+
+- Counter can be configured in 0.1 steps. For smaller steps, use msg.payload value.
+- Counter has a new topic refresh, to resend the last saved value.

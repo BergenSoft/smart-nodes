@@ -37,10 +37,10 @@ module.exports = function (RED)
         // ##################
         // # Dynamic config #
         // ##################
-        let start = parseInt(config.start, 10);
-        let step = parseInt(config.step, 10);
-        let min = parseInt(config.min, 10);
-        let max = parseInt(config.max, 10);
+        let start = parseFloat(config.start);
+        let step = parseFloat(config.step);
+        let min = parseFloat(config.min);
+        let max = parseFloat(config.max);
         let out_message = helper.evaluateNodeProperty(RED, config.out_message, config.out_message_type);
 
 
@@ -53,9 +53,8 @@ module.exports = function (RED)
         {
             handleTopic(msg);
 
-            sendResult();
-
             setStatus();
+            
             smart_context.set(node.id, node_settings);
         });
 
@@ -121,7 +120,11 @@ module.exports = function (RED)
 
                     node_settings.value = temp_value;
                     break;
-
+                
+                case "refresh":
+                    // Nothing to do, just resend the last message if value is set
+                    break;
+                
                 default:
                     node.error("Invalid topic: " + real_topic);
                     return;
@@ -129,15 +132,9 @@ module.exports = function (RED)
 
             // Check value is in range
             node_settings.value = Math.min(max, Math.max(min, node_settings.value));
-        }
-
-        /**
-         * Send the result to the output
-         */
-        let sendResult = () =>
-        {
+            
             // Nothing changed, nothing to do
-            if (node_settings.value == node_settings.last_message?.payload)
+            if (real_topic != "refresh" && node_settings.value == node_settings.last_message?.payload)
                 return;
 
             // if out_message is set, use this instead of the default message
