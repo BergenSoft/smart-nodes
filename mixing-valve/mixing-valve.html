@@ -152,6 +152,8 @@
                 min_change_time: { value: 100 },
                 links: { value: [], type: "smart_central-control[]" },
                 alarm_action: { value: "NOTHING" }, // NOTHING | OPEN | CLOSE
+                critical_temp_max: { value: 100 },
+                crit_temp_change_percent: { value: 0 },
                 config_change_date: { value: "" },
             },
             inputs: 1,
@@ -344,6 +346,43 @@
                             if (value !== this.value) $(this).spinner("value", value);
                         },
                     });
+
+                // New fields for critical temperature settings
+                $("#node-input-critical_temp_max")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0,
+                        max: 100,
+                        step: 1,
+                        change: function (event, ui)
+                        {
+                            var value = parseFloat(this.value);
+                            value = isNaN(value) ? 0.0 : value;
+                            value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
+                if ($("#node-input-critical_temp_max").val() === "")
+                    $("#node-input-critical_temp_max").val("100");
+
+                $("#node-input-crit_temp_change_percent")
+                    .css("max-width", "4rem")
+                    .spinner({
+                        min: 0,
+                        max: 100,
+                        step: 1,
+                        change: function (event, ui)
+                        {
+                            var value = parseFloat(this.value);
+                            value = isNaN(value) ? 0.0 : value;
+                            value = Math.max(value, parseFloat($(this).attr("aria-valuemin")));
+                            value = Math.min(value, parseFloat($(this).attr("aria-valuemax")));
+                            if (value !== this.value) $(this).spinner("value", value);
+                        },
+                    });
+                if ($("#node-input-crit_temp_change_percent").val() === "")
+                    $("#node-input-crit_temp_change_percent").val("0");
             },
             onadd: function ()
             {
@@ -411,6 +450,14 @@
     <div class="form-row only-open-close">
         <label for="node-input-min_change_time" style="width: 250px;"><i class="fa fa-sliders"></i> <span data-i18n="mixing-valve.ui.min_change_time"></span></label>
         <input id="node-input-min_change_time" value="0" /> ms
+    </div>
+    <div class="form-row">
+        <label for="node-input-critical_temp_max" style="width: 250px;"><i class="fa fa-thermometer-half"></i> <span data-i18n="mixing-valve.ui.critical_temp_max"></span></label>
+        <input id="node-input-critical_temp_max" value="100"/> °C
+    </div>
+    <div class="form-row">
+        <label for="node-input-crit_temp_change_percent" style="width: 250px;"><i class="fa fa-percent"></i> <span data-i18n="mixing-valve.ui.crit_temp_change_percent"></span></label>
+        <input id="node-input-crit_temp_change_percent" value="0"/> %
     </div>
     <hr/>
     <span><i class="fa fa-link"></i> <span data-i18n="mixing-valve.ui.controlled_by_central"></span></span>

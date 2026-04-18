@@ -24,6 +24,8 @@
             "precision": "Precision",
             "max_change_percent": "Max change",
             "max_change_temp_difference": "Temp at max change",
+            "critical_temp_max": "Critical temperature (max)",
+            "crit_temp_change_percent": "Critical temp change (%)",
             "min_change_time": "Min change duration",
             "controlled_by_central": "This block is controlled by the following central blocks:"
         }

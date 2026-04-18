@@ -247,3 +247,8 @@
 
 - Counter can be configured in 0.1 steps. For smaller steps, use msg.payload value.
 - Counter has a new topic refresh, to resend the last saved value.
+
+## Version 0.6.7:
+
+- Added crit temp change options to mixing-valve node.
+- Added UTC time usage in scheduler node.

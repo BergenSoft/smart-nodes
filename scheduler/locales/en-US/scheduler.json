@@ -15,7 +15,8 @@
             "thursday": "Thursday",
             "friday": "Friday",
             "saturday": "Saturday",
-            "sunday": "Sunday"
+            "sunday": "Sunday",
+            "use_utc": "Use UTC time"
         }
     }
 }

@@ -37,6 +37,7 @@
         defaults: {
             name: { value: "" },
             enabled: { value: false },
+            use_utc: { value: false },
             schedules: {
                 value: [],
                 validate: function (v)
@@ -122,6 +123,7 @@
                     $("#resend_on_start_row").hide();
             });
             $("#node-input-save_state").trigger("change");
+           // no special behaviour required for use_utc checkbox
 
             /**
              * prepare schedule
@@ -270,6 +272,7 @@
         oneditsave: function ()
         {
             let node = this;
+            node.use_utc = !!$("#node-input-use_utc").prop("checked");
 
             node.schedules = [];
 
@@ -313,6 +316,10 @@
         <label for="node-input-enabled"></label>
         <input type="checkbox" id="node-input-enabled" style="width: 20px;" />
         <label for="node-input-enabled" style="width: 200px;" data-i18n="scheduler.ui.scheduler_enabled"></label>
+    </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-use_utc" style="width: 20px;" />
+        <label for="node-input-use_utc" style="width: calc(100% - 30px);" data-i18n="scheduler.ui.use_utc"></label>
     </div>
     <div class="form-row" style="margin-bottom: 2px;">
         <p class="text-center"><i class="fa fa-list"></i> <strong data-i18n="scheduler.ui.schedules"></strong></p>

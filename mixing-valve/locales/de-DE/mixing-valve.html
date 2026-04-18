@@ -61,7 +61,10 @@
                 </tr>
                 <tr>
                     <td><code>current_temperature</code></td>
-                    <td>Setzt die aktuelle Temperatur auf <code>msg.payload</code> °C.</td>
+                    <td>
+                        Setzt die aktuelle Temperatur auf <code>msg.payload</code> °C.<br/>
+                        Wird die eingestellte kritische Temperatur überschritten, schließt sich der Mischer sofort um den eingestellten prozentualen Wert.
+                    </td>
                 </tr>
                 <tr>
                     <td><code>alarm</code></td>

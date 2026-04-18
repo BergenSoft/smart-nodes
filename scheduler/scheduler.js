@@ -6,6 +6,8 @@ module.exports = function (RED)
     {
         const node = this;
         RED.nodes.createNode(node, config);
+        // support use of UTC time (global option)
+        const useUtc = !!config.use_utc;
 
 
         // ###################
@@ -181,45 +183,69 @@ module.exports = function (RED)
                 return null;
 
             let now = new Date();
+
+            // use UTC or local values
+            const nowHour = useUtc ? now.getUTCHours() : now.getHours();
+            const nowMinute = useUtc ? now.getUTCMinutes() : now.getMinutes();
+            const nowSecond = useUtc ? now.getUTCSeconds() : now.getSeconds();
+            const nowDay = useUtc ? now.getUTCDay() : now.getDay();
+
             let findNextDay = false;
 
             // check if the time has already passed today
-            if (now.getHours() > schedule.hour)
+            if (nowHour > schedule.hour)
             {
                 findNextDay = true;
             }
-            else if (now.getHours() == schedule.hour)
+            else if (nowHour == schedule.hour)
             {
-                if (now.getMinutes() > schedule.minute)
+                if (nowMinute > schedule.minute)
                 {
                     findNextDay = true;
                 }
-                else if (now.getMinutes() == schedule.minute)
+                else if (nowMinute == schedule.minute)
                 {
-                    findNextDay = now.getSeconds() >= schedule.second;
+                    findNextDay = nowSecond >= schedule.second;
                 }
             }
 
             // find next day when the event should be raised
-            let possibleDay = schedule.days.filter(d => findNextDay ? d > now.getDay() : d >= now.getDay());
+            let possibleDay = schedule.days.filter(d => findNextDay ? d > nowDay : d >= nowDay);
             if (possibleDay.length == 0)
                 possibleDay = Math.min(...schedule.days);
             else
                 possibleDay = Math.min(...possibleDay);
 
-            let nextEvent = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + (
-                    findNextDay ?
-                        possibleDay <= now.getDay() ? 7 - now.getDay() + possibleDay : possibleDay - now.getDay()
-                        :
-                        possibleDay < now.getDay() ? 7 - now.getDay() + possibleDay : possibleDay - now.getDay()
-                ),
-                schedule.hour,
-                schedule.minute,
-                schedule.second
+            const dayOffset = (
+                findNextDay ?
+                    (possibleDay <= nowDay ? 7 - nowDay + possibleDay : possibleDay - nowDay)
+                    :
+                    (possibleDay < nowDay ? 7 - nowDay + possibleDay : possibleDay - nowDay)
             );
+
+            let nextEvent;
+            if (useUtc)
+            {
+                nextEvent = new Date(Date.UTC(
+                    now.getUTCFullYear(),
+                    now.getUTCMonth(),
+                    now.getUTCDate() + dayOffset,
+                    schedule.hour,
+                    schedule.minute,
+                    schedule.second
+                ));
+            }
+            else
+            {
+                nextEvent = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate() + dayOffset,
+                    schedule.hour,
+                    schedule.minute,
+                    schedule.second
+                );
+            }
 
             // helper.log(node, {
             //     i,
@@ -256,7 +282,7 @@ module.exports = function (RED)
                 node.status({
                     fill: "red",
                     shape: "dot",
-                    text: helper.getCurrentTimeForStatus() + ": Scheduler disabled"
+                    text: helper.getCurrentTimeForStatus() + (useUtc ? " (UTC): " : ": ") + "Scheduler disabled"
                 });
             }
             else if (nextEvent == null)
@@ -264,7 +290,7 @@ module.exports = function (RED)
                 node.status({
                     fill: "red",
                     shape: "dot",
-                    text: helper.getCurrentTimeForStatus() + ": No events planned"
+                    text: helper.getCurrentTimeForStatus() + (useUtc ? " (UTC): " : ": ") + "No events planned"
                 });
             }
             else
@@ -276,7 +302,7 @@ module.exports = function (RED)
                 node.status({
                     fill: "yellow",
                     shape: "dot",
-                    text: helper.getCurrentTimeForStatus() + ": Wait " + helper.formatMsToStatus(time, "until") + " to raise next event"
+                    text: helper.getCurrentTimeForStatus() + (useUtc ? " (UTC): " : ": ") + "Wait " + helper.formatMsToStatus(time, "until") + " to raise next event"
                 });
             }
         }

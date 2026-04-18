@@ -23,10 +23,10 @@ This smart nodes are still in development and can have breaking changes. So plea
 
 I spent a lots of hours in this project. If you like it, you can support my work in different ways:
 
--   Report bugs.
--   Create pull requests.
--   Name tipps and tricks if you see any improvement.
--   Donate via [Paypal](https://paypal.me/BergenSoft).
+- Report bugs.
+- Create pull requests.
+- Name tipps and tricks if you see any improvement.
+- Donate via [Paypal](https://paypal.me/BergenSoft).
 
 # Nodes
 
@@ -36,12 +36,12 @@ This node is able to control a light or a power outlet.
 
 ### **Features:**
 
--   Auto turn off the light after a fixed time.
--   Auto turn off the light with a custom time which is part of the message object.
--   Toggle light between on and off.
--   Can be activated by motion sensors.
--   Has an alarm on function to go to a specific state (on or off) when the alarm is activated.
--   Has an alarm off function to go to a specific (on, off, the last or the last sended) when the alarm is deactivated.
+- Auto turn off the light after a fixed time.
+- Auto turn off the light with a custom time which is part of the message object.
+- Toggle light between on and off.
+- Can be activated by motion sensors.
+- Has an alarm on function to go to a specific state (on or off) when the alarm is activated.
+- Has an alarm off function to go to a specific (on, off, the last or the last sended) when the alarm is deactivated.
 
 ## 2. Shutter control
 
@@ -50,12 +50,12 @@ There is no support for slats and it is also not planned as I don't need them, b
 
 ### **Features:**
 
--   One button control which switch between `up`, `stop`, `down`, `stop`.
--   Two button control for each direction `up and stop` and `down and stop`.
--   Send direct position the shutter should go to.
--   Stop shutter immediately.
--   Has an alarm on function to go to a specific state (Open or close) when the alarm is activated.
--   Has an alarm off function to restore a specific state when the alarm gets deaktivated.
+- One button control which switch between `up`, `stop`, `down`, `stop`.
+- Two button control for each direction `up and stop` and `down and stop`.
+- Send direct position the shutter should go to.
+- Stop shutter immediately.
+- Has an alarm on function to go to a specific state (Open or close) when the alarm is activated.
+- Has an alarm off function to restore a specific state when the alarm gets deaktivated.
 
 ## 3. Scene control
 
@@ -63,7 +63,7 @@ This node is tracking the state of multiple outputs and controls them by switchi
 
 ### **Features:**
 
--   An input message could name multiple scenes that should be iterated one by one by receiving the same message multiple times
+- An input message could name multiple scenes that should be iterated one by one by receiving the same message multiple times
 
 ## 4. Central control
 
@@ -71,8 +71,8 @@ This node can control multiple light/scene controls or shutter controls at the s
 
 ### **Features:**
 
--   Take care that multiple light/scene controls are turned of if any of them is one before executing a toggle command. This is helpful to avoid turning one light on and the other off.
--   The same is used for shutters with the up_stop or down_stop commands. A toggle is not supported, it will only be forwarded.
+- Take care that multiple light/scene controls are turned of if any of them is one before executing a toggle command. This is helpful to avoid turning one light on and the other off.
+- The same is used for shutters with the up_stop or down_stop commands. A toggle is not supported, it will only be forwarded.
 
 ## 5. Long press control
 
@@ -81,7 +81,7 @@ The time can be configured in this node.
 
 ### **Features:**
 
--   Imediately send a message to the long press output when the time is reached. It is not waiting until the button is released.
+- Imediately send a message to the long press output when the time is reached. It is not waiting until the button is released.
 
 ## 6. Multi press control
 
@@ -91,7 +91,7 @@ You can also choose 2-4 press detection.
 
 ### **Features:**
 
--   Imediately send a message to the last output when the max presses are reached. It is not waiting until the button is released.
+- Imediately send a message to the last output when the max presses are reached. It is not waiting until the button is released.
 
 ## 7. Hysteresis
 
@@ -99,8 +99,8 @@ This node is checking if the input value reachs a defined value until the upper 
 
 ### **Features:**
 
--   The state can be saved between NodeRed restarts.
--   The last message can automatically be sent 10 seconds after a deployment.
+- The state can be saved between NodeRed restarts.
+- The last message can automatically be sent 10 seconds after a deployment.
 
 ## 8. Logic
 
@@ -108,11 +108,11 @@ This node can be used for AND, OR and XOR logics. Inputs and outputs can be indi
 
 ### **Features:**
 
--   All input values could be individual converted as well as the output messsage.
--   A NOT logic is possible when selecting 1 input and convert the output.
--   The setpoint and hysteresis value can be changed in runtime.
--   The state can be saved between NodeRed restarts.
--   The last message can automatically be sent 10 seconds after a deployment.
+- All input values could be individual converted as well as the output messsage.
+- A NOT logic is possible when selecting 1 input and convert the output.
+- The setpoint and hysteresis value can be changed in runtime.
+- The state can be saved between NodeRed restarts.
+- The last message can automatically be sent 10 seconds after a deployment.
 
 ## 9. Statistic
 
@@ -120,10 +120,10 @@ This node can be used for getting the following types of values: Minimum, Maximu
 
 ### **Features:**
 
--   All input values could be individual converted as well as the output messsage.
--   A NOT logic is possible when selecting 1 input and convert the output.
--   The state can be saved between NodeRed restarts.
--   The last message can automatically be sent 10 seconds after a deployment.
+- All input values could be individual converted as well as the output messsage.
+- A NOT logic is possible when selecting 1 input and convert the output.
+- The state can be saved between NodeRed restarts.
+- The last message can automatically be sent 10 seconds after a deployment.
 
 ## 10. Compare
 
@@ -131,9 +131,9 @@ This node can compare 2 values with the following operators: < <= == >= > !=
 
 ### **Features:**
 
--   Can compare also texts like js would do.
--   The state can be saved between NodeRed restarts.
--   The last message can automatically be sent 10 seconds after a deployment.
+- Can compare also texts like js would do.
+- The state can be saved between NodeRed restarts.
+- The last message can automatically be sent 10 seconds after a deployment.
 
 ## 11. Delay
 
@@ -141,10 +141,10 @@ This node can delay incomming messages.
 
 ### **Features:**
 
--   Different times for `msg.payload = true` and `msg.payload = false`.
--   Delays can be changed in runtime.
--   The state can be saved between NodeRed restarts.
--   The last message can automatically be sent 10 seconds after a deployment.
+- Different times for `msg.payload = true` and `msg.payload = false`.
+- Delays can be changed in runtime.
+- The state can be saved between NodeRed restarts.
+- The last message can automatically be sent 10 seconds after a deployment.
 
 ## 12. Forwarder
 
@@ -152,9 +152,9 @@ This node can control if an incomming message should be forwarded or not.
 
 ### **Features:**
 
--   The forwarding can be enabled or disabled in runtime.
--   The state can be saved between NodeRed restarts.
--   The last message can automatically be sent 10 seconds after a deployment.
+- The forwarding can be enabled or disabled in runtime.
+- The state can be saved between NodeRed restarts.
+- The last message can automatically be sent 10 seconds after a deployment.
 
 ## 13. Scheduler
 
@@ -162,11 +162,11 @@ This node can send a defined message on defined times.
 
 ### **Features:**
 
--   The weekdays and the time can be selected as a trigger.
--   Multiple trigger and messages can be defined in one node.
--   The scheduler can be activated or deactivated in runtime.
--   The state can be saved between NodeRed restarts.
--   The last message can automatically be sent 10 seconds after a deployment.
+- The weekdays and the time can be selected as a trigger.
+- Multiple trigger and messages can be defined in one node.
+- The scheduler can be activated or deactivated in runtime.
+- The state can be saved between NodeRed restarts.
+- The last message can automatically be sent 10 seconds after a deployment.
 
 ## 14. Text execution
 
@@ -174,23 +174,23 @@ This node parses a text and performs actions to the selected and matching smart 
 
 ### **Features:**
 
--   Control light and scenes (only on or off) in german and english.
--   Control shutter in german and english.
+- Control light and scenes (only on or off) in german and english.
+- Control shutter in german and english.
 
 ### Examples
 
 Text in [ Braces ] is optional<br/>
 Room names that has to be entered in the nodes are in `code` style.
 
--   Turn on [the light in] the `living room` and the `kitchen` off.
--   Open [the shutter in] the `kitchen` and turn `studio` off.
--   Close [the shutter in the] `sleeping` room.
--   `Living room` to 10 %.
--   Turn on `living room` except the `couch` light.
+- Turn on [the light in] the `living room` and the `kitchen` off.
+- Open [the shutter in] the `kitchen` and turn `studio` off.
+- Close [the shutter in the] `sleeping` room.
+- `Living room` to 10 %.
+- Turn on `living room` except the `couch` light.
 
 ### **Features:**
 
--   Sends debug message to output.
+- Sends debug message to output.
 
 ## 15. Mixing valve
 
@@ -198,9 +198,10 @@ This node can control a mixing valve to get the required tput temperature. It is
 
 ### **Features:**
 
--   Define target temperature.
--   Support heating and cooling.
--   Define off mode to do nothing, open or close the valve.
+- Define target temperature.
+- Support heating and cooling.
+- Define off mode to do nothing, open or close the valve.
+- Fast change if crit temp is exeeded.
 
 ## 16. Heating curve
 
@@ -208,9 +209,9 @@ This node calculates the needed flow temperature regarding to the target room te
 
 ### **Features:**
 
--   Define slope and offset values.
--   Limit flow temperature with min and max values.
--   Preview of different curves in the node editor.
+- Define slope and offset values.
+- Limit flow temperature with min and max values.
+- Preview of different curves in the node editor.
 
 ## 17. Counter
 
@@ -218,9 +219,9 @@ This node countes up and down within a specified range.
 
 ### **Features:**
 
--   Define min, max and step values.
--   Set to a specific value.
--   Increment and decrement by default or by a given value.
+- Define min, max and step values.
+- Set to a specific value.
+- Increment and decrement by default or by a given value.
 
 ## 18. Mode Selector
 
@@ -228,6 +229,6 @@ This node can define multiple modes which stores the last selected mode persiten
 
 ### **Features:**
 
--   Define custom modes.
--   The first mode is the default on first start.
--   Save last mode persistent and resend it at start, if wanted.
+- Define custom modes.
+- The first mode is the default on first start.
+- Save last mode persistent and resend it at start, if wanted.

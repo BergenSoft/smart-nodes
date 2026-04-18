@@ -43,7 +43,10 @@
                 </tr>
                 <tr>
                     <td><code>setpoint</code></td>
-                    <td>Overrides the setpoint with <code>msg.payload</code> °C.</td>
+                    <td>
+                        Overrides the setpoint with <code>msg.payload</code> °C.<br/>
+                        If the configured critical temperature is exceeded, the mixer immediately moves toward the closed position by the configured percentage.
+                    </td>
                 </tr>
                 <tr>
                     <td><code>off_mode</code></td>

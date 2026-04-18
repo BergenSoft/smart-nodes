@@ -38,6 +38,8 @@ module.exports = function (RED)
             last_enabled_sended: null,
             alarm_active: false,
             config_change_date: config.config_change_date,
+            critical_temp_max: config.critical_temp_max,
+            crit_temp_change_percent: config.crit_temp_change_percent,
         }, smart_context.get(node.id, config.config_change_date));
 
         // Ensure correct types
@@ -45,6 +47,22 @@ module.exports = function (RED)
         node_settings.setpoint = parseFloat(node_settings.setpoint);
         if (isNaN(node_settings.setpoint) || !isFinite(node_settings.setpoint))
             node_settings.setpoint = 20;
+
+        if (!node_settings.critical_temp_max)
+        {
+            node_settings.critical_temp_max = null;
+        }
+        else
+        {
+            node_settings.critical_temp_max = parseFloat(node_settings.critical_temp_max);
+            if (isNaN(node_settings.critical_temp_max) || !isFinite(node_settings.critical_temp_max))
+                node_settings.critical_temp_max = null;
+        }
+
+        node_settings.crit_temp_change_percent = parseFloat(node_settings.crit_temp_change_percent);
+        if (isNaN(node_settings.crit_temp_change_percent) || !isFinite(node_settings.crit_temp_change_percent))
+            node_settings.crit_temp_change_percent = 0;
+
 
         // Remove old settings
         delete node_settings.precision;
@@ -271,6 +289,16 @@ module.exports = function (RED)
                         return;
                     }
                     node_settings.current_temperature = new_temp;
+
+                    // check if critical temperature is set and exceeded
+                    if (node_settings.critical_temp_max !== null && node_settings.crit_temp_change_percent > 0 && node_settings.current_temperature > node_settings.critical_temp_max)
+                    {
+                        force_position = node_settings.last_position - node_settings.crit_temp_change_percent;
+                        force_position = Math.max(force_position, 0);
+
+                        stopSampling();
+                        startSampling();
+                    }
                     break;
 
                 case "calibrate":
