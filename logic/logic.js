@@ -91,9 +91,9 @@ module.exports = function (RED)
             }
 
             if (inverts.includes(real_topic_number))
-                node_settings.input_states[real_topic_number - 1] = !msg.payload;
+                node_settings.input_states[real_topic_number - 1] = !helper.toBool(msg.payload);
             else
-                node_settings.input_states[real_topic_number - 1] = !!msg.payload; // !! => Convert to boolean
+                node_settings.input_states[real_topic_number - 1] = helper.toBool(msg.payload);
 
             let result = getResult();
 

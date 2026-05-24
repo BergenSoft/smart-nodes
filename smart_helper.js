@@ -1,5 +1,23 @@
 module.exports = {
 
+    toBool(value)
+    {
+        if (typeof value == "boolean")
+            return value;
+
+        if (typeof value == "string")
+        {
+            value = value.toLowerCase();
+            if (value == "true" || value == "yes" || value == "on")
+                return true;
+
+            if (value == "false" || value == "no" || value == "off")
+                return false;
+        }
+
+        return null;
+    },
+
     /**
      * This functions converts a value into the given type.
      * If a type is unknown the NodeRed function is used for conversation.

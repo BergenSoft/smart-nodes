@@ -117,7 +117,7 @@ module.exports = function (RED)
                 real_topic = "set";
 
                 if (mode == "BOOL")
-                    msg.payload = !msg.payload;
+                    msg.payload = !helper.toBool(msg.payload);
                 else if (mode == "PERCENTAGE")
                     msg.payload = 100 - boolToInt(msg.payload);
             }
@@ -141,22 +141,22 @@ module.exports = function (RED)
 
                     // Make sure it is bool or int
                     if (mode == "BOOL")
-                        msg.payload = !!msg.payload;
+                        msg.payload = helper.toBool(msg.payload);
                     else if (mode == "PERCENTAGE")
                         msg.payload = boolToInt(msg.payload);
 
                     // Output is already in the state of the status value and the timeout is running.
                     // No need to restart the timeout.
-                    if (node_settings.last_value == msg.payload && timeout != null)
+                    if (node_settings.last_value == helper.toBool(msg.payload) && timeout != null)
                         doRestartTimer = false;
 
-                    node_settings.last_value = msg.payload;
+                    node_settings.last_value = helper.toBool(msg.payload);
                     current_output_state = node_settings.last_value;
                     break;
 
                 case "off":
                     // If button is released, don't handle this message
-                    if (msg.payload === false)
+                    if (helper.toBool(msg.payload) === false)
                         return;
 
                     isBlinking = false;
@@ -171,7 +171,7 @@ module.exports = function (RED)
 
                 case "on":
                     // If button is released, don't handle this message
-                    if (msg.payload === false)
+                    if (helper.toBool(msg.payload) === false)
                         return;
 
                     isBlinking = false;
@@ -187,33 +187,33 @@ module.exports = function (RED)
                 case "set":
                     // Make sure it is bool or int
                     if (mode == "BOOL")
-                        msg.payload = !!msg.payload;
+                        msg.payload = helper.toBool(msg.payload);
                     else if (mode == "PERCENTAGE")
                         msg.payload = boolToInt(msg.payload);
 
                     isBlinking = false;
 
-                    node_settings.last_value = msg.payload;
+                    node_settings.last_value = helper.toBool(msg.payload);
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 
                 case "set_permanent":
                     // Make sure it is bool or int
                     if (mode == "BOOL")
-                        msg.payload = !!msg.payload;
+                        msg.payload = helper.toBool(msg.payload);
                     else if (mode == "PERCENTAGE")
                         msg.payload = boolToInt(msg.payload);
 
                     isBlinking = false;
-                    isPermanent = !!msg.payload; // false or 0 => not permanent
+                    isPermanent = helper.toBool(msg.payload);
 
-                    node_settings.last_value = msg.payload;
+                    node_settings.last_value = helper.toBool(msg.payload);
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 
                 case "motion":
                     // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    msg.payload = helper.toBool(msg.payload);
                     isMotion = msg.payload;
                     isBlinking = false;
 
@@ -248,7 +248,7 @@ module.exports = function (RED)
                     isBlinking = false;
 
                     // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    msg.payload = helper.toBool(msg.payload);
 
                     // No alarm change, do nothing
                     if (node_settings.alarm_active == msg.payload)
@@ -321,7 +321,7 @@ module.exports = function (RED)
                 case "toggle":
                 default:
                     // If button is released, don't handle this message
-                    if (msg.payload === false)
+                    if (helper.toBool(msg.payload) === false)
                         return;
 
                     if (mode == "BOOL")

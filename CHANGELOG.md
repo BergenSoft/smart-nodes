@@ -252,3 +252,8 @@
 
 - Added crit temp change options to mixing-valve node.
 - Added UTC time usage in scheduler node.
+
+## Version 0.7.0:
+
+- Added support of home assistant boolean values "on" and "off"
+- BREAKING CHANGE: The forwarder node is only using set_forwarder and set_forwarder_state topics.

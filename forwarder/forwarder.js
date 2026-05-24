@@ -42,6 +42,7 @@ module.exports = function (RED)
         // ##################
         let forward_true = config.always_forward_true;
         let forward_false = config.always_forward_false;
+        let forward_other = config.always_forward_other;
         let forward_last_on_enable = config.forward_last_on_enable;
 
 
@@ -85,18 +86,21 @@ module.exports = function (RED)
 
             if (real_topic != null)
             {
-                if (real_topic.startsWith("set_state"))
-                    real_topic = real_topic.replace("set_state", "set");
+                if (real_topic == "set_forwarder_state")
+                    real_topic = "set_forwarder";
 
-                if (real_topic == "set_inverted")
+                if (real_topic == "set_forwarder_state_inverted")
+                    real_topic = "set_forwarder_inverted";
+
+                if (real_topic == "set_forwarder_inverted")
                 {
-                    real_topic = "set";
-                    msg.payload = !msg.payload;
+                    real_topic = "set_forwarder";
+                    msg.payload = !helper.toBool(msg.payload);
                 }
 
-                if (real_topic == "enable" || (real_topic == "set" && msg.payload))
+                if (real_topic == "enable" || (real_topic == "set_forwarder" && helper.toBool(msg.payload)))
                     new_state = true;
-                else if (real_topic == "disable" || (real_topic == "set" && !msg.payload))
+                else if (real_topic == "disable" || (real_topic == "set_forwarder" && !helper.toBool(msg.payload)))
                     new_state = false;
             }
 
@@ -133,7 +137,7 @@ module.exports = function (RED)
 
                         default:
                             // Forward if enabled or forced
-                            if (node_settings.enabled || (forward_true && msg.payload) || (forward_false && !msg.payload))
+                            if (node_settings.enabled || (forward_true && helper.toBool(msg.payload) === true) || (forward_false && helper.toBool(msg.payload) === false) || (forward_other && typeof msg.payload !== "boolean"))
                             {
                                 node.send(helper.cloneObject(msg));
                                 node_settings.last_msg_was_sended = true;

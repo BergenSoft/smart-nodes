@@ -84,8 +84,10 @@ module.exports = function (RED)
                         if (msg.payload == null)
                             return;
 
-                        if (typeof msg.payload === "boolean")
+                        if (typeof msg.payload === "boolean" || msg.payload === "on" || msg.payload === "off")
                         {
+                            msg.payload = msg.payloadhelper.toBool(msg.payload);
+                            
                             // Syntax: set_mode#MODE_NAME and payload is boolean
                             // If payload is true, set to MODE_NAME
                             // if payload is false, set to default mode

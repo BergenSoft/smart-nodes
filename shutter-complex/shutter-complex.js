@@ -125,13 +125,13 @@ module.exports = function (RED)
             let real_topic = helper.getRealTopic(msg.topic, "toggle", ["up", "up_stop", "down", "down_stop", "stop", "toggle", "up_down", "position", "alarm"]);
 
             // skip if button is released
-            if (msg.payload === false && ["up", "up_stop", "down", "down_stop", "stop", "toggle"].includes(real_topic))
+            if (helper.toBool(msg.payload) === false && ["up", "up_stop", "down", "down_stop", "stop", "toggle"].includes(real_topic))
                 return;
 
             // Convert up_down from HA UI to next command
             if (real_topic == "up_down")
             {
-                if (msg.payload)
+                if (helper.toBool(msg.payload))
                     real_topic = "down";
                 else
                     real_topic = "up";
@@ -193,9 +193,21 @@ module.exports = function (RED)
                     startAction(ACTION_POSITION, msg.payload ?? null);
                     break;
 
+                case "status_up":
+                    // TODO: if status changed from false to true, start time measurement to calculate position
+                    // if status changed from true to false, stop time measurement and save position
+                    // if alarm is active, check if current action is allowed and stop if not
+                    break;
+
+                case "status_down":
+                    // TODO: if status changed from false to true, start time measurement to calculate position
+                    // if status changed from true to false, stop time measurement and save position
+                    // if alarm is active, check if current action is allowed and stop if not
+                    break;
+
                 case "alarm":
                     // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    msg.payload = helper.toBool(msg.payload);
 
                     // No alarm change, do nothing
                     if (node_settings.alarm_active == msg.payload)
@@ -263,6 +275,7 @@ module.exports = function (RED)
          */
         let startAction = (action, data = null, exact = false, ignoreAlarm = false) =>
         {
+            // TODO: Remove time measurment and use status messages to calculate position and direction.
             helper.log(node, "startAction", { action, data, exact, ignoreAlarm });
 
             // Nothing allowed if alarm is on

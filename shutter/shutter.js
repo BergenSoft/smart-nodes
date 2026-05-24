@@ -107,7 +107,7 @@ module.exports = function (RED)
             // Correct next topic to avoid handling up_stop, down_stop or toggle separately.
             if (real_topic == "short_up_down")
             {
-                real_topic = msg.payload ? "down" : "up";
+                real_topic = helper.toBool(msg.payload) ? "down" : "up";
                 if (msg.time_on == null)
                     msg.time_on = short_time_on_ms;
             }
@@ -150,7 +150,7 @@ module.exports = function (RED)
 
                 case "up_down":
                     // This is only used to track starting of the shutter
-                    node_settings.last_direction_up = !msg.payload;
+                    node_settings.last_direction_up = !helper.toBool(msg.payload);
                     is_running = true;
                     return;
 

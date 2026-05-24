@@ -70,7 +70,7 @@ module.exports = function (RED)
          */
         let handleTopic = msg =>
         {
-            if (msg.payload)
+            if (helper.toBool(msg.payload))
             {
                 on_time = Date.now();
                 startAutoLongPress();

@@ -175,11 +175,11 @@ module.exports = function (RED)
             if (real_topic == "set_inverted")
             {
                 real_topic = "set";
-                msg.payload = !msg.payload;
+                msg.payload = !helper.toBool(msg.payload);
             }
 
             if (real_topic == "set")
-                real_topic = (!!msg.payload) ? "enable" : "disable";
+                real_topic = helper.toBool(msg.payload) ? "enable" : "disable";
 
             switch (real_topic)
             {
@@ -307,7 +307,7 @@ module.exports = function (RED)
 
                 case "alarm":
                     // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    msg.payload = helper.toBool(msg.payload);
 
                     // No alarm change -> nothing to do
                     if (node_settings.alarm_active == msg.payload)

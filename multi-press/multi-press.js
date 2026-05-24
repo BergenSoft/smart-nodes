@@ -55,7 +55,7 @@ module.exports = function (RED)
         // ###############
         node.on("input", function (msg)
         {
-            if (msg.payload)
+            if (helper.toBool(msg.payload))
                 startTimeout();
         });
 

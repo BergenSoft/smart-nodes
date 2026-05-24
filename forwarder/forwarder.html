@@ -8,6 +8,7 @@
             enabled: { value: true },
             always_forward_true: { value: false },
             always_forward_false: { value: false },
+            always_forward_other: { value: true },
             forward_last_on_enable: { value: false },
             save_state: { value: false },
             resend_on_start: { value: false },
@@ -61,6 +62,10 @@
     <div class="form-row">
         <input type="checkbox" id="node-input-always_forward_false" style="width: 20px;" />
         <label for="node-input-always_forward_false" style="width: calc(100% - 30px);" data-i18n="[html]forwarder.ui.always_forward_false"></label>
+    </div>
+    <div class="form-row">
+        <input type="checkbox" id="node-input-always_forward_other" style="width: 20px;" />
+        <label for="node-input-always_forward_other" style="width: calc(100% - 30px);" data-i18n="[html]forwarder.ui.always_forward_other"></label>
     </div>
     <hr/>
     <h4 style="margin: 0.5rem 0;" data-i18n="forwarder.ui.system_start"></h4>

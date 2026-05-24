@@ -123,7 +123,7 @@ module.exports = function (RED)
 
                 case "status":
                     // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    msg.payload = helper.toBool(msg.payload);
                     node_settings.last_values[number] = msg.payload;
 
                     notifyCentral();
@@ -145,7 +145,7 @@ module.exports = function (RED)
 
                 case "set":
                     // Make sure it is bool
-                    msg.payload = !!msg.payload;
+                    msg.payload = helper.toBool(msg.payload);
                     node_settings.last_values = new Array(config.outputs).fill(msg.payload);
 
                     // This happens because of splitting by _ for scenes
@@ -155,7 +155,7 @@ module.exports = function (RED)
 
                 case "scene":
                     // Skip if button is released;
-                    if (msg.payload === false)
+                    if (helper.toBool(msg.payload) === false)
                         return;
 
                     if (typeof scenes === "undefined")
@@ -204,7 +204,7 @@ module.exports = function (RED)
 
                 case "toggle":
                     // Skip if button is released;
-                    if (msg.payload === false)
+                    if (helper.toBool(msg.payload) === false)
                         return;
 
                     node_settings.last_values = new Array(config.outputs).fill(currentScene == 0);
