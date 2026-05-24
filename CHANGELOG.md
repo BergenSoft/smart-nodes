@@ -257,3 +257,7 @@
 
 - Added support of home assistant boolean values "on" and "off"
 - BREAKING CHANGE: The forwarder node is only using set_forwarder and set_forwarder_state topics.
+
+## Version 0.7.1:
+
+- Small bugfix in mode-selector node.
