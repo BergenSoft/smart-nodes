@@ -193,7 +193,7 @@ module.exports = function (RED)
 
                     isBlinking = false;
 
-                    node_settings.last_value = helper.toBool(msg.payload);
+                    node_settings.last_value = msg.payload;
                     node_settings.last_value_sended = node_settings.last_value;
                     break;
 

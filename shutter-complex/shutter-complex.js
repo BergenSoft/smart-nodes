@@ -360,7 +360,7 @@ module.exports = function (RED)
                 case ACTION_UP:
                     // data is the run time
                     if (data == null)
-                        run_time_ms = node_settings.last_position * max_time_up / 100 * 1000;
+                        run_time_ms = node_settings.last_position * max_time_up / 100 * 1000 + 5000; // Add 5 seconds to ensure shutter reaches the end
                     else
                         run_time_ms = helper.getTimeInMsFromString(data);
                     break;
@@ -368,7 +368,7 @@ module.exports = function (RED)
                 case ACTION_DOWN:
                     // data is the run time
                     if (data == null)
-                        run_time_ms = (100 - node_settings.last_position) * max_time_down / 100 * 1000;
+                        run_time_ms = (100 - node_settings.last_position) * max_time_down / 100 * 1000 + 5000; // Add 5 seconds to ensure shutter reaches the end
                     else
                         run_time_ms = helper.getTimeInMsFromString(data);
                     break;

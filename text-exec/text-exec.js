@@ -132,6 +132,34 @@ module.exports = function (RED)
                         }
                         break;
 
+                    case "blink":
+                    case "blinken":
+                        // node.log("Set action to blink");
+                        mode = "light";
+                        action = "blink";
+                        if (performAction(mode, action, number, affectedNodes))
+                        {
+                            action = null;
+                            affectedNodes = [];
+                            number = null;
+                            without = false;
+                        }
+                        break;
+
+                    case "toggle":
+                    case "umschalten":
+                        // node.log("Set action to toggle");
+                        mode = "light";
+                        action = "toggle";
+                        if (performAction(mode, action, number, affectedNodes))
+                        {
+                            action = null;
+                            affectedNodes = [];
+                            number = null;
+                            without = false;
+                        }
+                        break;
+
                     case "aus":
                     case "off":
                     case "ausschalten":

@@ -261,3 +261,8 @@
 ## Version 0.7.1:
 
 - Small bugfix in mode-selector node.
+
+## Version 0.7.2:
+
+- Shutter complex node is adding a 5 secons longer time for actions up and down, to really get to the end.
+- Text exec node now understands blink and toggle for light nodes.
