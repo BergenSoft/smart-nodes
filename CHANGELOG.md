@@ -266,3 +266,7 @@
 
 - Shutter complex node is adding a 5 seconds longer time for actions up and down, to really get to the end.
 - Text exec node now understands blink and toggle for light nodes.
+
+## Version 0.7.3:
+
+- Added blink to scene node.

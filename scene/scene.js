@@ -55,6 +55,8 @@ module.exports = function (RED)
         // Also if the motion sensor turns off, no timeout is started.
         let isPermanent = false;
 
+        // If this is on, ignore all state changes while blinking
+        let isBlinking = false;
 
         // Here the date is stored, when the light should go off.
         // This is used to calculate the node status.
@@ -122,6 +124,10 @@ module.exports = function (RED)
                     break;
 
                 case "status":
+                    // Ignore if it is in blinking mode
+                    if (isBlinking)
+                        return;
+
                     // Make sure it is bool
                     msg.payload = helper.toBool(msg.payload);
                     node_settings.last_values[number] = msg.payload;
@@ -209,6 +215,28 @@ module.exports = function (RED)
 
                     node_settings.last_values = new Array(config.outputs).fill(currentScene == 0);
                     break;
+                
+                case "blink":
+                    // If already blinking, ignore
+                    if (isBlinking)
+                        return;
+
+                    isBlinking = true;
+
+                    // Send inverted values briefly
+                    const inverted = node_settings.last_values.map(v => !v);
+                    node.send(inverted.map(val => { return { payload: val }; }));
+                    setStatus();
+
+                    setTimeout(() =>
+                    {
+                        isBlinking = false;
+                        // Restore original values
+                        node.send(node_settings.last_values.map(val => { return { payload: val }; }));
+                        setStatus();
+                    }, helper.getTimeInMsFromString(msg.time_on, 500));
+
+                    return;
             }
 
             stopAutoOff();
